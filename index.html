@@ -118,6 +118,34 @@
             transition: transform 0.2s ease;
         }
         .profile-item:active { transform: scale(0.97); background: rgba(255,255,255,0.1); }
+
+        /* Highlighted Developer Button Style */
+        .dev-highlight {
+            margin-top: 3rem;
+            padding: 10px 20px;
+            border-radius: 12px;
+            background: rgba(59, 130, 246, 0.05);
+            border: 1px solid rgba(59, 130, 246, 0.2);
+            text-transform: uppercase;
+            font-size: 9px;
+            letter-spacing: 0.3em;
+            color: #60a5fa;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 15px rgba(59, 130, 246, 0.1);
+            animation: devPulse 3s infinite ease-in-out;
+            text-decoration: none;
+        }
+
+        .dev-highlight:active {
+            background: rgba(59, 130, 246, 0.2);
+            box-shadow: 0 0 20px rgba(59, 130, 246, 0.3);
+            transform: scale(0.95);
+        }
+
+        @keyframes devPulse {
+            0%, 100% { border-color: rgba(59, 130, 246, 0.2); box-shadow: 0 0 10px rgba(59, 130, 246, 0.05); opacity: 0.6; }
+            50% { border-color: rgba(59, 130, 246, 0.5); box-shadow: 0 0 20px rgba(59, 130, 246, 0.2); opacity: 1; }
+        }
     </style>
 </head>
 <body>
@@ -141,7 +169,7 @@
                 Enter System
             </button>
 
-            <a href="https://nikhil007-eng.github.io/xos-social-Id/" target="_blank" class="mt-12 text-gray-600 text-[9px] uppercase tracking-[0.3em]">
+            <a href="https://nikhil007-eng.github.io/xos-social-Id/" target="_blank" class="dev-highlight">
                 Developer
             </a>
         </div>
