@@ -12,13 +12,13 @@
     <style>
         :root {
             --accent: #3b82f6;
-            --glass: rgba(8, 8, 10, 0.85);
+            /* SEAMLESS BLEND: Lower opacity alpha for deeper integration with black */
+            --glass: rgba(15, 15, 20, 0.4); 
             --border: rgba(255, 255, 255, 0.08);
-            --bg-color: #030303;
+            --bg-color: #000000; /* Pure AMOLED Black */
             --text-color: #ffffff;
         }
 
-        /* Light Mode Variables */
         body.light-mode {
             --glass: rgba(255, 255, 255, 0.9);
             --border: rgba(0, 0, 0, 0.1);
@@ -37,7 +37,7 @@
             width: 100%;
             overflow: hidden;
             position: fixed;
-            background-color: var(--bg-color);
+            background-color: var(--bg-color) !important;
             transition: background-color 0.4s ease;
             touch-action: none;
         }
@@ -52,14 +52,6 @@
 
         .font-brand { font-family: 'Orbitron', sans-serif; letter-spacing: 2px; }
         .font-mono { font-family: 'Fira Code', monospace; }
-
-        .blob {
-            position: absolute;
-            filter: blur(80px);
-            z-index: -1;
-            opacity: 0.2;
-            border-radius: 50%;
-        }
 
         .view {
             position: absolute;
@@ -82,8 +74,9 @@
 
         .glass-panel {
             background: var(--glass);
-            backdrop-filter: blur(20px) saturate(180%);
-            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            /* ENHANCED BLUR: Deeper saturation and higher blur for seamless look */
+            backdrop-filter: blur(45px) saturate(210%);
+            -webkit-backdrop-filter: blur(45px) saturate(210%);
             border: 1px solid var(--border);
             color: var(--text-color);
         }
@@ -92,7 +85,7 @@
             border-radius: 24px;
             width: 100%;
             max-width: 360px;
-            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.8);
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.5);
         }
 
         .progress-fill {
@@ -151,8 +144,7 @@
         #photo-modal, #settings-modal {
             position: fixed;
             inset: 0;
-            background: rgba(0,0,0,0.9);
-            backdrop-filter: blur(15px);
+            background: #000000; /* Flat Black Overlay */
             z-index: 100;
             display: none;
             align-items: center;
@@ -176,7 +168,7 @@
             border-radius: 20px;
             overflow: hidden;
             border: 2px solid var(--accent);
-            box-shadow: 0 0 30px var(--accent);
+            box-shadow: 0 0 30px rgba(59, 130, 246, 0.3);
             transform: scale(0.8);
             transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
@@ -188,17 +180,16 @@
             border-radius: 28px;
             transform: scale(0.8);
             transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            position: relative; /* Needed for absolute positioning of X button */
+            position: relative;
         }
 
         .close-btn {
             position: absolute;
-            top: 10px; /* Moves it inside the boarder area */
-            right: 15px; /* Alignment inside boarder */
+            top: 10px;
+            right: 15px;
             width: 36px;
             height: 36px;
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid var(--border);
+            background: rgba(255, 255, 255, 0.1);
             border-radius: 50%;
             display: flex;
             align-items: center;
@@ -251,7 +242,6 @@
         <div class="modal-container" onclick="event.stopPropagation()">
             <div class="settings-box glass-panel text-center">
                 <div class="close-btn" onclick="backToProfile()"><i class="fas fa-times"></i></div>
-                
                 <h2 class="font-brand text-xl mb-6 mt-4 uppercase tracking-widest">Settings</h2>
                 <div class="flex items-center justify-between p-4 bg-white/5 rounded-2xl border border-white/5">
                     <span class="text-xs font-brand uppercase opacity-70">Dark Mode</span>
@@ -272,13 +262,9 @@
         </div>
     </div>
 
-    <div class="blob w-96 h-96 bg-blue-900 -top-20 -left-20"></div>
-    <div class="blob w-80 h-80 bg-purple-900 -bottom-20 -right-20"></div>
-
     <div id="view-welcome" class="view active">
         <div class="flex flex-col items-center text-center w-full">
             <div class="mb-8 relative">
-                <div class="absolute inset-0 bg-blue-500 rounded-full blur-xl opacity-20"></div>
                 <div class="relative w-24 h-24 rounded-full bg-black border border-gray-800 flex items-center justify-center">
                     <span class="font-brand text-5xl font-bold text-white">X</span>
                 </div>
@@ -378,7 +364,7 @@
             </div>
 
             <div class="mt-auto pb-6 text-center">
-                <p class="text-[8px] text-gray-800 font-mono tracking-widest">SECURE ACCESS ONLY</p>
+                <p class="text-[8px] text-gray-800 font-mono tracking-widest">ENCRYPTED TERMINAL</p>
             </div>
         </div>
     </div>
@@ -396,14 +382,12 @@
         }
 
         function openSettings() {
-            // Push state so phone back button works
             window.history.pushState({ modal: 'settings' }, '');
             const modal = document.getElementById('settings-modal');
             modal.style.display = 'flex';
             setTimeout(() => modal.classList.add('active'), 10);
         }
 
-        // Handles hardware back button and X button click
         function backToProfile() {
             if(window.history.state && window.history.state.modal === 'settings') {
                 window.history.back();
@@ -418,7 +402,6 @@
             setTimeout(() => modal.style.display = 'none', 300);
         }
 
-        // Listener for the back button gesture
         window.onpopstate = function(event) {
             closeSettings();
             closePhoto();
@@ -468,4 +451,5 @@
         }
     </script>
 </body>
-</html>
+                                                                                   </html>
+                                                                                   
