@@ -28,7 +28,7 @@
             width: 100%;
             overflow: hidden;
             position: fixed;
-            background-color: #030303; /* Pure clean dark base */
+            background-color: #030303;
             touch-action: none;
         }
 
@@ -43,7 +43,6 @@
         .font-brand { font-family: 'Orbitron', sans-serif; letter-spacing: 2px; }
         .font-mono { font-family: 'Fira Code', monospace; }
 
-        /* Glowing Blobs for Depth (Grid removed) */
         .blob {
             position: absolute;
             filter: blur(80px);
@@ -72,7 +71,6 @@
             to { opacity: 1; transform: scale(1); }
         }
 
-        /* UI Elements */
         .glass-panel {
             background: var(--glass);
             backdrop-filter: blur(20px) saturate(180%);
@@ -104,9 +102,22 @@
         }
         
         .profile-item {
-            transition: transform 0.2s ease;
+            transition: all 0.2s ease;
+            text-decoration: none;
         }
-        .profile-item:active { transform: scale(0.97); background: rgba(255,255,255,0.1); }
+        .profile-item:active { transform: scale(0.97); background: rgba(255,255,255,0.05); }
+
+        /* Admin Red Tick Glow */
+        .red-tick-glow {
+            color: #ff3131;
+            text-shadow: 0 0 8px rgba(255, 49, 49, 0.6);
+            animation: adminTickPulse 2s infinite ease-in-out;
+        }
+
+        @keyframes adminTickPulse {
+            0%, 100% { opacity: 0.8; transform: scale(1); filter: drop-shadow(0 0 2px rgba(255,49,49,0.4)); }
+            50% { opacity: 1; transform: scale(1.1); filter: drop-shadow(0 0 8px rgba(255,49,49,0.8)); }
+        }
 
         .dev-highlight {
             margin-top: 3rem;
@@ -118,15 +129,13 @@
             font-size: 9px;
             letter-spacing: 0.3em;
             color: #60a5fa;
-            transition: all 0.3s ease;
-            box-shadow: 0 0 15px rgba(59, 130, 246, 0.1);
             animation: devPulse 3s infinite ease-in-out;
             text-decoration: none;
         }
 
         @keyframes devPulse {
-            0%, 100% { border-color: rgba(59, 130, 246, 0.2); box-shadow: 0 0 10px rgba(59, 130, 246, 0.05); opacity: 0.6; }
-            50% { border-color: rgba(59, 130, 246, 0.5); box-shadow: 0 0 20px rgba(59, 130, 246, 0.2); opacity: 1; }
+            0%, 100% { border-color: rgba(59, 130, 246, 0.2); opacity: 0.6; }
+            50% { border-color: rgba(59, 130, 246, 0.5); opacity: 1; }
         }
 
         /* PHOTO MODAL */
@@ -163,11 +172,7 @@
             transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
 
-        .modal-content img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
+        .modal-content img { width: 100%; height: 100%; object-fit: cover; }
 
         .close-btn {
             position: absolute;
@@ -182,35 +187,14 @@
             align-items: center;
             justify-content: center;
             color: white;
-            font-size: 18px;
-            cursor: pointer;
-            backdrop-filter: blur(10px);
             z-index: 110;
         }
 
         #photo-modal.active { display: flex; opacity: 1; }
         #photo-modal.active .modal-content { transform: scale(1); }
 
-        .dev-note {
-            font-size: 9px;
-            color: rgba(255, 255, 255, 0.3);
-            text-transform: uppercase;
-            letter-spacing: 1.5px;
-            margin-top: 1.5rem;
-            text-align: center;
-        }
-
-        .dev-link {
-            font-size: 10px;
-            color: var(--accent);
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            opacity: 0.5;
-            transition: all 0.3s ease;
-            text-decoration: none;
-            display: inline-block;
-            margin-top: 8px;
-        }
+        .dev-note { font-size: 9px; color: rgba(255, 255, 255, 0.3); text-transform: uppercase; letter-spacing: 1.5px; margin-top: 1.5rem; text-align: center; }
+        .dev-link { font-size: 10px; color: var(--accent); text-transform: uppercase; letter-spacing: 2px; opacity: 0.5; transition: all 0.3s ease; text-decoration: none; display: inline-block; margin-top: 8px; }
         .dev-link:hover { opacity: 1; letter-spacing: 3.5px; }
     </style>
 </head>
@@ -218,12 +202,8 @@
 
     <div id="photo-modal" onclick="closePhoto()">
         <div class="modal-container" onclick="event.stopPropagation()">
-            <div class="close-btn" onclick="closePhoto()">
-                <i class="fas fa-times"></i>
-            </div>
-            <div class="modal-content">
-                <img id="zoomed-img" src="" alt="Zoomed Profile">
-            </div>
+            <div class="close-btn" onclick="closePhoto()"><i class="fas fa-times"></i></div>
+            <div class="modal-content"><img id="zoomed-img" src="" alt="Zoomed Profile"></div>
         </div>
     </div>
 
@@ -240,14 +220,8 @@
             </div>
             <h1 class="font-brand text-4xl mb-2 text-white">XOS</h1>
             <p class="text-gray-500 text-[10px] tracking-[0.4em] uppercase mb-12">Social Interface v1.0</p>
-            
-            <button onclick="enterSystem()" class="glass-panel w-full max-w-[280px] py-4 rounded-xl text-white font-medium tracking-widest uppercase text-sm active:scale-95 transition-transform">
-                Enter System
-            </button>
-
-            <a href="https://nikhil007-eng.github.io/xos-social-Id/" target="_blank" class="dev-highlight">
-                Developer
-            </a>
+            <button onclick="enterSystem()" class="glass-panel w-full max-w-[280px] py-4 rounded-xl text-white font-medium tracking-widest uppercase text-sm active:scale-95 transition-transform">Enter System</button>
+            <a href="https://nikhil007-eng.github.io/xos-social-Id/" target="_blank" class="dev-highlight">Developer</a>
         </div>
     </div>
 
@@ -273,7 +247,6 @@
                         <div id="sync-bar" class="progress-fill"></div>
                     </div>
                 </div>
-                <p class="mt-8 text-[9px] text-gray-600 italic">"Tailoring digital experience..."</p>
             </div>
         </div>
     </div>
@@ -293,30 +266,49 @@
             <p class="text-[9px] uppercase text-gray-600 tracking-[0.2em] mb-4 px-2">Select User</p>
             
             <div class="scroll-area flex flex-col gap-3">
-                <div class="profile-item glass-panel rounded-2xl p-4 flex items-center gap-4">
-                    <div onclick="zoomPhoto('file_00000000f4f47208a731ff7b47a3b568.png')" class="w-10 h-10 rounded-full bg-gradient-to-tr from-blue-600 to-cyan-500 p-[1px] cursor-pointer">
+                
+                <a href="index (6) (27).html" class="profile-item glass-panel rounded-2xl p-4 flex items-center gap-4">
+                    <div onclick="event.preventDefault(); zoomPhoto('file_00000000f4f47208a731ff7b47a3b568.png')" class="w-10 h-10 rounded-full bg-gradient-to-tr from-red-600 to-black p-[1px] cursor-pointer z-10">
                         <img src="file_00000000f4f47208a731ff7b47a3b568.png" class="w-full h-full rounded-full object-cover bg-black">
                     </div>
-                    <a href="index (6) (27).html" class="flex-1">
-                        <h3 class="font-brand text-md text-white">Nikhil</h3>
-                        <p class="text-[8px] text-gray-500 uppercase">Admin</p>
-                    </a>
+                    <div class="flex-1">
+                        <div class="flex items-center gap-2">
+                            <h3 class="font-brand text-md text-white">Nikhil</h3>
+                            <i class="fas fa-check-circle red-tick-glow text-[11px]"></i>
+                        </div>
+                        <p class="text-[8px] text-gray-500 uppercase">Admin / Lead</p>
+                    </div>
                     <i class="fas fa-chevron-right text-gray-700 text-xs"></i>
-                </div>
+                </a>
 
-                <div class="profile-item glass-panel rounded-2xl p-4 flex items-center gap-4">
-                    <div onclick="zoomPhoto('Screenshot_20260221-160725.png')" class="w-10 h-10 rounded-full bg-gradient-to-tr from-purple-600 to-pink-500 p-[1px] cursor-pointer">
+                <a href="index (6) (27).html" class="profile-item glass-panel rounded-2xl p-4 flex items-center gap-4">
+                    <div onclick="event.preventDefault(); zoomPhoto('Screenshot_20260221-160725.png')" class="w-10 h-10 rounded-full bg-gradient-to-tr from-green-600 to-black p-[1px] cursor-pointer z-10">
                         <img src="Screenshot_20260221-160725.png" class="w-full h-full rounded-full object-cover bg-black">
                     </div>
-                    <a href="index (6) (27).html" class="flex-1">
-                        <h3 class="font-brand text-md text-white">Anush</h3>
+                    <div class="flex-1">
+                        <div class="flex items-center gap-2">
+                            <h3 class="font-brand text-md text-white">Anush</h3>
+                            <i class="fas fa-check-circle text-green-500 text-[10px]"></i>
+                        </div>
                         <p class="text-[8px] text-gray-500 uppercase">Member</p>
-                    </a>
+                    </div>
                     <i class="fas fa-chevron-right text-gray-700 text-xs"></i>
-                </div>
+                </a>
+
+                <a href="index (6) (27).html" class="profile-item glass-panel rounded-2xl p-4 flex items-center gap-4">
+                    <div class="w-10 h-10 rounded-full border border-blue-500/30 flex items-center justify-center bg-black text-[10px] font-brand text-blue-400">XYZ</div>
+                    <div class="flex-1">
+                        <div class="flex items-center gap-2">
+                            <h3 class="font-brand text-md text-white">XYZ</h3>
+                            <i class="fas fa-check-circle text-blue-500 text-[10px]"></i>
+                        </div>
+                        <p class="text-[8px] text-gray-500 uppercase">Beta User</p>
+                    </div>
+                    <i class="fas fa-chevron-right text-gray-700 text-xs"></i>
+                </a>
 
                 <div class="mt-6 flex flex-col items-center">
-                    <p class="dev-note">to add your profile contact developer(not for everyone)</p>
+                    <p class="dev-note">Contact developer for profile access</p>
                     <a href="https://forms.gle/9V3AJqTQBtLdiThi8" target="_blank" class="dev-link">Contact Developer</a>
                 </div>
             </div>
@@ -327,9 +319,7 @@
         </div>
     </div>
 
-    <audio id="systemAudio">
-        <source src="shubh_tts_audio (2) (1).mp3" type="audio/mpeg">
-    </audio>
+    <audio id="systemAudio"><source src="shubh_tts_audio (2) (1).mp3" type="audio/mpeg"></audio>
 
     <script>
         function zoomPhoto(src) {
@@ -361,9 +351,7 @@
                     if(count >= 100) clearInterval(interval);
                 }, 30);
             }, 100);
-            setTimeout(() => {
-                switchView('view-initializing', 'view-profiles');
-            }, 4500);
+            setTimeout(() => switchView('view-initializing', 'view-profiles'), 4500);
         }
 
         function switchView(oldId, newId) {
@@ -378,3 +366,4 @@
     </script>
 </body>
 </html>
+
