@@ -302,13 +302,13 @@
                             <h3 class="font-brand text-md text-white">XYZ</h3>
                             <i class="fas fa-check-circle text-blue-500 text-[10px]"></i>
                         </div>
-                        <p class="text-[8px] text-gray-500 uppercase">Beta User</p>
+                        <p class="text-[8px] text-gray-500 uppercase">member</p>
                     </div>
                     <i class="fas fa-chevron-right text-gray-700 text-xs"></i>
                 </a>
 
                 <div class="mt-6 flex flex-col items-center">
-                    <p class="dev-note">Contact developer for profile access</p>
+                    <p class="dev-note">Contact developer to request profile</p>
                     <a href="https://forms.gle/9V3AJqTQBtLdiThi8" target="_blank" class="dev-link">Contact Developer</a>
                 </div>
             </div>
@@ -351,7 +351,7 @@
                     if(count >= 100) clearInterval(interval);
                 }, 30);
             }, 100);
-            setTimeout(() => switchView('view-initializing', 'view-profiles'), 4500);
+            setTimeout(() => switchView('view-initializing', 'view-profiles'), 3000);
         }
 
         function switchView(oldId, newId) {
