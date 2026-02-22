@@ -14,9 +14,18 @@
             --accent: #3b82f6;
             --glass: rgba(8, 8, 10, 0.85);
             --border: rgba(255, 255, 255, 0.08);
+            --bg-color: #030303;
+            --text-color: #ffffff;
         }
 
-        /* Prevent Zoom and Scrolling */
+        /* Light Mode Variables */
+        body.light-mode {
+            --glass: rgba(255, 255, 255, 0.9);
+            --border: rgba(0, 0, 0, 0.1);
+            --bg-color: #f0f2f5;
+            --text-color: #000000;
+        }
+
         * {
             box-sizing: border-box;
             -webkit-tap-highlight-color: transparent;
@@ -28,13 +37,14 @@
             width: 100%;
             overflow: hidden;
             position: fixed;
-            background-color: #030303;
+            background-color: var(--bg-color);
+            transition: background-color 0.4s ease;
             touch-action: none;
         }
 
         body {
             font-family: 'Inter', sans-serif;
-            color: white;
+            color: var(--text-color);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -51,7 +61,6 @@
             border-radius: 50%;
         }
 
-        /* View State Management */
         .view {
             position: absolute;
             inset: 0;
@@ -76,6 +85,7 @@
             backdrop-filter: blur(20px) saturate(180%);
             -webkit-backdrop-filter: blur(20px) saturate(180%);
             border: 1px solid var(--border);
+            color: var(--text-color);
         }
 
         .board-container {
@@ -107,7 +117,6 @@
         }
         .profile-item:active { transform: scale(0.97); background: rgba(255,255,255,0.05); }
 
-        /* Admin Red Tick Glow */
         .red-tick-glow {
             color: #ff3131;
             text-shadow: 0 0 8px rgba(255, 49, 49, 0.6);
@@ -138,8 +147,8 @@
             50% { border-color: rgba(59, 130, 246, 0.5); opacity: 1; }
         }
 
-        /* PHOTO MODAL */
-        #photo-modal {
+        /* MODALS */
+        #photo-modal, #settings-modal {
             position: fixed;
             inset: 0;
             background: rgba(0,0,0,0.9);
@@ -172,16 +181,24 @@
             transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
 
-        .modal-content img { width: 100%; height: 100%; object-fit: cover; }
+        .settings-box {
+            width: 85vw;
+            max-width: 320px;
+            padding: 30px;
+            border-radius: 28px;
+            transform: scale(0.8);
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative; /* Needed for absolute positioning of X button */
+        }
 
         .close-btn {
             position: absolute;
-            top: -20px;
-            right: -20px;
-            width: 44px;
-            height: 44px;
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            top: 10px; /* Moves it inside the boarder area */
+            right: 15px; /* Alignment inside boarder */
+            width: 36px;
+            height: 36px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border);
             border-radius: 50%;
             display: flex;
             align-items: center;
@@ -190,8 +207,38 @@
             z-index: 110;
         }
 
-        #photo-modal.active { display: flex; opacity: 1; }
-        #photo-modal.active .modal-content { transform: scale(1); }
+        #photo-modal.active, #settings-modal.active { display: flex; opacity: 1; }
+        #photo-modal.active .modal-content, #settings-modal.active .settings-box { transform: scale(1); }
+
+        /* TOGGLE SWITCH */
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 45px;
+            height: 24px;
+        }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            inset: 0;
+            background-color: #333;
+            transition: .4s;
+            border-radius: 34px;
+        }
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        input:checked + .slider { background-color: var(--accent); }
+        input:checked + .slider:before { transform: translateX(21px); }
 
         .dev-note { font-size: 9px; color: rgba(255, 255, 255, 0.3); text-transform: uppercase; letter-spacing: 1.5px; margin-top: 1.5rem; text-align: center; }
         .dev-link { font-size: 10px; color: var(--accent); text-transform: uppercase; letter-spacing: 2px; opacity: 0.5; transition: all 0.3s ease; text-decoration: none; display: inline-block; margin-top: 8px; }
@@ -199,6 +246,24 @@
     </style>
 </head>
 <body>
+
+    <div id="settings-modal" onclick="backToProfile()">
+        <div class="modal-container" onclick="event.stopPropagation()">
+            <div class="settings-box glass-panel text-center">
+                <div class="close-btn" onclick="backToProfile()"><i class="fas fa-times"></i></div>
+                
+                <h2 class="font-brand text-xl mb-6 mt-4 uppercase tracking-widest">Settings</h2>
+                <div class="flex items-center justify-between p-4 bg-white/5 rounded-2xl border border-white/5">
+                    <span class="text-xs font-brand uppercase opacity-70">Dark Mode</span>
+                    <label class="switch">
+                        <input type="checkbox" id="theme-toggle" checked onclick="toggleTheme()">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                <p class="mt-6 text-[8px] font-mono text-gray-500 uppercase tracking-widest">XOS v1.0.0 Global Control</p>
+            </div>
+        </div>
+    </div>
 
     <div id="photo-modal" onclick="closePhoto()">
         <div class="modal-container" onclick="event.stopPropagation()">
@@ -218,9 +283,9 @@
                     <span class="font-brand text-5xl font-bold text-white">X</span>
                 </div>
             </div>
-            <h1 class="font-brand text-4xl mb-2 text-white">XOS</h1>
+            <h1 class="font-brand text-4xl mb-2">XOS</h1>
             <p class="text-gray-500 text-[10px] tracking-[0.4em] uppercase mb-12">Social Interface v1.0</p>
-            <button onclick="enterSystem()" class="glass-panel w-full max-w-[280px] py-4 rounded-xl text-white font-medium tracking-widest uppercase text-sm active:scale-95 transition-transform">Enter System</button>
+            <button onclick="enterSystem()" class="glass-panel w-full max-w-[280px] py-4 rounded-xl font-medium tracking-widest uppercase text-sm active:scale-95 transition-transform">Enter System</button>
             <a href="https://nikhil007-eng.github.io/xos-social-Id/" target="_blank" class="dev-highlight">Developer</a>
         </div>
     </div>
@@ -254,26 +319,25 @@
     <div id="view-profiles" class="view">
         <div class="w-full max-w-md flex flex-col h-full pt-6">
             <div class="flex items-center justify-between mb-6 px-2">
-                <h1 class="font-brand text-2xl font-bold text-white">XOS</h1>
-                <i class="fas fa-cog text-gray-500"></i>
+                <h1 class="font-brand text-2xl font-bold">XOS</h1>
+                <i class="fas fa-cog text-gray-500 cursor-pointer p-2 active:rotate-90 transition-transform" onclick="openSettings()"></i>
             </div>
             
             <div class="relative mb-6">
                 <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-600 text-xs"></i>
-                <input type="text" placeholder="Search..." class="w-full pl-10 pr-4 py-3 rounded-xl bg-white/5 border border-white/10 text-sm outline-none text-white font-brand">
+                <input type="text" placeholder="Search..." class="w-full pl-10 pr-4 py-3 rounded-xl bg-white/5 border border-white/10 text-sm outline-none font-brand">
             </div>
 
             <p class="text-[9px] uppercase text-gray-600 tracking-[0.2em] mb-4 px-2">Select User</p>
             
             <div class="scroll-area flex flex-col gap-3">
-                
                 <a href="Nikhilprof.html" class="profile-item glass-panel rounded-2xl p-4 flex items-center gap-4">
                     <div onclick="event.preventDefault(); zoomPhoto('file_00000000f4f47208a731ff7b47a3b568.png')" class="w-10 h-10 rounded-full bg-gradient-to-tr from-red-600 to-black p-[1px] cursor-pointer z-10">
                         <img src="file_00000000f4f47208a731ff7b47a3b568.png" class="w-full h-full rounded-full object-cover bg-black">
                     </div>
                     <div class="flex-1">
                         <div class="flex items-center gap-2">
-                            <h3 class="font-brand text-md text-white">Nikhil</h3>
+                            <h3 class="font-brand text-md">Nikhil</h3>
                             <i class="fas fa-check-circle red-tick-glow text-[11px]"></i>
                         </div>
                         <p class="text-[8px] text-gray-500 uppercase">Admin</p>
@@ -287,7 +351,7 @@
                     </div>
                     <div class="flex-1">
                         <div class="flex items-center gap-2">
-                            <h3 class="font-brand text-md text-white">Anush</h3>
+                            <h3 class="font-brand text-md">Anush</h3>
                             <i class="fas fa-check-circle text-green-500 text-[10px]"></i>
                         </div>
                         <p class="text-[8px] text-gray-500 uppercase">Member</p>
@@ -299,7 +363,7 @@
                     <div class="w-10 h-10 rounded-full border border-blue-500/30 flex items-center justify-center bg-black text-[10px] font-brand text-blue-400">XYZ</div>
                     <div class="flex-1">
                         <div class="flex items-center gap-2">
-                            <h3 class="font-brand text-md text-white">XYZ</h3>
+                            <h3 class="font-brand text-md">XYZ</h3>
                             <i class="fas fa-check-circle text-blue-500 text-[10px]"></i>
                         </div>
                         <p class="text-[8px] text-gray-500 uppercase">member</p>
@@ -322,7 +386,46 @@
     <audio id="systemAudio"><source src="shubh_tts_audio (2) (1).mp3" type="audio/mpeg"></audio>
 
     <script>
+        function toggleTheme() {
+            const isDark = document.getElementById('theme-toggle').checked;
+            if (isDark) {
+                document.body.classList.remove('light-mode');
+            } else {
+                document.body.classList.add('light-mode');
+            }
+        }
+
+        function openSettings() {
+            // Push state so phone back button works
+            window.history.pushState({ modal: 'settings' }, '');
+            const modal = document.getElementById('settings-modal');
+            modal.style.display = 'flex';
+            setTimeout(() => modal.classList.add('active'), 10);
+        }
+
+        // Handles hardware back button and X button click
+        function backToProfile() {
+            if(window.history.state && window.history.state.modal === 'settings') {
+                window.history.back();
+            } else {
+                closeSettings();
+            }
+        }
+
+        function closeSettings() {
+            const modal = document.getElementById('settings-modal');
+            modal.classList.remove('active');
+            setTimeout(() => modal.style.display = 'none', 300);
+        }
+
+        // Listener for the back button gesture
+        window.onpopstate = function(event) {
+            closeSettings();
+            closePhoto();
+        };
+
         function zoomPhoto(src) {
+            window.history.pushState({ modal: 'photo' }, '');
             const modal = document.getElementById('photo-modal');
             const img = document.getElementById('zoomed-img');
             img.src = src;
@@ -366,4 +469,3 @@
     </script>
 </body>
 </html>
-
