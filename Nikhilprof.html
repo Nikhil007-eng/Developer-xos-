@@ -92,10 +92,19 @@
 </head>
 <body>
 
-    <div id="floating-post" class="floating-modal" onclick="handleBackAction()">
+    <div id="auth-portal" style="display: none; position: fixed; inset: 0; z-index: 200; background: #000; flex-direction: column; align-items: center; justify-content: center;">
+        <div class="close-btn-circle" onclick="closeAuth()" style="top: 30px; right: 30px; cursor: pointer;">
+            <i class="fas fa-times"></i>
+        </div>
+        <h2 class="font-brand text-[10px] mb-2 text-blue-500 tracking-[0.3em]">SECURE UPLINK</h2>
+        <input type="password" id="auth-key" class="auth-input w-64 p-4 bg-white/5 border border-white/10 rounded-xl text-center outline-none font-brand" placeholder="••••">
+        <button onclick="verifyAccess()" class="mt-8 text-[10px] font-brand border border-white/20 px-8 py-3 rounded-full uppercase tracking-widest active:bg-white active:text-black">Verify Access</button>
+    </div>
+
+    <div id="floating-post" class="floating-modal" onclick="handleCloseRequest()">
         <div class="modal-box glass-panel" onclick="event.stopPropagation()">
             <div id="media-loader" class="loader"><div class="spinner"></div></div>
-            <div class="close-btn-circle" onclick="handleBackAction()" style="cursor: pointer;"><i class="fas fa-times"></i></div>
+            <div class="close-btn-circle" onclick="handleCloseRequest()" style="cursor: pointer;"><i class="fas fa-times"></i></div>
             <div class="h-full w-full relative">
                 <div id="media-container" class="w-full h-full"></div>
                 <audio id="post-audio" src=""></audio>
@@ -106,9 +115,9 @@
         </div>
     </div>
 
-    <div id="profile-modal" class="floating-modal" onclick="handleBackAction()">
+    <div id="profile-modal" class="floating-modal" onclick="handleCloseRequest()">
         <div class="modal-box square-modal glass-panel" onclick="event.stopPropagation()">
-            <div class="close-btn-circle" onclick="handleBackAction()" style="cursor: pointer;">
+            <div class="close-btn-circle" onclick="handleCloseRequest()" style="cursor: pointer;">
                 <i class="fas fa-times"></i>
             </div>
             <div class="h-full w-full relative">
@@ -151,6 +160,7 @@
         <div class="px-6">
             <div class="flex justify-between items-center mb-6 px-2">
                 <span class="font-brand text-[9px] text-gray-500 uppercase tracking-[0.3em]">Posts</span>
+                <button onclick="openAuth()" class="w-8 h-8 glass-panel rounded-lg flex items-center justify-center text-xs text-white"><i class="fas fa-plus"></i></button>
             </div>
             <div id="posts-grid" class="grid grid-cols-2 gap-3"></div>
         </div>
@@ -173,7 +183,7 @@
             });
         }
 
-        // --- BACK ACTION & MUTE LOGIC ---
+        // --- CORE LOGIC: MUTE AND BACK BUTTON HANDLING ---
 
         function openProfile() {
             window.history.pushState({ modal: 'profile' }, "");
@@ -216,26 +226,25 @@
             setTimeout(() => modal.classList.add('active'), 10);
         }
 
-        // THE "AUTO-MUTE" KILL SWITCH
         function stopAllMedia() {
             const audio = document.getElementById('post-audio');
             const container = document.getElementById('media-container');
-
-            // 1. Kill Audio
+            
+            // Hard stop audio
             audio.pause();
-            audio.src = ""; // This forces an immediate stop
+            audio.src = "";
             audio.load();
 
-            // 2. Kill Video
+            // Hard stop video
             const video = container.querySelector('video');
             if(video) {
                 video.pause();
-                video.src = ""; // This forces an immediate mute/stop
-                video.load(); 
+                video.src = "";
+                video.load();
             }
         }
 
-        function closeAllModalsUI() {
+        function closeUI() {
             const postModal = document.getElementById('floating-post');
             const profileModal = document.getElementById('profile-modal');
             
@@ -249,16 +258,33 @@
             }, 300);
         }
 
-        // Called by X button or clicking outside
-        function handleBackAction() {
-            window.history.back(); 
+        // Triggered by X or background click - uses History API to trigger 'popstate'
+        function handleCloseRequest() {
+            if (window.history.state && window.history.state.modal) {
+                window.history.back();
+            } else {
+                // Fallback if state is missing
+                stopAllMedia();
+                closeUI();
+            }
         }
 
-        // Triggers on Back Button OR handleBackAction()
-        window.addEventListener('popstate', function() {
-            stopAllMedia(); // Mutes/Stops everything instantly
-            closeAllModalsUI(); // Closes the visual window
-        });
+        // The "Master Switch" for the back button and gesture
+        window.onpopstate = function() {
+            stopAllMedia();
+            closeUI();
+        };
+
+        function openAuth() { document.getElementById('auth-portal').style.display = 'flex'; }
+        function closeAuth() { document.getElementById('auth-portal').style.display = 'none'; }
+        
+        function verifyAccess() {
+            if(document.getElementById('auth-key').value === "1234") {
+                window.location.href = "YOUR_GOOGLE_FORM_LINK";
+            } else {
+                alert("ACCESS DENIED");
+            }
+        }
 
         renderGrid();
     </script>
