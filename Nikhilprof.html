@@ -200,7 +200,9 @@
         <div class="modal-box glass-panel" onclick="event.stopPropagation()">
             <div id="media-loader" class="loader"><div class="spinner"></div></div>
             <div class="close-btn-circle" onclick="handleExit()" style="cursor: pointer;"><i class="fas fa-times"></i></div>
-            <div class="h-full w-full relative"><div id="media-container" class="w-full h-full"></div><audio id="post-audio" src=""></audio>
+            <div class="h-full w-full relative">
+                <div id="media-container" class="w-full h-full"></div>
+                <audio id="post-audio"></audio>
                 <div class="caption-container"><p id="post-caption" class="text-xs font-light text-gray-300 leading-relaxed"></p></div>
             </div>
         </div>
@@ -310,9 +312,30 @@
             const post = POSTS_DATA[index];
             const modal = document.getElementById('floating-post');
             const container = document.getElementById('media-container');
-            container.innerHTML = `<img src="${post.src}" class="w-full h-full object-cover">`;
+            const audio = document.getElementById('post-audio');
+            const caption = document.getElementById('post-caption');
+            const loader = document.getElementById('media-loader');
+
+            loader.style.opacity = '1';
+            caption.innerText = post.caption;
+            container.innerHTML = '';
+
+            if (post.type === 'video') {
+                container.innerHTML = `<video id="active-video" src="${post.src}" class="w-full h-full object-cover" autoplay loop playsinline></video>`;
+            } else {
+                container.innerHTML = `<img src="${post.src}" class="w-full h-full object-cover">`;
+            }
+
+            if (post.audio) {
+                audio.src = post.audio;
+                audio.play().catch(() => {});
+            }
+
             modal.style.display = 'flex';
-            setTimeout(() => modal.classList.add('active'), 10);
+            setTimeout(() => {
+                modal.classList.add('active');
+                loader.style.opacity = '0';
+            }, 10);
         }
 
         function handleExit() {
@@ -321,6 +344,12 @@
         }
 
         function killAndHide() {
+            const video = document.getElementById('active-video');
+            if (video) { video.pause(); video.src = ""; }
+            
+            const audio = document.getElementById('post-audio');
+            if (audio) { audio.pause(); audio.currentTime = 0; audio.src = ""; }
+
             const modals = ['floating-post', 'profile-modal', 'menu-modal', 'license-modal', 'followers-modal', 'auth-portal'];
             modals.forEach(id => {
                 const el = document.getElementById(id);
@@ -329,8 +358,4 @@
             setTimeout(() => { modals.forEach(id => { const el = document.getElementById(id); if(el) el.style.display = 'none'; }); }, 300);
         }
 
-        window.addEventListener('popstate', killAndHide);
-        renderGrid();
-    </script>
-</body>
-</html>
+        window.addEven
