@@ -125,6 +125,21 @@
         </div>
     </div>
 
+    <div id="profile-modal" class="floating-modal" onclick="closeProfile()">
+        <div class="modal-box glass-panel" onclick="event.stopPropagation()">
+            <div class="close-btn-circle" onclick="closeProfile()" style="cursor: pointer;">
+                <i class="fas fa-times"></i>
+            </div>
+            <div class="h-full w-full relative">
+                <img src="file_00000000f4f47208a731ff7b47a3b568.png" class="w-full h-full object-cover">
+                <div class="caption-container">
+                    <p class="font-brand text-[10px] text-blue-500 tracking-widest">ADMIN IDENTIFICATION</p>
+                    <p class="text-xs font-light text-gray-300 mt-1">STATUS: AUTHORIZED // 884-XOS</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="blob w-96 h-96 bg-blue-900 top-[-10%] left-[-10%]"></div>
     <div class="blob w-80 h-80 bg-purple-900 bottom-[-10%] right-[-10%]"></div>
 
@@ -138,7 +153,9 @@
         <div class="px-6 mb-8">
             <div class="glass-panel p-6 rounded-[32px] relative">
                 <div class="flex items-center gap-6">
-                    <div class="relative w-20 h-20 rounded-2xl overflow-hidden border border-white/10"><img src="file_00000000f4f47208a731ff7b47a3b568.png" class="w-full h-full object-cover"></div>
+                    <div onclick="openProfile()" class="relative w-20 h-20 rounded-2xl overflow-hidden border border-white/10 cursor-pointer active:scale-95 transition-transform">
+                        <img src="file_00000000f4f47208a731ff7b47a3b568.png" class="w-full h-full object-cover">
+                    </div>
                     <div class="flex-1">
                         <div class="flex items-center gap-2">
                             <h1 class="font-brand text-xl text-white">NIKHIL</h1>
@@ -163,12 +180,11 @@
     </div>
 
     <script>
-        // UPDATE YOUR POSTS HERE
         const POSTS_DATA = [
             {
                 type: 'image',
                 src: 'Picsart_26-02-20_19-32-15-424.png',
-                audio: 'background_beat.mp3', // Link your mp3 here
+                audio: 'background_beat.mp3',
                 caption: 'New haircut'
             },
             {
@@ -190,6 +206,20 @@
             });
         }
 
+        // Profile Modal Logic
+        function openProfile() {
+            const modal = document.getElementById('profile-modal');
+            modal.style.display = 'flex';
+            setTimeout(() => modal.classList.add('active'), 10);
+        }
+
+        function closeProfile() {
+            const modal = document.getElementById('profile-modal');
+            modal.classList.remove('active');
+            setTimeout(() => { modal.style.display = 'none'; }, 300);
+        }
+
+        // Post Modal Logic
         function openPost(index) {
             const post = POSTS_DATA[index];
             const container = document.getElementById('media-container');
@@ -199,7 +229,6 @@
             
             loader.style.opacity = '1';
             document.getElementById('post-caption').innerText = post.caption;
-
             container.innerHTML = '';
             
             if(post.type === 'video') {
@@ -218,7 +247,6 @@
                 container.appendChild(img);
             }
 
-            // Audio Logic
             if(post.audio) {
                 audio.src = post.audio;
                 audio.currentTime = 0;
@@ -242,7 +270,7 @@
         
         function verifyAccess() {
             const key = document.getElementById('auth-key').value;
-            if(key === "1234") { // Update password here
+            if(key === "1234") {
                 window.location.href = "YOUR_GOOGLE_FORM_LINK";
             } else {
                 alert("ACCESS DENIED");
