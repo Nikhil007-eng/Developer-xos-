@@ -42,14 +42,12 @@
             50% { opacity: 1; transform: scale(1.1); filter: drop-shadow(0 0 8px var(--admin-red)); }
         }
 
-        /* Modal Overlay */
         .floating-modal {
             position: fixed; inset: 0; z-index: 100; background: rgba(0,0,0,0.95);
             backdrop-filter: blur(20px); display: none; align-items: center; justify-content: center;
             opacity: 0; transition: opacity 0.3s ease;
         }
 
-        /* 3:5 Aspect Box */
         .modal-box {
             width: 82vw; aspect-ratio: 3 / 5; max-width: 380px; max-height: 85vh;
             background: #000; border: 1px solid var(--border); border-radius: 28px;
@@ -57,7 +55,6 @@
             transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
 
-        /* Profile Modal A*A Square */
         .square-modal {
             aspect-ratio: 1 / 1 !important;
             width: 85vw !important;
@@ -86,17 +83,6 @@
             display: flex; align-items: center; justify-content: center; z-index: 110;
         }
 
-        #auth-portal {
-            position: fixed; inset: 0; z-index: 200; background: #000;
-            display: none; flex-direction: column; align-items: center; justify-content: center;
-        }
-
-        .auth-input {
-            background: rgba(255,255,255,0.05); border: 1px solid var(--border);
-            color: white; text-align: center; padding: 15px; border-radius: 12px;
-            font-family: 'Orbitron', sans-serif; letter-spacing: 4px; outline: none;
-        }
-
         .caption-container {
             position: absolute; bottom: 0; left: 0; right: 0; 
             padding: 24px 20px; background: linear-gradient(transparent, rgba(0,0,0,0.9));
@@ -106,20 +92,10 @@
 </head>
 <body>
 
-    <div id="auth-portal">
-        <div class="close-btn-circle" onclick="closeAuth()" style="top: 30px; right: 30px; cursor: pointer;">
-            <i class="fas fa-times"></i>
-        </div>
-        <h2 class="font-brand text-[10px] mb-2 text-blue-500 tracking-[0.3em]">SECURE UPLINK</h2>
-        <p class="text-[8px] text-gray-500 mb-8 uppercase tracking-widest">Enter Unique ID Code</p>
-        <input type="password" id="auth-key" class="auth-input w-64" placeholder="••••">
-        <button onclick="verifyAccess()" class="mt-8 text-[10px] font-brand border border-white/20 px-8 py-3 rounded-full uppercase tracking-widest active:bg-white active:text-black">Verify Access</button>
-    </div>
-
-    <div id="floating-post" class="floating-modal" onclick="closePost()">
+    <div id="floating-post" class="floating-modal" onclick="handleBackAction()">
         <div class="modal-box glass-panel" onclick="event.stopPropagation()">
             <div id="media-loader" class="loader"><div class="spinner"></div></div>
-            <div class="close-btn-circle" onclick="closePost()" style="cursor: pointer;"><i class="fas fa-times"></i></div>
+            <div class="close-btn-circle" onclick="handleBackAction()" style="cursor: pointer;"><i class="fas fa-times"></i></div>
             <div class="h-full w-full relative">
                 <div id="media-container" class="w-full h-full"></div>
                 <audio id="post-audio" src=""></audio>
@@ -130,9 +106,9 @@
         </div>
     </div>
 
-    <div id="profile-modal" class="floating-modal" onclick="closeProfile()">
+    <div id="profile-modal" class="floating-modal" onclick="handleBackAction()">
         <div class="modal-box square-modal glass-panel" onclick="event.stopPropagation()">
-            <div class="close-btn-circle" onclick="closeProfile()" style="cursor: pointer;">
+            <div class="close-btn-circle" onclick="handleBackAction()" style="cursor: pointer;">
                 <i class="fas fa-times"></i>
             </div>
             <div class="h-full w-full relative">
@@ -146,11 +122,9 @@
     </div>
 
     <div class="blob w-96 h-96 bg-blue-900 top-[-10%] left-[-10%]"></div>
-    <div class="blob w-80 h-80 bg-purple-900 bottom-[-10%] right-[-10%]"></div>
-
     <div class="main-container">
         <div class="flex justify-between items-center px-6 py-8">
-            <button onclick="history.back()" class="glass-panel w-10 h-10 rounded-full flex items-center justify-center text-gray-400 active:scale-90 transition-transform">
+            <button onclick="history.back()" class="glass-panel w-10 h-10 rounded-full flex items-center justify-center text-gray-400">
                 <i class="fas fa-chevron-left"></i>
             </button>
             <span class="font-brand text-[9px] text-gray-500 tracking-[0.4em]">ADMIN // PROFILE</span>
@@ -160,7 +134,7 @@
         <div class="px-6 mb-8">
             <div class="glass-panel p-6 rounded-[32px] relative">
                 <div class="flex items-center gap-6">
-                    <div onclick="openProfile()" class="relative w-20 h-20 rounded-2xl overflow-hidden border border-white/10 cursor-pointer active:scale-95 transition-transform">
+                    <div onclick="openProfile()" class="relative w-20 h-20 rounded-2xl overflow-hidden border border-white/10 cursor-pointer">
                         <img src="file_00000000f4f47208a731ff7b47a3b568.png" class="w-full h-full object-cover">
                     </div>
                     <div class="flex-1">
@@ -169,9 +143,6 @@
                             <i class="fas fa-check-circle red-tick-glow text-xs"></i>
                         </div>
                         <p class="text-[10px] text-blue-500 font-mono tracking-tighter">884-XOS-ADMIN</p>
-                        <div class="flex gap-4 mt-3">
-                            <a href="#" class="text-[10px] uppercase tracking-widest text-gray-400"><span class="text-white font-bold">2.4k</span> Followers</a>
-                        </div>
                     </div>
                 </div>
             </div>
@@ -180,7 +151,6 @@
         <div class="px-6">
             <div class="flex justify-between items-center mb-6 px-2">
                 <span class="font-brand text-[9px] text-gray-500 uppercase tracking-[0.3em]">Posts</span>
-                <button onclick="openAuth()" class="w-8 h-8 glass-panel rounded-lg flex items-center justify-center text-xs text-white"><i class="fas fa-plus"></i></button>
             </div>
             <div id="posts-grid" class="grid grid-cols-2 gap-3"></div>
         </div>
@@ -198,26 +168,22 @@
                 const item = document.createElement('div');
                 item.className = 'glass-panel aspect-square rounded-2xl overflow-hidden active:scale-95 transition-transform relative';
                 item.onclick = () => openPost(index);
-                item.innerHTML = post.type === 'video' ? `<video src="${post.src}" class="w-full h-full object-cover opacity-50"></video><div class="absolute inset-0 flex items-center justify-center"><i class="fas fa-play text-xs opacity-50"></i></div>` : `<img src="${post.src}" class="w-full h-full object-cover opacity-80">`;
+                item.innerHTML = post.type === 'video' ? `<video src="${post.src}" class="w-full h-full object-cover opacity-50"></video>` : `<img src="${post.src}" class="w-full h-full object-cover opacity-80">`;
                 grid.appendChild(item);
             });
         }
 
-        // Profile Logic (A*A)
+        // --- BACK ACTION & MUTE LOGIC ---
+
         function openProfile() {
+            window.history.pushState({ modal: 'profile' }, "");
             const modal = document.getElementById('profile-modal');
             modal.style.display = 'flex';
             setTimeout(() => modal.classList.add('active'), 10);
         }
 
-        function closeProfile() {
-            const modal = document.getElementById('profile-modal');
-            modal.classList.remove('active');
-            setTimeout(() => { modal.style.display = 'none'; }, 300);
-        }
-
-        // Post Logic (3:5)
         function openPost(index) {
+            window.history.pushState({ modal: 'post' }, "");
             const post = POSTS_DATA[index];
             const container = document.getElementById('media-container');
             const loader = document.getElementById('media-loader');
@@ -243,34 +209,56 @@
 
             if(post.audio) {
                 audio.src = post.audio;
-                audio.currentTime = 0;
-                audio.play().catch(e => console.log("Audio waiting for interaction"));
+                audio.play().catch(() => {});
             }
 
             modal.style.display = 'flex';
             setTimeout(() => modal.classList.add('active'), 10);
         }
 
-        function closePost() {
-            const modal = document.getElementById('floating-post');
+        // THE "AUTO-MUTE" KILL SWITCH
+        function stopAllMedia() {
             const audio = document.getElementById('post-audio');
-            modal.classList.remove('active');
-            audio.pause();
-            setTimeout(() => { modal.style.display = 'none'; }, 300);
-        }
+            const container = document.getElementById('media-container');
 
-        function openAuth() { document.getElementById('auth-portal').style.display = 'flex'; }
-        function closeAuth() { document.getElementById('auth-portal').style.display = 'none'; }
-        
-        function verifyAccess() {
-            const key = document.getElementById('auth-key').value;
-            if(key === "1234") {
-                window.location.href = "YOUR_GOOGLE_FORM_LINK";
-            } else {
-                alert("ACCESS DENIED");
-                document.getElementById('auth-key').value = '';
+            // 1. Kill Audio
+            audio.pause();
+            audio.src = ""; // This forces an immediate stop
+            audio.load();
+
+            // 2. Kill Video
+            const video = container.querySelector('video');
+            if(video) {
+                video.pause();
+                video.src = ""; // This forces an immediate mute/stop
+                video.load(); 
             }
         }
+
+        function closeAllModalsUI() {
+            const postModal = document.getElementById('floating-post');
+            const profileModal = document.getElementById('profile-modal');
+            
+            postModal.classList.remove('active');
+            profileModal.classList.remove('active');
+            
+            setTimeout(() => { 
+                postModal.style.display = 'none'; 
+                profileModal.style.display = 'none';
+                document.getElementById('media-container').innerHTML = ''; 
+            }, 300);
+        }
+
+        // Called by X button or clicking outside
+        function handleBackAction() {
+            window.history.back(); 
+        }
+
+        // Triggers on Back Button OR handleBackAction()
+        window.addEventListener('popstate', function() {
+            stopAllMedia(); // Mutes/Stops everything instantly
+            closeAllModalsUI(); // Closes the visual window
+        });
 
         renderGrid();
     </script>
