@@ -6,7 +6,7 @@
     <title>XOS - System View</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Orbitron:wght@500;700&display=swap" rel="stylesheet">
 
     <style>
@@ -85,7 +85,6 @@
         }
         .social-btn:active { transform: scale(0.9); background: var(--accent); }
 
-        /* TOGGLE STYLES: Default to ON (Dark Mode) */
         .toggle-track { width: 50px; height: 26px; background: var(--accent); border-radius: 20px; position: relative; cursor: pointer; transition: 0.3s; }
         .toggle-thumb { width: 20px; height: 20px; background: white; border-radius: 50%; position: absolute; top: 3px; left: 26px; transition: 0.3s; }
         
@@ -115,13 +114,19 @@
         <div class="modal-box menu-window" onclick="event.stopPropagation()">
             <div class="flex justify-between items-center mb-8">
                 <h3 class="font-brand text-[10px] text-blue-500 tracking-[0.3em]">FOLLOWERS</h3>
-                <i class="fas fa-times text-gray-500" onclick="handleExit()"></i>
+                <div class="close-btn-circle" style="position: static; width: 30px; height: 30px;" onclick="handleExit()">
+                    <i class="fas fa-times text-xs"></i>
+                </div>
             </div>
+            
             <div class="space-y-4 max-h-[60vh] overflow-y-auto pr-2">
                 <div class="flex items-center justify-between p-3 glass-panel rounded-2xl border border-white/5">
                     <div class="flex items-center gap-4">
                         <div class="w-10 h-10 rounded-full bg-blue-500/20 border border-blue-500/30 flex items-center justify-center font-brand text-xs text-blue-400">XYZ</div>
-                        <div><p class="text-xs font-semibold">User_XYZ</p><p class="text-[9px] text-gray-500 uppercase tracking-wider">Level 1 Access</p></div>
+                        <div>
+                            <p class="text-xs font-semibold">User_XYZ</p>
+                            <p class="text-[9px] text-gray-500 uppercase tracking-wider">Level 1 Access</p>
+                        </div>
                     </div>
                 </div>
                 <p class="text-[9px] text-center text-gray-600 font-brand mt-4 uppercase">End of Directory</p>
@@ -133,32 +138,59 @@
         <div class="modal-box menu-window" onclick="event.stopPropagation()">
             <div class="flex justify-between items-center mb-8">
                 <h3 class="font-brand text-[10px] text-blue-500 tracking-[0.3em]">SYSTEM OPTIONS</h3>
-                <i class="fas fa-times text-gray-500" onclick="handleExit()"></i>
+                <div class="close-btn-circle" style="position: static; width: 30px; height: 30px; cursor: pointer;" onclick="handleExit()">
+                    <i class="fas fa-times text-xs"></i>
+                </div>
             </div>
             <div class="space-y-6">
                 <div class="flex items-center justify-between p-4 glass-panel rounded-2xl">
                     <span class="text-xs font-brand">DARK MODE</span>
-                    <div class="toggle-track" onclick="toggleDarkMode()"><div class="toggle-thumb" id="theme-thumb"></div></div>
+                    <div class="toggle-track" onclick="toggleDarkMode()">
+                        <div class="toggle-thumb" id="theme-thumb"></div>
+                    </div>
                 </div>
-                <div onclick="openLicense()" class="flex items-center gap-4 p-4 glass-panel rounded-2xl active:scale-95 transition-transform"><i class="fas fa-id-card text-blue-500"></i><span class="text-xs font-brand">VIEW LICENSE</span></div>
-                <div class="pt-4"><p class="text-[9px] text-gray-500 font-brand mb-4 text-center">CONNECTIVITY</p><div class="flex justify-center gap-6"><a href="https://x.com" class="social-btn"><i class="fa-brands fa-x-twitter"></i></a><a href="https://linkedin.com" class="social-btn"><i class="fab fa-linkedin-in"></i></a><a href="https://instagram.com" class="social-btn"><i class="fab fa-instagram"></i></a></div></div>
+                <div onclick="openLicense()" class="flex items-center gap-4 p-4 glass-panel rounded-2xl active:scale-95 transition-transform">
+                    <i class="fas fa-id-card text-blue-500"></i>
+                    <span class="text-xs font-brand">VIEW LICENSE</span>
+                </div>
+                <div class="pt-4">
+                    <p class="text-[9px] text-gray-500 font-brand mb-4 text-center">CONNECTIVITY</p>
+                    <div class="flex justify-center gap-6">
+                        <a href="https://x.com" class="social-btn"><i class="fa-brands fa-x-twitter"></i></a>
+                        <a href="https://linkedin.com" class="social-btn"><i class="fab fa-linkedin-in"></i></a>
+                        <a href="https://instagram.com" class="social-btn"><i class="fab fa-instagram"></i></a>
+                        <a href="https://snapchat.com" class="social-btn"><i class="fab fa-snapchat"></i></a>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 
     <div id="license-modal" class="floating-modal" onclick="handleExit()">
         <div class="license-card font-brand" onclick="event.stopPropagation()">
-            <div class="flex justify-between text-[11px] text-[#7f8fb3] mb-6"><div><span class="license-dot"></span>PROTOCOL : ACTIVE</div><div onclick="handleExit()"><i class="fas fa-times"></i></div></div>
+            <div class="flex justify-between text-[11px] text-[#7f8fb3] mb-6">
+                <div><span class="license-dot"></span>PROTOCOL : ACTIVE</div>
+                <div class="close-btn-circle" style="position: static; width: 24px; height: 24px; cursor: pointer;" onclick="handleExit()">
+                    <i class="fas fa-times text-[10px]"></i>
+                </div>
+            </div>
             <div class="text-[32px] font-semibold tracking-wider">XOS <span class="text-[#2f7cff]">INT</span></div>
             <div class="text-[11px] tracking-[4px] text-[#3a6fff] mt-1">SECURE LICENSE ACCESS</div>
             <div class="h-[1px] bg-white/10 my-6"></div>
-            <div class="text-[12px] leading-[2] text-[#9fb3ff]"><div><span class="text-[#4d7cff]">ID :</span> Nikhil@xos</div><div><span class="text-[#4d7cff]">ROLE :</span> Special Member</div><div><span class="text-[#4d7cff]">STATUS :</span> Authorized by admin</div><div><span class="text-[#4d7cff]">VALIDITY :</span> 2026 – </div></div>
+            <div class="text-[12px] leading-[2] text-[#9fb3ff]">
+                <div><span class="text-[#4d7cff]">ID :</span> Nikhil@xos</div>
+                <div><span class="text-[#4d7cff]">ROLE :</span> Special Member</div>
+                <div><span class="text-[#4d7cff]">STATUS :</span> Authorized by admin</div>
+                <div><span class="text-[#4d7cff]">VALIDITY :</span> 2026 – </div>
+            </div>
             <div class="mt-8 text-[10px] text-[#5a6d99] opacity-70 italic">“Tailoring the digital experience to the core user.”</div>
         </div>
     </div>
 
     <div id="auth-portal" style="display: none; position: fixed; inset: 0; z-index: 200; background: #000; flex-direction: column; align-items: center; justify-content: center;">
-        <div class="close-btn-circle" onclick="closeAuth()"><i class="fas fa-times"></i></div>
+        <div class="close-btn-circle" onclick="closeAuth()" style="top: 30px; right: 30px; cursor: pointer;">
+            <i class="fas fa-times"></i>
+        </div>
         <h2 class="font-brand text-[10px] mb-2 text-blue-500 tracking-[0.3em]">SECURE UPLINK</h2>
         <input type="password" id="auth-key" class="bg-white/5 border border-white/10 p-4 rounded-xl text-center font-brand text-white outline-none" placeholder="••••">
         <button onclick="verifyAccess()" class="mt-8 text-[10px] font-brand border border-white/20 px-8 py-3 rounded-full uppercase tracking-widest active:bg-white active:text-black">Verify Access</button>
@@ -167,10 +199,8 @@
     <div id="floating-post" class="floating-modal" onclick="handleExit()">
         <div class="modal-box glass-panel" onclick="event.stopPropagation()">
             <div id="media-loader" class="loader"><div class="spinner"></div></div>
-            <div class="close-btn-circle" onclick="handleExit()"><i class="fas fa-times"></i></div>
-            <div class="h-full w-full relative">
-                <div id="media-container" class="w-full h-full"></div>
-                <audio id="post-audio" src=""></audio>
+            <div class="close-btn-circle" onclick="handleExit()" style="cursor: pointer;"><i class="fas fa-times"></i></div>
+            <div class="h-full w-full relative"><div id="media-container" class="w-full h-full"></div><audio id="post-audio" src=""></audio>
                 <div class="caption-container"><p id="post-caption" class="text-xs font-light text-gray-300 leading-relaxed"></p></div>
             </div>
         </div>
@@ -178,8 +208,10 @@
 
     <div id="profile-modal" class="floating-modal" onclick="handleExit()">
         <div class="modal-box square-modal glass-panel" onclick="event.stopPropagation()">
-            <div class="close-btn-circle" onclick="handleExit()"><i class="fas fa-times"></i></div>
-            <div class="h-full w-full relative"><img src="file_00000000f4f47208a731ff7b47a3b568.png" class="w-full h-full object-cover"><div class="caption-container"><p class="font-brand text-[10px] text-blue-500 tracking-widest">SYSTEM ADMIN</p><p class="text-[8px] text-gray-400">DATA SECURED</p></div></div>
+            <div class="close-btn-circle" onclick="handleExit()" style="cursor: pointer;"><i class="fas fa-times"></i></div>
+            <div class="h-full w-full relative"><img src="file_00000000f4f47208a731ff7b47a3b568.png" class="w-full h-full object-cover">
+                <div class="caption-container"><p class="font-brand text-[10px] text-blue-500 tracking-widest">SYSTEM ADMIN</p><p class="text-[8px] text-gray-400">DATA SECURED</p></div>
+            </div>
         </div>
     </div>
 
@@ -190,18 +222,27 @@
             <span class="font-brand text-[9px] text-gray-500 tracking-[0.4em]">ADMIN // PROFILE</span>
             <button onclick="openMenu()" class="glass-panel w-10 h-10 rounded-xl flex items-center justify-center text-white active:scale-90 transition-transform"><i class="fas fa-bars-staggered"></i></button>
         </div>
+
         <div class="px-6 mb-8">
             <div class="glass-panel p-6 rounded-[32px] relative">
                 <div class="flex items-center gap-6">
                     <div onclick="openProfile()" class="relative w-20 h-20 rounded-2xl overflow-hidden border border-white/10 cursor-pointer active:scale-95 transition-transform"><img src="file_00000000f4f47208a731ff7b47a3b568.png" class="w-full h-full object-cover"></div>
                     <div class="flex-1">
-                        <div class="flex items-center gap-2"><h1 class="font-brand text-xl">NIKHIL</h1><i class="fas fa-check-circle red-tick-glow text-xs"></i></div>
+                        <div class="flex items-center gap-2">
+                            <h1 class="font-brand text-xl">NIKHIL</h1>
+                            <i class="fas fa-check-circle red-tick-glow text-xs"></i>
+                        </div>
                         <p class="text-[10px] text-blue-500 font-mono tracking-tighter">Nikhil@xos</p>
-                        <div class="flex gap-4 mt-3"><div onclick="openFollowers()" class="text-[10px] uppercase tracking-widest text-gray-400 active:text-white transition-colors cursor-pointer"><span class="font-bold">2.4k</span> Followers</div></div>
+                        <div class="flex gap-4 mt-3">
+                            <div onclick="openFollowers()" class="text-[10px] uppercase tracking-widest text-gray-400 active:text-white transition-colors cursor-pointer">
+                                <span class="font-bold">2.4k</span> Followers
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
+
         <div class="px-6">
             <div class="flex justify-between items-center mb-6 px-2">
                 <span class="font-brand text-[9px] text-gray-500 uppercase tracking-[0.3em]">Posts</span>
@@ -212,12 +253,9 @@
     </div>
 
     <script>
-        const POSTS_DATA = [
-            { type: 'image', src: 'Picsart_26-02-20_19-32-15-424.png', audio: 'danger.mp3', caption: 'New haircut' },
-            { type: 'video', src: 'video1.mp4', audio: '', caption: 'yatra' }
-        ];
-
-        document.addEventListener('DOMContentLoaded', () => { document.body.classList.remove('light-mode'); renderGrid(); });
+        const POSTS_DATA = [{ type: 'image', src: 'Picsart_26-02-20_19-32-15-424.png', audio: 'danger.mp3', caption: 'New haircut' }, { type: 'video', src: 'video1.mp4', audio: '', caption: 'yatra' }];
+        
+        document.addEventListener('DOMContentLoaded', () => { document.body.classList.remove('light-mode'); });
 
         function openAuth() { document.getElementById('auth-portal').style.display = 'flex'; }
         function closeAuth() { document.getElementById('auth-portal').style.display = 'none'; }
@@ -227,23 +265,40 @@
             } else { alert("ACCESS DENIED"); }
         }
 
-        function openFollowers() { window.history.pushState({ modal: 'active' }, ""); const modal = document.getElementById('followers-modal'); modal.style.display = 'flex'; setTimeout(() => modal.classList.add('active'), 10); }
-        function openMenu() { window.history.pushState({ modal: 'active' }, ""); const modal = document.getElementById('menu-modal'); modal.style.display = 'flex'; setTimeout(() => modal.classList.add('active'), 10); }
-        function openLicense() { window.history.pushState({ modal: 'active' }, ""); document.getElementById('menu-modal').classList.remove('active'); setTimeout(() => { document.getElementById('menu-modal').style.display = 'none'; const modal = document.getElementById('license-modal'); modal.style.display = 'flex'; setTimeout(() => modal.classList.add('active'), 10); }, 300); }
+        function openFollowers() {
+            window.history.pushState({ modal: 'active' }, "");
+            const modal = document.getElementById('followers-modal');
+            modal.style.display = 'flex';
+            setTimeout(() => modal.classList.add('active'), 10);
+        }
+
+        function openMenu() {
+            window.history.pushState({ modal: 'active' }, "");
+            const modal = document.getElementById('menu-modal');
+            modal.style.display = 'flex';
+            setTimeout(() => modal.classList.add('active'), 10);
+        }
+
+        function openLicense() {
+            window.history.pushState({ modal: 'active' }, "");
+            document.getElementById('menu-modal').classList.remove('active');
+            setTimeout(() => {
+                document.getElementById('menu-modal').style.display = 'none';
+                const modal = document.getElementById('license-modal');
+                modal.style.display = 'flex';
+                setTimeout(() => modal.classList.add('active'), 10);
+            }, 300);
+        }
+
         function toggleDarkMode() { document.body.classList.toggle('light-mode'); }
 
         function renderGrid() {
             const grid = document.getElementById('posts-grid');
-            grid.innerHTML = '';
             POSTS_DATA.forEach((post, index) => {
                 const item = document.createElement('div');
-                item.className = 'glass-panel aspect-square rounded-2xl overflow-hidden active:scale-95 transition-transform relative cursor-pointer';
+                item.className = 'glass-panel aspect-square rounded-2xl overflow-hidden active:scale-95 transition-transform relative';
                 item.onclick = () => openPost(index);
-                if(post.type === 'video') {
-                    item.innerHTML = `<video src="${post.src}" class="w-full h-full object-cover opacity-50"></video><div class="absolute inset-0 flex items-center justify-center"><i class="fas fa-play text-white/50"></i></div>`;
-                } else {
-                    item.innerHTML = `<img src="${post.src}" class="w-full h-full object-cover opacity-80">`;
-                }
+                item.innerHTML = post.type === 'video' ? `<video src="${post.src}" class="w-full h-full object-cover opacity-50"></video>` : `<img src="${post.src}" class="w-full h-full object-cover opacity-80">`;
                 grid.appendChild(item);
             });
         }
@@ -255,45 +310,9 @@
             const post = POSTS_DATA[index];
             const modal = document.getElementById('floating-post');
             const container = document.getElementById('media-container');
-            const loader = document.getElementById('media-loader');
-            const audio = document.getElementById('post-audio');
-            
-            loader.style.opacity = '1';
-            document.getElementById('post-caption').innerText = post.caption;
-            container.innerHTML = '';
-            
-            if(post.type === 'video') {
-                const video = document.createElement('video');
-                video.src = post.src;
-                video.autoplay = true;
-                video.loop = true;
-                video.muted = false;
-                video.className = "w-full h-full object-cover";
-                video.oncanplay = () => loader.style.opacity = '0';
-                container.appendChild(video);
-            } else {
-                const img = document.createElement('img');
-                img.src = post.src;
-                img.className = "w-full h-full object-cover";
-                img.onload = () => loader.style.opacity = '0';
-                container.appendChild(img);
-            }
-
-            if(post.audio) {
-                audio.src = post.audio;
-                audio.play().catch(e => console.log("Audio needs interaction"));
-            }
-
+            container.innerHTML = `<img src="${post.src}" class="w-full h-full object-cover">`;
             modal.style.display = 'flex';
             setTimeout(() => modal.classList.add('active'), 10);
-        }
-
-        function stopAllMedia() {
-            const audio = document.getElementById('post-audio');
-            audio.pause(); audio.src = "";
-            const container = document.getElementById('media-container');
-            const video = container.querySelector('video');
-            if(video) { video.pause(); video.src = ""; }
         }
 
         function handleExit() {
@@ -302,7 +321,6 @@
         }
 
         function killAndHide() {
-            stopAllMedia();
             const modals = ['floating-post', 'profile-modal', 'menu-modal', 'license-modal', 'followers-modal', 'auth-portal'];
             modals.forEach(id => {
                 const el = document.getElementById(id);
@@ -312,6 +330,7 @@
         }
 
         window.addEventListener('popstate', killAndHide);
+        renderGrid();
     </script>
 </body>
 </html>
