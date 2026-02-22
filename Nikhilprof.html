@@ -36,29 +36,38 @@
 
         .main-container { height: 100dvh; overflow-y: auto; touch-action: pan-y; padding-bottom: 100px; }
 
-        /* Admin Tick Glow */
         .red-tick-glow { color: var(--admin-red); animation: tickPulse 2s infinite ease-in-out; }
         @keyframes tickPulse {
             0%, 100% { opacity: 0.7; transform: scale(1); filter: drop-shadow(0 0 2px var(--admin-red)); }
             50% { opacity: 1; transform: scale(1.1); filter: drop-shadow(0 0 8px var(--admin-red)); }
         }
 
-        /* 3:5 Aspect Ratio Modal */
+        /* Modal Overlay */
         .floating-modal {
             position: fixed; inset: 0; z-index: 100; background: rgba(0,0,0,0.95);
             backdrop-filter: blur(20px); display: none; align-items: center; justify-content: center;
             opacity: 0; transition: opacity 0.3s ease;
         }
+
+        /* 3:5 Aspect Box */
         .modal-box {
             width: 82vw; aspect-ratio: 3 / 5; max-width: 380px; max-height: 85vh;
             background: #000; border: 1px solid var(--border); border-radius: 28px;
             overflow: hidden; position: relative; transform: scale(0.9);
             transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
+
+        /* Profile Modal A*A Square */
+        .square-modal {
+            aspect-ratio: 1 / 1 !important;
+            width: 85vw !important;
+            max-width: 400px !important;
+            border-radius: 32px !important;
+        }
+
         .floating-modal.active { display: flex; opacity: 1; }
         .floating-modal.active .modal-box { transform: scale(1); }
 
-        /* Loader */
         .loader {
             position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
             background: #000; z-index: 5; transition: opacity 0.5s ease;
@@ -70,7 +79,6 @@
         }
         @keyframes spin { to { transform: rotate(360deg); } }
 
-        /* Modal Close Buttons */
         .close-btn-circle {
             position: absolute; top: 15px; right: 15px; width: 36px; height: 36px;
             border-radius: 50%; background: rgba(255,255,255,0.1); backdrop-filter: blur(10px);
@@ -78,7 +86,6 @@
             display: flex; align-items: center; justify-content: center; z-index: 110;
         }
 
-        /* Auth Portal Overlay */
         #auth-portal {
             position: fixed; inset: 0; z-index: 200; background: #000;
             display: none; flex-direction: column; align-items: center; justify-content: center;
@@ -113,11 +120,9 @@
         <div class="modal-box glass-panel" onclick="event.stopPropagation()">
             <div id="media-loader" class="loader"><div class="spinner"></div></div>
             <div class="close-btn-circle" onclick="closePost()" style="cursor: pointer;"><i class="fas fa-times"></i></div>
-            
             <div class="h-full w-full relative">
                 <div id="media-container" class="w-full h-full"></div>
                 <audio id="post-audio" src=""></audio>
-                
                 <div class="caption-container">
                     <p id="post-caption" class="text-xs font-light text-gray-300 leading-relaxed"></p>
                 </div>
@@ -126,15 +131,15 @@
     </div>
 
     <div id="profile-modal" class="floating-modal" onclick="closeProfile()">
-        <div class="modal-box glass-panel" onclick="event.stopPropagation()">
+        <div class="modal-box square-modal glass-panel" onclick="event.stopPropagation()">
             <div class="close-btn-circle" onclick="closeProfile()" style="cursor: pointer;">
                 <i class="fas fa-times"></i>
             </div>
             <div class="h-full w-full relative">
                 <img src="file_00000000f4f47208a731ff7b47a3b568.png" class="w-full h-full object-cover">
                 <div class="caption-container">
-                    <p class="font-brand text-[10px] text-blue-500 tracking-widest">ADMIN IDENTIFICATION</p>
-                    <p class="text-xs font-light text-gray-300 mt-1">STATUS: AUTHORIZED // 884-XOS</p>
+                    <p class="font-brand text-[10px] text-blue-500 tracking-widest">SYSTEM ADMIN</p>
+                    <p class="text-[8px] text-gray-400">DATA SECURED</p>
                 </div>
             </div>
         </div>
@@ -145,7 +150,9 @@
 
     <div class="main-container">
         <div class="flex justify-between items-center px-6 py-8">
-            <a href="secondpage.html" class="glass-panel w-10 h-10 rounded-full flex items-center justify-center text-gray-400"><i class="fas fa-chevron-left"></i></a>
+            <button onclick="history.back()" class="glass-panel w-10 h-10 rounded-full flex items-center justify-center text-gray-400 active:scale-90 transition-transform">
+                <i class="fas fa-chevron-left"></i>
+            </button>
             <span class="font-brand text-[9px] text-gray-500 tracking-[0.4em]">ADMIN // PROFILE</span>
             <div class="w-10"></div>
         </div>
@@ -163,7 +170,7 @@
                         </div>
                         <p class="text-[10px] text-blue-500 font-mono tracking-tighter">884-XOS-ADMIN</p>
                         <div class="flex gap-4 mt-3">
-                            <a href="LINK_FOR_FOLLOWERS_HERE.html" class="text-[10px] uppercase tracking-widest text-gray-400"><span class="text-white font-bold">2.4k</span> Followers</a>
+                            <a href="#" class="text-[10px] uppercase tracking-widest text-gray-400"><span class="text-white font-bold">2.4k</span> Followers</a>
                         </div>
                     </div>
                 </div>
@@ -181,18 +188,8 @@
 
     <script>
         const POSTS_DATA = [
-            {
-                type: 'image',
-                src: 'Picsart_26-02-20_19-32-15-424.png',
-                audio: 'background_beat.mp3',
-                caption: 'New haircut'
-            },
-            {
-                type: 'video',
-                src: 'cinematic_intro.mp4',
-                audio: '', 
-                caption: 'UI Rendering Test. Status: Stable.'
-            }
+            { type: 'image', src: 'Picsart_26-02-20_19-32-15-424.png', audio: 'background_beat.mp3', caption: 'New haircut' },
+            { type: 'video', src: 'cinematic_intro.mp4', audio: '', caption: 'UI Rendering Test. Status: Stable.' }
         ];
 
         function renderGrid() {
@@ -206,7 +203,7 @@
             });
         }
 
-        // Profile Modal Logic
+        // Profile Logic (A*A)
         function openProfile() {
             const modal = document.getElementById('profile-modal');
             modal.style.display = 'flex';
@@ -219,7 +216,7 @@
             setTimeout(() => { modal.style.display = 'none'; }, 300);
         }
 
-        // Post Modal Logic
+        // Post Logic (3:5)
         function openPost(index) {
             const post = POSTS_DATA[index];
             const container = document.getElementById('media-container');
@@ -233,16 +230,13 @@
             
             if(post.type === 'video') {
                 const video = document.createElement('video');
-                video.src = post.src;
-                video.autoplay = true;
-                video.loop = true;
+                video.src = post.src; video.autoplay = true; video.loop = true;
                 video.className = "w-full h-full object-cover";
                 video.oncanplay = () => loader.style.opacity = '0';
                 container.appendChild(video);
             } else {
                 const img = document.createElement('img');
-                img.src = post.src;
-                img.className = "w-full h-full object-cover";
+                img.src = post.src; img.className = "w-full h-full object-cover";
                 img.onload = () => loader.style.opacity = '0';
                 container.appendChild(img);
             }
