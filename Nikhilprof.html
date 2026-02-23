@@ -110,31 +110,32 @@
 <body>
 
     <div id="followers-modal" class="floating-modal" onclick="handleExit()">
-        <div class="modal-box menu-window" onclick="event.stopPropagation()">
-            <div class="flex justify-between items-center mb-8">
-                <h3 class="font-brand text-[10px] text-blue-500 tracking-[0.3em]">FOLLOWERS</h3>
-                <div class="close-btn-circle" style="position: static; width: 30px; height: 30px;" onclick="handleExit()">
-                    <i class="fas fa-times text-xs"></i>
-                </div>
+    <div class="modal-box menu-window" onclick="event.stopPropagation()">
+        
+        <div class="flex justify-between items-center mb-8">
+            <h3 class="font-brand text-[10px] text-blue-500 tracking-[0.3em]">FOLLOWERS</h3>
+            <div class="close-btn-circle" style="position: static; width: 30px; height: 30px;" onclick="handleExit()">
+                <i class="fas fa-times text-xs"></i>
             </div>
-                            <a href="index (6) (27).html" class="block">
-    <div class="flex items-center gap-4 p-2">
-        <div class="w-10 h-10 rounded-full overflow-hidden border border-white/10">
-            <img src="Screenshot_20260221-160725.png" class="w-full h-full object-cover" alt="Anush">
         </div>
-        <div>
-            <p class="text-xs font-semibold">Anush</p>
-            <p class="text-[9px] text-gray-500 uppercase">Member</p>
-        </div>
-    </div>
-</a>
-                        </div>
+
+        <div class="flex flex-col gap-4">
+            <a href="index (6) (27).html" class="block active:opacity-70 transition-opacity">
+                <div class="flex items-center gap-4 p-2">
+                    <div class="w-10 h-10 rounded-full overflow-hidden border border-white/10">
+                        <img src="Screenshot_20260221-160725.png" class="w-full h-full object-cover" alt="Anush">
+                    </div>
+                    <div>
+                        <p class="text-xs font-semibold">Anush</p>
+                        <p class="text-[9px] text-gray-500 uppercase">Member</p>
                     </div>
                 </div>
-                <p class="text-[9px] text-center text-gray-600 font-brand mt-4 uppercase">End of Directory</p>
-            </div>
+            </a>
+            <p class="text-[9px] text-center text-gray-600 font-brand mt-6 uppercase">End of Directory</p>
         </div>
     </div>
+</div>
+
 
     <div id="menu-modal" class="floating-modal" onclick="handleExit()">
         <div class="modal-box menu-window" onclick="event.stopPropagation()">
