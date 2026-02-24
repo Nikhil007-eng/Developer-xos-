@@ -242,6 +242,19 @@
         </div>
     </div>
 
+    <div id="profile-modal" class="floating-modal" onclick="handleExit()">
+        <div class="modal-box square-modal glass-panel" onclick="event.stopPropagation()">
+            <div class="close-btn-circle" onclick="handleExit()" style="cursor: pointer;"><i class="fas fa-times"></i></div>
+            <div class="h-full w-full relative">
+                <img src="file_00000000f4f47208a731ff7b47a3b568.png" class="w-full h-full object-cover">
+                <div class="caption-container">
+                    <p class="font-brand text-[10px] text-blue-500 tracking-widest">SYSTEM ADMIN</p>
+                    <p class="text-[8px] text-gray-400">DATA SECURED</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="main-container">
         <div class="flex justify-between items-center px-6 py-8">
             <button onclick="history.back()" class="glass-panel w-10 h-10 rounded-full flex items-center justify-center text-gray-400 active:scale-90 transition-transform"><i class="fas fa-chevron-left"></i></button>
@@ -252,7 +265,9 @@
         <div class="px-6 mb-8">
             <div class="glass-panel p-6 rounded-[32px] relative">
                 <div class="flex items-center gap-6">
-                    <div onclick="openProfile()" class="relative w-20 h-20 rounded-2xl overflow-hidden border border-white/10 cursor-pointer active:scale-95 transition-transform"><img src="file_00000000f4f47208a731ff7b47a3b568.png" class="w-full h-full object-cover"></div>
+                    <div onclick="window.openProfile()" class="relative w-20 h-20 rounded-2xl overflow-hidden border border-white/10 cursor-pointer active:scale-95 transition-transform">
+                        <img src="file_00000000f4f47208a731ff7b47a3b568.png" class="w-full h-full object-cover">
+                    </div>
                     <div class="flex-1">
                         <div class="flex items-center gap-2">
                             <h1 class="font-brand text-xl">NIKHIL</h1>
@@ -344,7 +359,12 @@
             });
         }
 
-        window.openProfile = () => { window.history.pushState({ modal: 'active' }, ""); const modal = document.getElementById('profile-modal'); modal.style.display = 'flex'; setTimeout(() => modal.classList.add('active'), 10); }
+        window.openProfile = () => { 
+            window.history.pushState({ modal: 'active' }, ""); 
+            const modal = document.getElementById('profile-modal'); 
+            modal.style.display = 'flex'; 
+            setTimeout(() => modal.classList.add('active'), 10); 
+        }
 
         window.openPost = function(index) {
             activePostIndex = index;
