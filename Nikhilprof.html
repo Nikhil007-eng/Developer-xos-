@@ -106,7 +106,7 @@
 
         .caption-container { position: absolute; bottom: 0; left: 0; right: 0; padding: 24px 20px; background: linear-gradient(transparent, rgba(0,0,0,0.9)); z-index: 10; }
 
-        /* Updated Comment System Styles: Down to Up, 3/4 Coverage */
+        /* Bottom-Up Comment Sidebar */
         #comment-sidebar {
             position: absolute; left: 0; right: 0; bottom: -75%; width: 100%; height: 75%;
             z-index: 120; transition: bottom 0.5s cubic-bezier(0.19, 1, 0.22, 1);
@@ -232,22 +232,13 @@
                         </div>
                         <div id="comment-list" class="flex-1 overflow-y-auto space-y-4 custom-scrollbar pr-2"></div>
                         <div class="mt-4 flex gap-2">
-                            <input type="text" id="comment-input" class="flex-1 bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-xs text-white outline-none font-light" placeholder="Write feedback...">
+                            <input type="text" id="comment-input" class="flex-1 bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-xs text-white outline-none font-light" placeholder="Type feedback...">
                             <button onclick="addComment()" class="w-11 h-11 glass-panel rounded-xl flex items-center justify-center text-blue-500 active:scale-90 transition-transform">
                                 <i class="fas fa-paper-plane text-xs"></i>
                             </button>
                         </div>
                     </div>
                 </div>
-            </div>
-        </div>
-    </div>
-
-    <div id="profile-modal" class="floating-modal" onclick="handleExit()">
-        <div class="modal-box square-modal glass-panel" onclick="event.stopPropagation()">
-            <div class="close-btn-circle" onclick="handleExit()" style="cursor: pointer;"><i class="fas fa-times"></i></div>
-            <div class="h-full w-full relative"><img src="file_00000000f4f47208a731ff7b47a3b568.png" class="w-full h-full object-cover">
-                <div class="caption-container"><p class="font-brand text-[10px] text-blue-500 tracking-widest">SYSTEM ADMIN</p><p class="text-[8px] text-gray-400">DATA SECURED</p></div>
             </div>
         </div>
     </div>
@@ -270,9 +261,7 @@
                         </div>
                         <p class="text-[10px] text-blue-500 font-mono tracking-tighter">Nikhil@xos</p>
                         <div class="flex gap-4 mt-3">
-                            <div onclick="openFollowers()" class="text-[10px] uppercase tracking-widest text-gray-400 active:text-white transition-colors cursor-pointer">
-                                <span class="font-bold"></span> Followers
-                            </div>
+                            <div onclick="openFollowers()" class="text-[10px] uppercase tracking-widest text-gray-400 active:text-white transition-colors cursor-pointer">Followers</div>
                         </div>
                     </div>
                 </div>
@@ -347,6 +336,7 @@
         function openProfile() { window.history.pushState({ modal: 'active' }, ""); const modal = document.getElementById('profile-modal'); modal.style.display = 'flex'; setTimeout(() => modal.classList.add('active'), 10); }
 
         function openPost(index) {
+            // Crucial: Set index BEFORE rendering comments
             activePostIndex = index;
             window.history.pushState({ modal: 'active' }, "");
             const post = POSTS_DATA[index];
@@ -371,7 +361,7 @@
                 audio.play().catch(() => {});
             }
 
-            renderComments();
+            renderComments(); // Load persistent comments from LocalStorage
             modal.style.display = 'flex';
             setTimeout(() => {
                 modal.classList.add('active');
@@ -386,9 +376,11 @@
         function addComment() {
             const input = document.getElementById('comment-input');
             const text = input.value.trim();
-            if (!text) return;
+            if (!text || activePostIndex === null) return;
 
+            // Load all posts comments
             const allComments = JSON.parse(localStorage.getItem('xos_comments') || '{}');
+            // If this specific post has no array, create it
             if (!allComments[activePostIndex]) allComments[activePostIndex] = [];
 
             const newComment = {
@@ -399,6 +391,7 @@
 
             allComments[activePostIndex].push(newComment);
             localStorage.setItem('xos_comments', JSON.stringify(allComments));
+            
             input.value = '';
             renderComments();
         }
