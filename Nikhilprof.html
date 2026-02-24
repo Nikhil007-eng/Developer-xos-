@@ -226,12 +226,12 @@
                 <div id="comment-sidebar" class="glass-panel backdrop-blur-3xl">
                     <div class="p-6 flex flex-col h-full">
                         <div class="flex justify-between items-center mb-6">
-                            <h3 class="font-brand text-[9px] text-blue-500 tracking-widest">FEEDBACK</h3>
+                            <h3 class="font-brand text-[9px] text-blue-500 tracking-widest">comments</h3>
                             <button onclick="toggleComments()" class="text-white/40"><i class="fas fa-chevron-down"></i></button>
                         </div>
                         <div id="comment-list" class="flex-1 overflow-y-auto space-y-4 custom-scrollbar pr-2"></div>
                         <div class="mt-4 flex gap-2">
-                            <input type="text" id="comment-input" class="flex-1 bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-xs text-white outline-none font-light" placeholder="Type feedback...">
+                            <input type="text" id="comment-input" class="flex-1 bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-xs text-white outline-none font-light" placeholder="Type a comment...">
                             <button onclick="addComment()" class="w-11 h-11 glass-panel rounded-xl flex items-center justify-center text-blue-500 active:scale-90 transition-transform">
                                 <i class="fas fa-paper-plane text-xs"></i>
                             </button>
@@ -317,8 +317,8 @@
         window.closeAuth = () => document.getElementById('auth-portal').style.display = 'none';
         
         window.verifyAccess = () => {
-            if(document.getElementById('auth-key').value === "1234") {
-                window.location.href = "YOUR_GOOGLE_FORM_LINK";
+            if(document.getElementById('auth-key').value === "nyna") {
+                window.location.href = "Https://forms.gle/muG9miN9GJKpVMhn6";
             } else { alert("ACCESS DENIED"); }
         }
 
