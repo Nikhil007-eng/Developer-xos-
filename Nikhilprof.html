@@ -15,7 +15,7 @@
             --admin-red: #ff3131;
             --glass: rgba(10, 10, 12, 0.85);
             --border: rgba(255, 255, 255, 0.08);
-            --bg-color: #000000;
+            --bg-color: #000000; /* Pure AMOLED Black */
             --text-main: #ffffff;
         }
 
@@ -106,18 +106,18 @@
 
         .caption-container { position: absolute; bottom: 0; left: 0; right: 0; padding: 24px 20px; background: linear-gradient(transparent, rgba(0,0,0,0.9)); z-index: 10; }
 
-        /* Smooth Bottom-Up Transition (3/4 Height) */
+        /* Bottom-Up Comment Sidebar */
         #comment-sidebar {
             position: absolute; left: 0; right: 0; bottom: -75%; width: 100%; height: 75%;
-            z-index: 120; transition: bottom 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+            z-index: 120; transition: bottom 0.5s cubic-bezier(0.19, 1, 0.22, 1);
             display: flex; flex-direction: column;
             border-top: 1px solid var(--border);
             border-radius: 32px 32px 0 0;
         }
         #comment-sidebar.open { bottom: 0; }
         .custom-scrollbar::-webkit-scrollbar { width: 0; }
-        .comment-item { animation: slideUpFade 0.4s ease-out forwards; }
-        @keyframes slideUpFade { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .comment-item { animation: fadeInScale 0.4s ease-out forwards; }
+        @keyframes fadeInScale { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
     </style>
 </head>
 <body>
@@ -179,6 +179,35 @@
             </div>
         </div>
     </div>
+    <div id="license-modal" class="floating-modal" onclick="handleExit()">
+        <div class="license-card font-brand" onclick="event.stopPropagation()">
+            <div class="flex justify-between text-[11px] text-[#7f8fb3] mb-6">
+                <div><span class="license-dot"></span>PROTOCOL : ACTIVE</div>
+                <div class="close-btn-circle" style="position: static; width: 24px; height: 24px; cursor: pointer;" onclick="handleExit()">
+                    <i class="fas fa-times text-[10px]"></i>
+                </div>
+            </div>
+            <div class="text-[32px] font-semibold tracking-wider">XOS <span class="text-[#2f7cff]">INT</span></div>
+            <div class="text-[11px] tracking-[4px] text-[#3a6fff] mt-1">SECURE LICENSE ACCESS</div>
+            <div class="h-[1px] bg-white/10 my-6"></div>
+            <div class="text-[12px] leading-[2] text-[#9fb3ff]">
+                <div><span class="text-[#4d7cff]">ID :</span> Nikhil@xos</div>
+                <div><span class="text-[#4d7cff]">ROLE :</span> Special Member</div>
+                <div><span class="text-[#4d7cff]">STATUS :</span> Authorized by admin</div>
+                <div><span class="text-[#4d7cff]">VALIDITY :</span> 2026 – </div>
+            </div>
+            <div class="mt-8 text-[10px] text-[#5a6d99] opacity-70 italic">“Tailoring the digital experience to the core user.”</div>
+        </div>
+    </div>
+
+    <div id="auth-portal" style="display: none; position: fixed; inset: 0; z-index: 200; background: #000; flex-direction: column; align-items: center; justify-content: center;">
+        <div class="close-btn-circle" onclick="closeAuth()" style="top: 30px; right: 30px; cursor: pointer;">
+            <i class="fas fa-times"></i>
+        </div>
+        <h2 class="font-brand text-[10px] mb-2 text-blue-500 tracking-[0.3em]">SECURE UPLINK</h2>
+        <input type="password" id="auth-key" class="bg-white/5 border border-white/10 p-4 rounded-xl text-center font-brand text-white outline-none" placeholder="••••">
+        <button onclick="verifyAccess()" class="mt-8 text-[10px] font-brand border border-white/20 px-8 py-3 rounded-full uppercase tracking-widest active:bg-white active:text-black">Verify Access</button>
+    </div>
 
     <div id="floating-post" class="floating-modal" onclick="handleExit()">
         <div class="modal-box glass-panel" onclick="event.stopPropagation()">
@@ -202,8 +231,8 @@
                         </div>
                         <div id="comment-list" class="flex-1 overflow-y-auto space-y-4 custom-scrollbar pr-2"></div>
                         <div class="mt-4 flex gap-2">
-                            <input type="text" id="comment-input" class="flex-1 bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-xs text-white outline-none font-light" placeholder="Public feedback...">
-                            <button id="send-comment" class="w-11 h-11 glass-panel rounded-xl flex items-center justify-center text-blue-500 active:scale-90 transition-transform">
+                            <input type="text" id="comment-input" class="flex-1 bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-xs text-white outline-none font-light" placeholder="Type feedback...">
+                            <button onclick="addComment()" class="w-11 h-11 glass-panel rounded-xl flex items-center justify-center text-blue-500 active:scale-90 transition-transform">
                                 <i class="fas fa-paper-plane text-xs"></i>
                             </button>
                         </div>
@@ -219,7 +248,32 @@
             <span class="font-brand text-[9px] text-gray-500 tracking-[0.4em]">ADMIN // PROFILE</span>
             <button onclick="openMenu()" class="glass-panel w-10 h-10 rounded-xl flex items-center justify-center text-white active:scale-90 transition-transform"><i class="fas fa-bars-staggered"></i></button>
         </div>
-        <div id="posts-grid" class="grid grid-cols-2 gap-3 px-6"></div>
+
+        <div class="px-6 mb-8">
+            <div class="glass-panel p-6 rounded-[32px] relative">
+                <div class="flex items-center gap-6">
+                    <div onclick="openProfile()" class="relative w-20 h-20 rounded-2xl overflow-hidden border border-white/10 cursor-pointer active:scale-95 transition-transform"><img src="file_00000000f4f47208a731ff7b47a3b568.png" class="w-full h-full object-cover"></div>
+                    <div class="flex-1">
+                        <div class="flex items-center gap-2">
+                            <h1 class="font-brand text-xl">NIKHIL</h1>
+                            <i class="fas fa-check-circle red-tick-glow text-xs"></i>
+                        </div>
+                        <p class="text-[10px] text-blue-500 font-mono tracking-tighter">Nikhil@xos</p>
+                        <div class="flex gap-4 mt-3">
+                            <div onclick="openFollowers()" class="text-[10px] uppercase tracking-widest text-gray-400 active:text-white transition-colors cursor-pointer">Followers</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="px-6">
+            <div class="flex justify-between items-center mb-6 px-2">
+                <span class="font-brand text-[9px] text-gray-500 uppercase tracking-[0.3em]">Posts</span>
+                <button onclick="openAuth()" class="w-8 h-8 glass-panel rounded-lg flex items-center justify-center text-xs text-white"><i class="fas fa-plus"></i></button>
+            </div>
+            <div id="posts-grid" class="grid grid-cols-2 gap-3"></div>
+        </div>
     </div>
 
     <script type="module">
@@ -233,6 +287,7 @@
             storageBucket: "steel-melody-464711-d6.firebasestorage.app",
             messagingSenderId: "288849938458",
             appId: "1:288849938458:web:d615242bb9f1e1ee0fe9a3",
+            measurementId: "G-NGF1EMPTEP",
             databaseURL: "https://steel-melody-464711-d6-default-rtdb.firebaseio.com"
         };
 
@@ -241,7 +296,41 @@
 
         const POSTS_DATA = [{ type: 'image', src: 'Picsart_26-02-20_19-32-15-424.png', audio: 'nikhilp1.mp3', caption: 'New haircut' }, { type: 'video', src: 'video1.mp4', audio: '', caption: 'yatra' }];
         let activePostIndex = null;
-        let commentListener = null;
+
+        window.toggleDarkMode = () => document.body.classList.toggle('light-mode');
+        window.openAuth = () => document.getElementById('auth-portal').style.display = 'flex';
+        window.closeAuth = () => document.getElementById('auth-portal').style.display = 'none';
+        
+        window.verifyAccess = () => {
+            if(document.getElementById('auth-key').value === "1234") {
+                window.location.href = "YOUR_GOOGLE_FORM_LINK";
+            } else { alert("ACCESS DENIED"); }
+        }
+
+        window.openFollowers = () => {
+            window.history.pushState({ modal: 'active' }, "");
+            const modal = document.getElementById('followers-modal');
+            modal.style.display = 'flex';
+            setTimeout(() => modal.classList.add('active'), 10);
+        }
+
+        window.openMenu = () => {
+            window.history.pushState({ modal: 'active' }, "");
+            const modal = document.getElementById('menu-modal');
+            modal.style.display = 'flex';
+            setTimeout(() => modal.classList.add('active'), 10);
+        }
+
+        window.openLicense = () => {
+            window.history.pushState({ modal: 'active' }, "");
+            document.getElementById('menu-modal').classList.remove('active');
+            setTimeout(() => {
+                document.getElementById('menu-modal').style.display = 'none';
+                const modal = document.getElementById('license-modal');
+                modal.style.display = 'flex';
+                setTimeout(() => modal.classList.add('active'), 10);
+            }, 300);
+        }
 
         window.renderGrid = function() {
             const grid = document.getElementById('posts-grid');
@@ -249,11 +338,13 @@
             POSTS_DATA.forEach((post, index) => {
                 const item = document.createElement('div');
                 item.className = 'glass-panel aspect-square rounded-2xl overflow-hidden active:scale-95 transition-transform relative';
-                item.onclick = () => openPost(index);
+                item.onclick = () => window.openPost(index);
                 item.innerHTML = post.type === 'video' ? `<video src="${post.src}" class="w-full h-full object-cover opacity-50" muted></video>` : `<img src="${post.src}" class="w-full h-full object-cover opacity-80">`;
                 grid.appendChild(item);
             });
         }
+
+        window.openProfile = () => { window.history.pushState({ modal: 'active' }, ""); const modal = document.getElementById('profile-modal'); modal.style.display = 'flex'; setTimeout(() => modal.classList.add('active'), 10); }
 
         window.openPost = function(index) {
             activePostIndex = index;
@@ -267,54 +358,72 @@
 
             loader.style.opacity = '1';
             caption.innerText = post.caption;
-            container.innerHTML = post.type === 'video' ? `<video id="active-video" src="${post.src}" class="w-full h-full object-cover" autoplay loop playsinline></video>` : `<img src="${post.src}" class="w-full h-full object-cover">`;
+            container.innerHTML = '';
 
-            if (post.audio) { audio.src = post.audio; audio.play().catch(() => {}); }
+            if (post.type === 'video') {
+                container.innerHTML = `<video id="active-video" src="${post.src}" class="w-full h-full object-cover" autoplay loop playsinline></video>`;
+            } else {
+                container.innerHTML = `<img src="${post.src}" class="w-full h-full object-cover">`;
+            }
 
-            initCommentStream(index);
+            if (post.audio) {
+                audio.src = post.audio;
+                audio.play().catch(() => {});
+            }
+
+            renderComments(); 
             modal.style.display = 'flex';
-            setTimeout(() => { modal.classList.add('active'); loader.style.opacity = '0'; }, 10);
+            setTimeout(() => {
+                modal.classList.add('active');
+                loader.style.opacity = '0';
+            }, 10);
         }
 
-        window.toggleComments = function() { document.getElementById('comment-sidebar').classList.toggle('open'); }
+        window.toggleComments = () => document.getElementById('comment-sidebar').classList.toggle('open');
 
-        document.getElementById('send-comment').onclick = function() {
+        window.addComment = function() {
             const input = document.getElementById('comment-input');
             const text = input.value.trim();
             if (!text || activePostIndex === null) return;
 
-            push(ref(db, 'comments/' + activePostIndex), {
+            const postRef = ref(db, 'comments/' + activePostIndex);
+            push(postRef, {
                 text: text,
                 time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
                 timestamp: Date.now()
             });
+            
             input.value = '';
         }
 
-        function initCommentStream(index) {
+        window.deleteComment = function(id) {
+            const commentRef = ref(db, `comments/${activePostIndex}/${id}`);
+            remove(commentRef);
+        }
+
+        function renderComments() {
             const list = document.getElementById('comment-list');
-            const postRef = ref(db, 'comments/' + index);
-            
+            const postRef = ref(db, 'comments/' + activePostIndex);
+
             onValue(postRef, (snapshot) => {
                 const data = snapshot.val();
-                if (!data) { list.innerHTML = `<div class="text-white/20 text-center text-[10px] mt-10 tracking-widest uppercase">No feedback yet</div>`; return; }
-                
+                if (!data) {
+                    list.innerHTML = `<div class="text-white/20 text-center text-[10px] mt-10 uppercase tracking-widest">No conversation yet</div>`;
+                    return;
+                }
+
                 const comments = Object.entries(data).map(([id, val]) => ({ id, ...val }));
                 list.innerHTML = comments.map(c => `
                     <div class="comment-item glass-panel p-3 rounded-2xl border border-white/5 relative">
-                        <div class="flex justify-between items-center mb-1">
-                            <span class="text-[8px] text-blue-500/60 font-mono">${c.time}</span>
-                            <button onclick="window.deleteComment('${c.id}')" class="text-white/10 hover:text-red-500"><i class="fas fa-trash text-[8px]"></i></button>
+                        <div class="flex justify-between items-start mb-1">
+                            <span class="text-[9px] text-blue-500/60 font-mono">${c.time}</span>
+                            <button onclick="window.deleteComment('${c.id}')" class="text-white/20 hover:text-red-500"><i class="fas fa-trash text-[9px]"></i></button>
                         </div>
-                        <p class="text-xs text-white/80 font-light">${c.text}</p>
+                        <p class="text-xs text-white/80 font-light leading-relaxed">${c.text}</p>
                     </div>
                 `).join('');
                 list.scrollTop = list.scrollHeight;
             });
-        }
-
-        window.deleteComment = function(id) {
-            remove(ref(db, `comments/${activePostIndex}/${id}`));
         }
 
         window.handleExit = function() {
@@ -326,15 +435,22 @@
             const video = document.getElementById('active-video');
             if (video) { video.pause(); video.src = ""; }
             const audio = document.getElementById('post-audio');
-            if (audio) { audio.pause(); audio.src = ""; }
+            if (audio) { audio.pause(); audio.currentTime = 0; audio.src = ""; }
             document.getElementById('comment-sidebar').classList.remove('open');
-            const modals = ['floating-post'];
-            modals.forEach(id => { const el = document.getElementById(id); if(el) el.classList.remove('active'); });
-            setTimeout(() => { modals.forEach(id => { const el = document.getElementById(id); if(el) el.style.display = 'none'; }); }, 300);
+            const modals = ['floating-post', 'profile-modal', 'menu-modal', 'license-modal', 'followers-modal', 'auth-portal'];
+            modals.forEach(id => {
+                const el = document.getElementById(id);
+                if(el) el.classList.remove('active');
+            });
+            setTimeout(() => {
+                modals.forEach(id => {
+                    const el = document.getElementById(id);
+                    if(el) el.style.display = 'none';
+                });
+            }, 300);
         }
-
         window.addEventListener('popstate', window.killAndHide);
-        renderGrid();
+        window.renderGrid();
     </script>
 </body>
 </html>
