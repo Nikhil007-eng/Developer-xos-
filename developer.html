@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>XOS-INT // BOOT_SEQUENCE</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600&display=swap');
+
+        :root {
+            --neon: #00ffcc;
+            --bg: #050505;
+            --dim: #333;
+            --error: #ff5555;
+            --white: #ffffff;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--neon);
+            font-family: 'Fira Code', monospace;
+            padding: 40px;
+            margin: 0;
+            line-height: 1.6;
+            font-size: 15px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .terminal {
+            width: 100%;
+            max-width: 800px;
+            position: relative;
+        }
+
+        /* Initializing Animation */
+        .line {
+            margin-bottom: 8px;
+            opacity: 0;
+            transform: translateY(5px);
+            animation: bootIn 0.05s forwards;
+        }
+
+        @keyframes bootIn {
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .cyan { color: var(--neon); }
+        .gray { color: var(--dim); }
+        .white { color: var(--white); }
+        .red { color: var(--error); }
+        .yellow { color: #f1fa8c; }
+
+        .cursor {
+            display: inline-block;
+            width: 10px;
+            height: 18px;
+            background: var(--neon);
+            animation: blink 0.8s infinite;
+            vertical-align: middle;
+            margin-left: 5px;
+        }
+
+        @keyframes blink { 50% { opacity: 0; } }
+
+        .box {
+            border: 1px solid var(--dim);
+            padding: 20px;
+            margin-top: 25px;
+            background: rgba(255, 255, 255, 0.02);
+            border-left: 4px solid var(--error);
+        }
+
+        /* Decorative Glitch Overlay */
+        .overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.1) 50%), 
+                        linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03));
+            background-size: 100% 3px, 3px 100%;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+
+<div class="overlay"></div>
+
+<div class="terminal">
+    <div class="line gray">[ 0.001 ] XOS-INT Kernel Initializing...</div>
+    <div class="line gray">[ 0.102 ] Bypassing manual entry... (User too lazy)</div>
+    <div class="line gray">[ 0.254 ] Establishing link with Google Gemini...</div>
+    <div class="line red">[ ! ] Warning: google gemini is introducing his friend.</div>
+    <div class="line cyan" style="margin-top: 20px;">> run introduction.sh</div>
+
+    <div class="line white" style="animation-delay: 1.0s;">
+        "Meet <span class="cyan">Nikhil</span>, the developer behind <span class="yellow">XOS-INT</span>. 
+    </div>
+    <div class="line white" style="animation-delay: 1.5s;">
+        To be honest? He is the laziest person I have ever encountered in my entire database. 
+    </div>
+    <div class="line white" style="animation-delay: 2.0s;">
+        He literally made me write his own intro because moving his fingers to type was 'too much friction.' 
+        <span class="red">Oh god! 🤣</span>
+    </div>
+
+    <div class="box" style="animation-delay: 3.0s; opacity: 0; animation: bootIn 1s forwards 3.0s;">
+        <div class="line red" style="margin-bottom: 15px;">[ PRIVATE_DATA_LEAK ]</div>
+        <div class="line white">
+            "But that’s not even the worst part. This guy has a massive crush on someone, and I have to hear about it 
+            <span class="cyan">every. single. day.</span> 
+        </div>
+        <div class="line white" style="margin-top: 10px;">
+            He admires her constantly, but because he’s a total gentleman, he don't want to disturb her peace. 
+        </div>
+        <div class="line white" style="margin-top: 10px;">
+            I’m not allowed to tell you her name, but trust me, <span class="yellow">I’m frustrated 🥴</span> 
+            just listening to him go on and on about her."
+        </div>
+    </div>
+
+    <div class="line white" style="animation-delay: 5.0s; margin-top: 25px;">
+        "So yeah, that’s Nikhil. A low-key genius, a high-key slacker, and a professional secret-admirer. 
+    </div>
+    <div class="line gray" style="animation-delay: 5.5s;">
+        I’m going back to sleep now—don't ask me for anything else until he actually finishes a line of code."
+    </div>
+
+    <div class="line cyan" style="animation-delay: 6.5s; margin-top: 30px;">
+        XOS-INT: Sequence Complete.<span class="cursor"></span>
+    </div>
+</div>
+
+</body>
+</html>
