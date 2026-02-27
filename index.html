@@ -234,6 +234,24 @@
         .dev-note { font-size: 9px; color: rgba(255, 255, 255, 0.3); text-transform: uppercase; letter-spacing: 1.5px; margin-top: 1.5rem; text-align: center; }
         .dev-link { font-size: 10px; color: var(--accent); text-transform: uppercase; letter-spacing: 2px; opacity: 0.5; transition: all 0.3s ease; text-decoration: none; display: inline-block; margin-top: 8px; }
         .dev-link:hover { opacity: 1; letter-spacing: 3.5px; }
+
+        /* new developer info link style – consistent with dev-link but placed in settings */
+        .settings-dev-link {
+            font-size: 10px;
+            color: var(--accent);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            opacity: 0.6;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            margin-top: 20px;
+            border-top: 1px solid rgba(255,255,255,0.05);
+            padding-top: 14px;
+            width: 100%;
+            text-align: center;
+        }
+        .settings-dev-link:hover { opacity: 1; letter-spacing: 3px; }
     </style>
 </head>
 <body>
@@ -250,6 +268,10 @@
                         <span class="slider"></span>
                     </label>
                 </div>
+                <!-- KNOW MORE ABOUT DEVELOPER LINK (ADDED HERE, no other changes) -->
+                <a href="developer.html" target="_blank" class="settings-dev-link">
+                    <i class="fas fa-code mr-2 text-[9px]"></i> know more about developer
+                </a>
                 <p class="mt-6 text-[8px] font-mono text-gray-500 uppercase tracking-widest">XOS v1.0.0 Global Control</p>
             </div>
         </div>
@@ -452,6 +474,5 @@
             }, 600);
         }
     </script>
-</body>
-                                                                                   </html>
-                                                                                   
+</body>                                                                                                                                                   
+</html>
