@@ -250,14 +250,14 @@
         }
         .settings-dev-link:hover { opacity: 1; letter-spacing: 3px; }
 
-        /* --- PRIVACY BANNER: raised from bottom, full mobile width --- */
+        /* PRIVACY BANNER (unchanged) */
         .privacy-banner-container {
-            width: 100%;                /* fits mobile screen width exactly */
-            max-width: 100%;             /* no restriction, uses full parent width */
-            padding-left: 20px;           /* match body padding for consistency */
+            width: 100%;
+            max-width: 100%;
+            padding-left: 20px;
             padding-right: 20px;
-            margin-top: 20px;            /* space above banner (pushes it up from bottom) */
-            margin-bottom: 10px;          /* small gap from very bottom */
+            margin-top: 20px;
+            margin-bottom: 10px;
             transition: opacity 0.4s ease, transform 0.3s ease;
             opacity: 1;
             transform: translateY(0);
@@ -311,39 +311,90 @@
             to { transform: translateX(-50%); }
         }
 
-        /* LAYOUT: top group and banner pushed up a bit from bottom */
         .welcome-layout {
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: space-between;  /* top group vs banner */
+            justify-content: space-between;
             width: 100%;
             height: 100%;
         }
 
         .top-group {
-            flex: 1;                        /* take available space, push banner down */
+            flex: 1;
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center;        /* keep content centered vertically */
+            justify-content: center;
             width: 100%;
         }
 
-        /* ensure banner is not at extreme bottom but has some space above */
         .banner-wrapper {
             width: 100%;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: flex-end;
-            margin-bottom: 20px;            /* additional bottom gap, but not too low */
+            margin-bottom: 20px;
+        }
+
+        /* --- NEW GLASSY BUTTON STYLES (global feed) --- */
+        .global-feed-btn {
+            background: var(--glass);
+            backdrop-filter: blur(45px) saturate(210%);
+            -webkit-backdrop-filter: blur(45px) saturate(210%);
+            border: 1px solid var(--border);
+            color: var(--text-color);
+            transition: all 0.2s ease;
+            font-size: 12px;
+            padding: 8px 14px;
+            border-radius: 30px;          /* fully rounded */
+            letter-spacing: 0.5px;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            text-transform: uppercase;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            cursor: pointer;
+            text-decoration: none;          /* remove underline if anchor */
+        }
+
+        .global-feed-btn:active {
+            transform: scale(0.94);
+            background: rgba(255,255,255,0.1);
+        }
+
+        /* override for light mode consistency */
+        body.light-mode .global-feed-btn {
+            background: rgba(255,255,255,0.7);
+            border-color: rgba(0,0,0,0.1);
+            color: #000;
+        }
+
+        /* header row adjustments: place feed button left, cog right */
+        .profiles-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+            margin-bottom: 1.5rem;  /* matches mb-6 */
+            padding-left: 0.5rem;    /* px-2 equivalent */
+            padding-right: 0.5rem;
+        }
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .header-left h1 {
+            margin-bottom: 0;        /* override default mb if any */
         }
     </style>
 </head>
 <body>
     
-    <!-- Settings Modal (unchanged) -->
+    <!-- Settings Modal -->
     <div id="settings-modal" onclick="backToProfile()">
         <div class="modal-container" onclick="event.stopPropagation()">
             <div class="settings-box glass-panel text-center">
@@ -371,10 +422,9 @@
         </div>
     </div>
 
-    <!-- ========== WELCOME VIEW (banner raised, full mobile width) ========= -->
+    <!-- WELCOME VIEW -->
     <div id="view-welcome" class="view active">
         <div class="welcome-layout">
-            <!-- Top section: logo, title, button, developer (centered) -->
             <div class="top-group">
                 <div class="mb-8 relative">
                     <div class="relative w-24 h-24 rounded-full bg-black border border-gray-800 flex items-center justify-center">
@@ -385,11 +435,9 @@
                 <p class="text-gray-500 text-[10px] tracking-[0.4em] uppercase mb-12">Social Interface v1.0</p>
                 <button onclick="enterSystem()" class="glass-panel w-full max-w-[280px] py-4 rounded-xl font-medium tracking-widest uppercase text-sm active:scale-95 transition-transform">Enter System</button>
                 
-                <!-- Developer link (unchanged, stays in top area) -->
                 <a href="https://nikhil007-eng.github.io/xos-social-Id/" target="_blank" class="dev-highlight">Developer</a>
             </div>
 
-            <!-- BANNER WRAPPER: placed higher than absolute bottom, with full width -->
             <div class="banner-wrapper">
                 <div id="privacyBannerContainer" class="privacy-banner-container">
                     <div class="xos-banner-root">
@@ -401,7 +449,7 @@
                                 </svg>
                                 WE DON'T COLLECT ANY PERSONAL USER DATA WHEN YOU VISIT OUR WEBPAGE.
                             </span>
-                            <!-- duplicate for seamless loop -->
+                            <!-- duplicate -->
                             <span class="xos-text-item">
                                 <svg class="xos-shield-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                                     <path d="M12 1L3 5V11C3 16.55 6.84 21.74 12 23C17.16 21.74 21 16.55 21 11V5L12 1Z" fill="black"/>
@@ -443,11 +491,19 @@
         </div>
     </div>
 
-    <!-- PROFILES VIEW -->
+    <!-- PROFILES VIEW (with global feed glassy button left of settings) -->
     <div id="view-profiles" class="view">
         <div class="w-full max-w-md flex flex-col h-full pt-6">
-            <div class="flex items-center justify-between mb-6 px-2">
-                <h1 class="font-brand text-2xl font-bold">XOS</h1>
+            <!-- header row with global feed button (left) and settings cog (right) -->
+            <div class="profiles-header">
+                <div class="header-left">
+                    <h1 class="font-brand text-2xl font-bold">XOS</h1>
+                    <!-- NEW: Glassy global feed button, positioned left of settings -->
+                    <a href="https://nikhil007-eng.github.io/XOS-GLOBAL/" target="_blank" class="global-feed-btn">
+                        <i class="fas fa-globe-asia" style="font-size: 11px;"></i>
+                        <span>global feed</span>
+                    </a>
+                </div>
                 <i class="fas fa-cog text-gray-500 cursor-pointer p-2 active:rotate-90 transition-transform" onclick="openSettings()"></i>
             </div>
             
@@ -459,6 +515,7 @@
             <p class="text-[9px] uppercase text-gray-600 tracking-[0.2em] mb-4 px-2">Select User</p>
             
             <div class="scroll-area flex flex-col gap-3">
+                <!-- Nikhil profile (admin) -->
                 <a href="Nikhilprof.html" class="profile-item glass-panel rounded-2xl p-4 flex items-center gap-4">
                     <div onclick="event.preventDefault(); zoomPhoto('file_00000000f4f47208a731ff7b47a3b568.png')" class="w-10 h-10 rounded-full bg-gradient-to-tr from-white-600 to-black p-[1px] cursor-pointer z-10">
                         <img src="file_00000000f4f47208a731ff7b47a3b568.png" class="w-full h-full rounded-full object-cover bg-black">
@@ -473,6 +530,7 @@
                     <i class="fas fa-chevron-right text-gray-700 text-xs"></i>
                 </a>
 
+                <!-- Anush profile -->
                 <a href="https://nikhil007-eng.github.io/xosintanush/" class="profile-item glass-panel rounded-2xl p-4 flex items-center gap-4">
                     <div onclick="event.preventDefault(); zoomPhoto('Screenshot_20260221-160725.png')" class="w-10 h-10 rounded-full bg-gradient-to-tr from-white-600 to-black p-[1px] cursor-pointer z-10">
                         <img src="Screenshot_20260221-160725.png" class="w-full h-full rounded-full object-cover bg-black">
@@ -487,6 +545,7 @@
                     <i class="fas fa-chevron-right text-gray-700 text-xs"></i>
                 </a>
 
+                <!-- Niranjan profile -->
                 <a href="https://nikhil007-eng.github.io/xosint/" class="profile-item glass-panel rounded-2xl p-4 flex items-center gap-4">
                     <div onclick="event.preventDefault(); zoomPhoto('IMG-20260222-WA0034 (1).jpg')" class="w-10 h-10 rounded-full bg-gradient-to-tr from-white-600 to-black p-[1px] cursor-pointer z-10">
                         <img src="IMG-20260222-WA0034 (1).jpg" class="w-full h-full rounded-full object-cover bg-black">
@@ -567,7 +626,7 @@
         }
 
         function enterSystem() {
-            // Hide the privacy banner (now raised and full width)
+            // Hide privacy banner
             const bannerContainer = document.getElementById('privacyBannerContainer');
             if (bannerContainer) {
                 bannerContainer.classList.add('banner-hidden');
