@@ -250,42 +250,94 @@
         }
         .settings-dev-link:hover { opacity: 1; letter-spacing: 3px; }
 
-        #comment-sidebar {
-    /* Position fixed to bottom of screen */
-    position: fixed;
-    left: 0;
-    bottom: 0; /* Changed from -100% to 0 */
-    right: 0;
-    
-    /* Full screen width */
-    width: 100%;
-    height: 75dvh; /* Keeps 75% of viewport height */
-    
-    z-index: 120;
-    
-    /* Slide animation - hidden by default */
-    transform: translateY(100%); /* Hide off-screen at bottom */
-    transition: transform 0.5s cubic-bezier(0.19, 1, 0.22, 1);
-    
-    display: flex;
-    flex-direction: column;
-    
-    /* XOS Styling */
-    border-top: 1px solid var(--border);
-    border-radius: 32px 32px 0 0;
-    
-    /* Essential for mobile: prevents content from touching the edges */
-    box-sizing: border-box;
-    overflow: hidden;
-    
-    /* When sidebar is open/active */
-    &.active {
-        transform: translateY(0); /* Slide up to visible position */
-    }
+        /* --- PRIVACY BANNER: raised from bottom, full mobile width --- */
+        .privacy-banner-container {
+            width: 100%;                /* fits mobile screen width exactly */
+            max-width: 100%;             /* no restriction, uses full parent width */
+            padding-left: 20px;           /* match body padding for consistency */
+            padding-right: 20px;
+            margin-top: 20px;            /* space above banner (pushes it up from bottom) */
+            margin-bottom: 10px;          /* small gap from very bottom */
+            transition: opacity 0.4s ease, transform 0.3s ease;
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .privacy-banner-container.banner-hidden {
+            opacity: 0;
+            transform: translateY(10px);
+            pointer-events: none;
+            display: none;
+        }
+
+        .xos-banner-root {
+            width: 100%;
+            height: 34px;
+            background: #ffffff;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            overflow: hidden;
+            border: 1px solid #ebebeb;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+
+        .xos-marquee-content {
+            display: flex;
+            animation: xos-scroll 15s linear infinite;
+        }
+
+        .xos-text-item {
+            display: flex;
+            align-items: center;
+            padding-right: 60px;
+            color: #000;
+            font-family: sans-serif;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            white-space: nowrap;
+        }
+
+        .xos-shield-icon {
+            width: 14px;
+            height: 14px;
+            margin-right: 8px;
+        }
 
         @keyframes xos-scroll {
             from { transform: translateX(0); }
             to { transform: translateX(-50%); }
+        }
+
+        /* LAYOUT: top group and banner pushed up a bit from bottom */
+        .welcome-layout {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;  /* top group vs banner */
+            width: 100%;
+            height: 100%;
+        }
+
+        .top-group {
+            flex: 1;                        /* take available space, push banner down */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;        /* keep content centered vertically */
+            width: 100%;
+        }
+
+        /* ensure banner is not at extreme bottom but has some space above */
+        .banner-wrapper {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-end;
+            margin-bottom: 20px;            /* additional bottom gap, but not too low */
         }
     </style>
 </head>
@@ -320,40 +372,45 @@
         </div>
     </div>
 
-    <!-- WELCOME VIEW with moving banner below developer button -->
+    <!-- ========== WELCOME VIEW (banner raised, full mobile width) ========= -->
     <div id="view-welcome" class="view active">
-        <div class="flex flex-col items-center text-center w-full">
-            <div class="mb-8 relative">
-                <div class="relative w-24 h-24 rounded-full bg-black border border-gray-800 flex items-center justify-center">
-                    <span class="font-brand text-5xl font-bold text-white">X</span>
+        <div class="welcome-layout">
+            <!-- Top section: logo, title, button, developer (centered) -->
+            <div class="top-group">
+                <div class="mb-8 relative">
+                    <div class="relative w-24 h-24 rounded-full bg-black border border-gray-800 flex items-center justify-center">
+                        <span class="font-brand text-5xl font-bold text-white">X</span>
+                    </div>
                 </div>
+                <h1 class="font-brand text-4xl mb-2">XOS</h1>
+                <p class="text-gray-500 text-[10px] tracking-[0.4em] uppercase mb-12">Social Interface v1.0</p>
+                <button onclick="enterSystem()" class="glass-panel w-full max-w-[280px] py-4 rounded-xl font-medium tracking-widest uppercase text-sm active:scale-95 transition-transform">Enter System</button>
+                
+                <!-- Developer link (unchanged, stays in top area) -->
+                <a href="https://nikhil007-eng.github.io/xos-social-Id/" target="_blank" class="dev-highlight">Developer</a>
             </div>
-            <h1 class="font-brand text-4xl mb-2">XOS</h1>
-            <p class="text-gray-500 text-[10px] tracking-[0.4em] uppercase mb-12">Social Interface v1.0</p>
-            <button onclick="enterSystem()" class="glass-panel w-full max-w-[280px] py-4 rounded-xl font-medium tracking-widest uppercase text-sm active:scale-95 transition-transform">Enter System</button>
-            
-            <!-- Developer link (unchanged) -->
-            <a href="https://nikhil007-eng.github.io/xos-social-Id/" target="_blank" class="dev-highlight">Developer</a>
 
-            <!-- MARQUEE PRIVACY BANNER MOVED HERE: below developer button -->
-            <div id="privacyBannerContainer" class="privacy-banner-container">
-                <div class="xos-banner-root">
-                    <div class="xos-marquee-content">
-                        <span class="xos-text-item">
-                            <svg class="xos-shield-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M12 1L3 5V11C3 16.55 6.84 21.74 12 23C17.16 21.74 21 16.55 21 11V5L12 1Z" fill="black"/>
-                                <path d="M12 6L9 11H15L12 6Z" fill="white"/>
-                            </svg>
-                            WE DON'T COLLECT ANY PERSONAL USER DATA WHEN YOU VISIT OUR WEBPAGE.
-                        </span>
-                        <!-- duplicate for seamless loop -->
-                        <span class="xos-text-item">
-                            <svg class="xos-shield-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M12 1L3 5V11C3 16.55 6.84 21.74 12 23C17.16 21.74 21 16.55 21 11V5L12 1Z" fill="black"/>
-                                <path d="M12 6L9 11H15L12 6Z" fill="white"/>
-                            </svg>
-                            WE DON'T COLLECT ANY PERSONAL USER DATA WHEN YOU VISIT OUR WEBPAGE.
-                        </span>
+            <!-- BANNER WRAPPER: placed higher than absolute bottom, with full width -->
+            <div class="banner-wrapper">
+                <div id="privacyBannerContainer" class="privacy-banner-container">
+                    <div class="xos-banner-root">
+                        <div class="xos-marquee-content">
+                            <span class="xos-text-item">
+                                <svg class="xos-shield-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M12 1L3 5V11C3 16.55 6.84 21.74 12 23C17.16 21.74 21 16.55 21 11V5L12 1Z" fill="black"/>
+                                    <path d="M12 6L9 11H15L12 6Z" fill="white"/>
+                                </svg>
+                                WE DON'T COLLECT ANY PERSONAL USER DATA WHEN YOU VISIT OUR WEBPAGE.
+                            </span>
+                            <!-- duplicate for seamless loop -->
+                            <span class="xos-text-item">
+                                <svg class="xos-shield-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M12 1L3 5V11C3 16.55 6.84 21.74 12 23C17.16 21.74 21 16.55 21 11V5L12 1Z" fill="black"/>
+                                    <path d="M12 6L9 11H15L12 6Z" fill="white"/>
+                                </svg>
+                                WE DON'T COLLECT ANY PERSONAL USER DATA WHEN YOU VISIT OUR WEBPAGE.
+                            </span>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -511,11 +568,10 @@
         }
 
         function enterSystem() {
-            // Hide the privacy banner (now inside welcome view)
+            // Hide the privacy banner (now raised and full width)
             const bannerContainer = document.getElementById('privacyBannerContainer');
             if (bannerContainer) {
                 bannerContainer.classList.add('banner-hidden');
-                // Optionally remove after transition (but fine as is)
             }
 
             const audio = document.getElementById('systemAudio');
