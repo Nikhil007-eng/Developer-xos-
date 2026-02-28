@@ -107,12 +107,32 @@
         .caption-container { position: absolute; bottom: 0; left: 0; right: 0; padding: 24px 20px; background: linear-gradient(transparent, rgba(0,0,0,0.9)); z-index: 10; }
 
         /* Bottom-Up Comment Sidebar */
-        #comment-sidebar {
-            position: absolute; left: 0; right: 0; bottom: -75%; width: 100%; height: 75%;
-            z-index: 120; transition: bottom 0.5s cubic-bezier(0.19, 1, 0.22, 1);
-            display: flex; flex-direction: column;
-            border-top: 1px solid var(--border);
-            border-radius: 32px 32px 0 0;
+        ##comment-sidebar {
+    /* Change position to fixed so it stays relative to the screen, not the page height */
+    position: fixed; 
+    left: 0; 
+    right: 0; 
+    /* Bottom stays at -100% to hide it completely when closed */
+    bottom: -100%; 
+    
+    /* Dimensions */
+    width: 100%; 
+    /* Use dvh (dynamic viewport height) for better mobile browser support */
+    height: 75dvh; 
+    
+    z-index: 120; 
+    transition: bottom 0.5s cubic-bezier(0.19, 1, 0.22, 1);
+    display: flex; 
+    flex-direction: column;
+    
+    /* XOS Styling */
+    border-top: 1px solid var(--border);
+    border-radius: 32px 32px 0 0;
+    
+    /* Essential for mobile: prevents content from touching the edges */
+    box-sizing: border-box; 
+    overflow: hidden;
+
         }
         #comment-sidebar.open { bottom: 0; }
         .custom-scrollbar::-webkit-scrollbar { width: 0; }
