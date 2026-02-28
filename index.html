@@ -251,11 +251,71 @@
             width: 100%;
             text-align: center;
         }
+        .xos-banner-root {
+    width: 90%;
+    margin: 15px auto;
+    background: #ffffff;
+    height: 34px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+    border: 1px solid #eeeeee;
+    box-shadow: 0px 4px 10px rgba(0,0,0,0.05);
+}
+
+.xos-marquee-content {
+    display: flex;
+    animation: xos-scroll 15s linear infinite;
+}
+
+.xos-text-item {
+    display: flex;
+    align-items: center;
+    padding-right: 60px; /* Space between the text loops */
+    color: #000;
+    font-family: sans-serif; /* Your XOS clean font */
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    white-space: nowrap;
+}
+
+.xos-shield-icon {
+    width: 14px;
+    height: 14px;
+    margin-right: 8px;
+}
+
+@keyframes xos-scroll {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+}
+        
         .settings-dev-link:hover { opacity: 1; letter-spacing: 3px; }
     </style>
 </head>
 <body>
-
+<div id="privacyBanner" class="xos-banner-root">
+    <div class="xos-marquee-content">
+        <span class="xos-text-item">
+            <svg class="xos-shield-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 1L3 5V11C3 16.55 6.84 21.74 12 23C17.16 21.74 21 16.55 21 11V5L12 1Z" fill="black"/>
+                <path d="M12 6L9 11H15L12 6Z" fill="white"/>
+            </svg>
+            WE DON'T COLLECT ANY BACKGROUND DATA
+        </span>
+        <span class="xos-text-item">
+            <svg class="xos-shield-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 1L3 5V11C3 16.55 6.84 21.74 12 23C17.16 21.74 21 16.55 21 11V5L12 1Z" fill="black"/>
+                <path d="M12 6L9 11H15L12 6Z" fill="white"/>
+            </svg>
+            WE DON'T COLLECT ANY BACKGROUND DATA
+        </span>
+    </div>
+</div>
+    
     <div id="settings-modal" onclick="backToProfile()">
         <div class="modal-container" onclick="event.stopPropagation()">
             <div class="settings-box glass-panel text-center">
@@ -447,6 +507,9 @@
         }
 
         function enterSystem() {
+            // Add this line inside your Enter System click function
+document.getElementById('privacyBanner').classList.add('banner-hidden');
+            
             const audio = document.getElementById('systemAudio');
             audio.play().catch(() => {});
             switchView('view-welcome', 'view-initializing');
