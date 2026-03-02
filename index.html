@@ -8,7 +8,12 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;600&family=Orbitron:wght@500;700&family=Fira+Code:wght@400&display=swap" rel="stylesheet">
+    <link rel="manifest" href="manifest.json">
 
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#000000">
+    
     <style>
         :root {
             --accent: #3b82f6;
@@ -662,5 +667,37 @@
     </script>
     <script data-goatcounter="https://xos-int.goatcounter.com/count"
         async src="//gc.zgo.at/count.js"></script>
+    <script>
+    // 1. Register the Service Worker
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('sw.js');
+    }
+
+    // 2. Handle the Shortcut/Install Prompt
+    let deferredPrompt;
+    const installBtn = document.getElementById('install-btn');
+
+    window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        deferredPrompt = e;
+        // Make your shortcut button visible once the app is ready to install
+        installBtn.style.display = 'flex';
+    });
+
+    installBtn.addEventListener('click', async () => {
+        if (deferredPrompt) {
+            deferredPrompt.prompt();
+            const { outcome } = await deferredPrompt.userChoice;
+            if (outcome === 'accepted') {
+                installBtn.style.display = 'none';
+            }
+            deferredPrompt = null;
+        } else {
+            // Fallback for iOS and other browsers
+            alert("To add XOS to your home screen:\n1. Tap the Share button (or menu ⋮)\n2. Select 'Add to Home screen'");
+        }
+    });
+    </script>
+    
 </body>                                                                                                                                                   
 </html>
