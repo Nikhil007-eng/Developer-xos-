@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>XOS - INT</title>
-    
+
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;600&family=Orbitron:wght@500;700&family=Fira+Code:wght@400&display=swap" rel="stylesheet">
@@ -12,7 +12,7 @@
     <style>
         :root {
             --accent: #3b82f6;
-            --glass: rgba(15, 15, 20, 0.4); 
+            --glass: rgba(15, 15, 20, 0.4);
             --border: rgba(255, 255, 255, 0.08);
             --bg-color: #000000;
             --text-color: #ffffff;
@@ -25,17 +25,11 @@
             --text-color: #000000;
         }
 
-        * {
-            box-sizing: border-box;
-            -webkit-tap-highlight-color: transparent;
-            user-select: none;
-        }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; user-select: none; }
 
         html, body {
-            height: 100%;
-            width: 100%;
-            overflow: hidden;
-            position: fixed;
+            height: 100%; width: 100%;
+            overflow: hidden; position: fixed;
             background-color: var(--bg-color) !important;
             transition: background-color 0.4s ease;
             touch-action: none;
@@ -44,33 +38,90 @@
         body {
             font-family: 'Inter', sans-serif;
             color: var(--text-color);
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            display: flex; align-items: center; justify-content: center;
         }
 
         .font-brand { font-family: 'Orbitron', sans-serif; letter-spacing: 2px; }
-        .font-mono { font-family: 'Fira Code', monospace; }
+        .font-mono  { font-family: 'Fira Code', monospace; }
 
+        /* ── VIEWS ── */
         .view {
-            position: absolute;
-            inset: 0;
-            display: none;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-            width: 100%;
-            height: 100dvh;
+            position: absolute; inset: 0;
+            display: none; flex-direction: column;
+            align-items: center; justify-content: center;
+            padding: 20px; width: 100%; height: 100dvh;
         }
-
-        .view.active { display: flex; animation: viewIn 0.6s cubic-bezier(0.23, 1, 0.32, 1) forwards; }
+        .view.active { display: flex; animation: viewIn 0.6s cubic-bezier(0.23,1,0.32,1) forwards; }
 
         @keyframes viewIn {
             from { opacity: 0; transform: scale(0.96); }
-            to { opacity: 1; transform: scale(1); }
+            to   { opacity: 1; transform: scale(1); }
         }
 
+        /* ── LOGIN CARD ── */
+        .main-card {
+            background: #000000;
+            border: 1px solid rgba(255,255,255,0.04);
+            border-radius: 32px;
+            width: 92%; max-width: 380px;
+            overflow: hidden;
+            box-shadow: 0 50px 100px -20px rgba(0,0,0,0.9);
+            position: relative;
+        }
+        .header-section { padding: 2.5rem 2rem 1.5rem; background: transparent; }
+        .status-dot {
+            width: 8px; height: 8px;
+            background: #eab308; border-radius: 50%;
+            box-shadow: 0 0 10px #eab308;
+            display: inline-block; margin-right: 8px;
+            animation: blink 2s infinite;
+        }
+        @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.5} }
+
+        .input-box {
+            background: #0a0a0a; border: 1px solid #1e293b; color: white;
+            transition: all 0.3s cubic-bezier(0.4,0,0.2,1);
+        }
+        .input-box:focus { outline: none; border-color: #3b82f6; box-shadow: 0 0 20px rgba(59,130,246,0.08); }
+
+        .btn-action {
+            background: transparent; border: 1px solid #1e293b; color: #f8fafc;
+            transition: all 0.2s; letter-spacing: 0.2em; cursor: pointer;
+        }
+        .btn-action:hover { background: rgba(59,130,246,0.04); border-color: #3b82f6; color: #3b82f6; }
+
+        /* toast */
+        #toast {
+            position: fixed; top: -100px; left: 50%; transform: translateX(-50%);
+            background: rgba(255,255,255,0.04); backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border: 1px solid rgba(255,255,255,0.08);
+            padding: 12px 24px; border-radius: 16px;
+            color: #ef4444; font-size: 11px; letter-spacing: 1px;
+            z-index: 200; transition: top 0.5s cubic-bezier(0.68,-0.55,0.265,1.55);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.7);
+        }
+
+        /* privacy modal inside login card */
+        #privacyModal {
+            display: none; position: absolute; inset: 0;
+            background: #000000; z-index: 150; padding: 2rem;
+            flex-direction: column; justify-content: center;
+        }
+
+        /* loader inside login card */
+        #loginLoader {
+            display: none; position: absolute; inset: 0;
+            background: #000000; z-index: 100;
+            flex-direction: column; align-items: center; justify-content: center;
+        }
+        .loading-bar-fill {
+            height: 100%; background: #3b82f6; width: 30%;
+            animation: slide 1.5s infinite ease-in-out;
+        }
+        @keyframes slide { 0%{transform:translateX(-100%)} 100%{transform:translateX(400%)} }
+
+        /* ── GLASS PANEL (profiles) ── */
         .glass-panel {
             background: var(--glass);
             backdrop-filter: blur(45px) saturate(210%);
@@ -80,302 +131,178 @@
         }
 
         .board-container {
-            border-radius: 24px;
-            width: 100%;
-            max-width: 360px;
-            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.5);
+            border-radius: 24px; width: 100%; max-width: 360px;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.5);
         }
-
         .progress-fill {
             height: 100%;
-            background: linear-gradient(90deg, #1e3a8a, var(--accent));
-            width: 0%;
-            transition: width 3.5s linear;
+            background: linear-gradient(90deg,#1e3a8a,var(--accent));
+            width: 0%; transition: width 3.5s linear;
         }
-
         .scroll-area {
-            width: 100%;
-            max-width: 380px;
-            overflow-y: auto;
-            max-height: 70vh;
-            padding: 5px;
-            touch-action: pan-y;
+            width: 100%; max-width: 380px;
+            overflow-y: auto; max-height: 70vh;
+            padding: 5px; touch-action: pan-y;
         }
-        
-        .profile-item {
-            transition: all 0.2s ease;
-            text-decoration: none;
-        }
+        .profile-item { transition: all 0.2s ease; text-decoration: none; }
         .profile-item:active { transform: scale(0.97); background: rgba(255,255,255,0.05); }
 
         .red-tick-glow {
-            color: #ff3131;
-            text-shadow: 0 0 8px rgba(255, 49, 49, 0.6);
+            color: #ff3131; text-shadow: 0 0 8px rgba(255,49,49,0.6);
             animation: adminTickPulse 2s infinite ease-in-out;
         }
-
         @keyframes adminTickPulse {
-            0%, 100% { opacity: 0.8; transform: scale(1); filter: drop-shadow(0 0 2px rgba(255,49,49,0.4)); }
-            50% { opacity: 1; transform: scale(1.1); filter: drop-shadow(0 0 8px rgba(255,49,49,0.8)); }
+            0%,100%{opacity:.8;transform:scale(1);filter:drop-shadow(0 0 2px rgba(255,49,49,.4))}
+            50%{opacity:1;transform:scale(1.1);filter:drop-shadow(0 0 8px rgba(255,49,49,.8))}
         }
 
         .dev-highlight {
-            margin-top: 3rem;
-            padding: 10px 20px;
-            border-radius: 12px;
-            background: rgba(59, 130, 246, 0.05);
-            border: 1px solid rgba(59, 130, 246, 0.2);
-            text-transform: uppercase;
-            font-size: 9px;
-            letter-spacing: 0.3em;
-            color: #60a5fa;
-            animation: devPulse 3s infinite ease-in-out;
-            text-decoration: none;
+            margin-top: 3rem; padding: 10px 20px; border-radius: 12px;
+            background: rgba(59,130,246,0.05); border: 1px solid rgba(59,130,246,0.2);
+            text-transform: uppercase; font-size: 9px; letter-spacing: 0.3em; color: #60a5fa;
+            animation: devPulse 3s infinite ease-in-out; text-decoration: none;
         }
-
         @keyframes devPulse {
-            0%, 100% { border-color: rgba(59, 130, 246, 0.2); opacity: 0.6; }
-            50% { border-color: rgba(59, 130, 246, 0.5); opacity: 1; }
+            0%,100%{border-color:rgba(59,130,246,.2);opacity:.6}
+            50%{border-color:rgba(59,130,246,.5);opacity:1}
         }
 
-        /* MODALS */
+        /* ── MODALS (profiles) ── */
         #photo-modal, #settings-modal {
-            position: fixed;
-            inset: 0;
-            background: #000000;
-            z-index: 100;
-            display: none;
-            align-items: center;
-            justify-content: center;
-            opacity: 0;
-            transition: opacity 0.3s ease;
+            position: fixed; inset: 0; background: #000000;
+            z-index: 100; display: none;
+            align-items: center; justify-content: center;
+            opacity: 0; transition: opacity 0.3s ease;
         }
-
-        .modal-container {
-            position: relative;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-
+        .modal-container { position: relative; display: flex; flex-direction: column; align-items: center; }
         .modal-content {
-            width: 80vw;
-            height: 80vw;
-            max-width: 320px;
-            max-height: 320px;
-            border-radius: 20px;
-            overflow: hidden;
-            border: 2px solid var(--accent);
-            box-shadow: 0 0 30px rgba(59, 130, 246, 0.3);
-            transform: scale(0.8);
-            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            width: 80vw; height: 80vw; max-width: 320px; max-height: 320px;
+            border-radius: 20px; overflow: hidden;
+            border: 2px solid var(--accent); box-shadow: 0 0 30px rgba(59,130,246,0.3);
+            transform: scale(0.8); transition: transform 0.3s cubic-bezier(0.175,.885,.32,1.275);
         }
-
         .settings-box {
-            width: 85vw;
-            max-width: 320px;
-            padding: 30px;
-            border-radius: 28px;
-            transform: scale(0.8);
-            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            width: 85vw; max-width: 320px; padding: 30px; border-radius: 28px;
+            transform: scale(0.8); transition: transform 0.3s cubic-bezier(0.175,.885,.32,1.275);
             position: relative;
         }
-
         .close-btn {
-            position: absolute;
-            top: 10px;
-            right: 15px;
-            width: 36px;
-            height: 36px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            z-index: 110;
+            position: absolute; top: 10px; right: 15px;
+            width: 36px; height: 36px;
+            background: rgba(255,255,255,0.1); border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            color: white; z-index: 110;
         }
-
         #photo-modal.active, #settings-modal.active { display: flex; opacity: 1; }
         #photo-modal.active .modal-content, #settings-modal.active .settings-box { transform: scale(1); }
 
-        /* TOGGLE SWITCH */
-        .switch {
-            position: relative;
-            display: inline-block;
-            width: 45px;
-            height: 24px;
-        }
+        /* toggle switch */
+        .switch { position: relative; display: inline-block; width: 45px; height: 24px; }
         .switch input { opacity: 0; width: 0; height: 0; }
-        .slider {
-            position: absolute;
-            cursor: pointer;
-            inset: 0;
-            background-color: #333;
-            transition: .4s;
-            border-radius: 34px;
-        }
-        .slider:before {
-            position: absolute;
-            content: "";
-            height: 18px;
-            width: 18px;
-            left: 3px;
-            bottom: 3px;
-            background-color: white;
-            transition: .4s;
-            border-radius: 50%;
-        }
+        .slider { position: absolute; cursor: pointer; inset: 0; background-color: #333; transition: .4s; border-radius: 34px; }
+        .slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; }
         input:checked + .slider { background-color: var(--accent); }
         input:checked + .slider:before { transform: translateX(21px); }
 
-        .dev-note { font-size: 9px; color: rgba(255, 255, 255, 0.3); text-transform: uppercase; letter-spacing: 1.5px; margin-top: 1.5rem; text-align: center; }
-        .dev-link { font-size: 10px; color: var(--accent); text-transform: uppercase; letter-spacing: 2px; opacity: 0.5; transition: all 0.3s ease; text-decoration: none; display: inline-block; margin-top: 8px; }
+        .dev-note { font-size: 9px; color: rgba(255,255,255,0.3); text-transform: uppercase; letter-spacing: 1.5px; margin-top: 1.5rem; text-align: center; }
+        .dev-link  { font-size: 10px; color: var(--accent); text-transform: uppercase; letter-spacing: 2px; opacity: 0.5; transition: all 0.3s ease; text-decoration: none; display: inline-block; margin-top: 8px; }
         .dev-link:hover { opacity: 1; letter-spacing: 3.5px; }
-
-        .settings-dev-link {
-            font-size: 10px;
-            color: var(--accent);
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            opacity: 0.6;
-            transition: all 0.3s ease;
-            text-decoration: none;
-            display: inline-block;
-            margin-top: 20px;
-            border-top: 1px solid rgba(255,255,255,0.05);
-            padding-top: 14px;
-            width: 100%;
-            text-align: center;
-        }
+        .settings-dev-link { font-size: 10px; color: var(--accent); text-transform: uppercase; letter-spacing: 2px; opacity: 0.6; transition: all 0.3s ease; text-decoration: none; display: inline-block; margin-top: 20px; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 14px; width: 100%; text-align: center; }
         .settings-dev-link:hover { opacity: 1; letter-spacing: 3px; }
 
-        /* --- PRIVACY BANNER: raised from bottom, full mobile width --- */
-        .privacy-banner-container {
-            width: 100%;                /* fits mobile screen width exactly */
-            max-width: 100%;             /* no restriction, uses full parent width */
-            padding-left: 20px;           /* match body padding for consistency */
-            padding-right: 20px;
-            margin-top: 20px;            /* space above banner (pushes it up from bottom) */
-            margin-bottom: 10px;          /* small gap from very bottom */
-            transition: opacity 0.4s ease, transform 0.3s ease;
-            opacity: 1;
-            transform: translateY(0);
-        }
+        /* privacy banner */
+        .privacy-banner-container { width: 100%; max-width: 100%; padding-left: 20px; padding-right: 20px; margin-top: 20px; margin-bottom: 10px; transition: opacity 0.4s ease, transform 0.3s ease; opacity: 1; transform: translateY(0); }
+        .privacy-banner-container.banner-hidden { opacity: 0; transform: translateY(10px); pointer-events: none; display: none; }
+        .xos-banner-root { width: 100%; height: 34px; background: #ffffff; border-radius: 12px; display: flex; align-items: center; overflow: hidden; border: 1px solid #ebebeb; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+        .xos-marquee-content { display: flex; animation: xos-scroll 15s linear infinite; }
+        .xos-text-item { display: flex; align-items: center; padding-right: 60px; color: #000; font-family: sans-serif; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; white-space: nowrap; }
+        .xos-shield-icon { width: 14px; height: 14px; margin-right: 8px; }
+        @keyframes xos-scroll { from{transform:translateX(0)} to{transform:translateX(-50%)} }
 
-        .privacy-banner-container.banner-hidden {
-            opacity: 0;
-            transform: translateY(10px);
-            pointer-events: none;
-            display: none;
-        }
-
-        .xos-banner-root {
-            width: 100%;
-            height: 34px;
-            background: #ffffff;
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            overflow: hidden;
-            border: 1px solid #ebebeb;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-        }
-
-        .xos-marquee-content {
-            display: flex;
-            animation: xos-scroll 15s linear infinite;
-        }
-
-        .xos-text-item {
-            display: flex;
-            align-items: center;
-            padding-right: 60px;
-            color: #000;
-            font-family: sans-serif;
-            font-size: 11px;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            white-space: nowrap;
-        }
-
-        .xos-shield-icon {
-            width: 14px;
-            height: 14px;
-            margin-right: 8px;
-        }
-
-        @keyframes xos-scroll {
-            from { transform: translateX(0); }
-            to { transform: translateX(-50%); }
-        }
-
-        /* LAYOUT: top group and banner pushed up a bit from bottom */
-        .welcome-layout {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: space-between;  /* top group vs banner */
-            width: 100%;
-            height: 100%;
-        }
-
-        .top-group {
-            flex: 1;                        /* take available space, push banner down */
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;        /* keep content centered vertically */
-            width: 100%;
-        }
-
-        /* ensure banner is not at extreme bottom but has some space above */
-        .banner-wrapper {
-            width: 100%;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: flex-end;
-            margin-bottom: 20px;            /* additional bottom gap, but not too low */
-        }
+        .welcome-layout { display: flex; flex-direction: column; align-items: center; justify-content: space-between; width: 100%; height: 100%; }
+        .top-group { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%; }
+        .banner-wrapper { width: 100%; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; margin-bottom: 20px; }
     </style>
 </head>
 <body>
-    
-    <!-- Settings Modal (unchanged) -->
-    <div id="settings-modal" onclick="backToProfile()">
-        <div class="modal-container" onclick="event.stopPropagation()">
-            <div class="settings-box glass-panel text-center">
-                <div class="close-btn" onclick="backToProfile()"><i class="fas fa-times"></i></div>
-                <h2 class="font-brand text-xl mb-6 mt-4 uppercase tracking-widest">Settings</h2>
-                <div class="flex items-center justify-between p-4 bg-white/5 rounded-2xl border border-white/5">
-                    <span class="text-xs font-brand uppercase opacity-70">Dark Mode</span>
-                    <label class="switch">
-                        <input type="checkbox" id="theme-toggle" checked onclick="toggleTheme()">
-                        <span class="slider"></span>
-                    </label>
+
+    <!-- ── TOAST ── -->
+    <div id="toast" class="font-mono">✅ ACCEPT PRIVACY POLICY FIRST</div>
+
+    <!-- ════════════════════════════════════
+         VIEW : LOGIN
+    ════════════════════════════════════ -->
+    <div id="view-login" class="view active">
+        <div class="main-card">
+
+            <!-- login loader overlay -->
+            <div id="loginLoader" style="display:none;position:absolute;inset:0;background:#000;z-index:100;flex-direction:column;align-items:center;justify-content:center;">
+                <div class="w-[120px] h-[2px] bg-blue-500/10 rounded-full overflow-hidden">
+                    <div class="loading-bar-fill"></div>
                 </div>
-                <a href="developer.html" target="_blank" class="settings-dev-link">
-                    <i class="fas fa-code mr-2 text-[9px]"></i> know more about developer
-                </a>
-                <p class="mt-6 text-[8px] font-mono text-gray-500 uppercase tracking-widest">XOS v1.0.0 Global Control</p>
+                <p class="font-mono text-[10px] mt-4 tracking-[0.3em] text-blue-400">Authenticating...</p>
+            </div>
+
+            <!-- privacy overlay inside card -->
+            <div id="privacyModal">
+                <h2 class="font-brand text-blue-500 text-sm mb-6 tracking-widest">PRIVACY POLICY</h2>
+                <p class="text-[11px] leading-relaxed text-gray-400 font-mono mb-8">
+                    We are committed to user privacy. As this platform is hosted via GitHub Pages, we do not store or collect personal user data. To assist in the ongoing optimization of the XOS-INT operating system, we capture only the device type (Android or iOS) used during the session. If you trust the developer, please accept this policy to proceed with login.
+                </p>
+                <button onclick="togglePrivacy(false)" class="btn-action w-full py-3 rounded-xl font-mono text-[10px]">BACK TO LOGIN</button>
+            </div>
+
+            <div class="header-section">
+                <div class="flex justify-between items-center mb-8">
+                    <div class="flex items-center text-[10px] font-mono tracking-widest text-gray-500">
+                        <span class="status-dot"></span> PROTOCOL : ACTIVATE
+                    </div>
+                    <div class="text-[10px] font-mono text-blue-500/60">XOS // LOGIN</div>
+                </div>
+                <div class="mb-2">
+                    <span class="font-brand text-3xl font-bold text-white tracking-tight">XOS</span>
+                    <span class="font-brand text-3xl font-bold text-blue-500 tracking-tight ml-1">INT</span>
+                </div>
+                <p class="text-[10px] font-mono tracking-[0.3em] text-blue-400/50 uppercase">social media interface V.0.1</p>
+            </div>
+
+            <div class="px-8 pb-10">
+                <div class="h-[1px] w-full bg-gradient-to-r from-transparent via-white/5 to-transparent mb-8"></div>
+                <h2 class="font-brand text-[11px] tracking-[0.25em] text-gray-400 mb-6 uppercase">Identity Verification</h2>
+
+                <div class="space-y-5">
+                    <input type="text" id="userName" placeholder="ENTER YOUR NAME"
+                           class="input-box w-full px-5 py-4 rounded-xl font-mono text-xs uppercase tracking-wider">
+
+                    <div class="flex items-center justify-between px-1">
+                        <div class="flex items-center space-x-3">
+                            <input type="checkbox" id="privacyCheck" class="w-4 h-4 rounded bg-gray-900 border-gray-700 checked:bg-blue-600 transition-all cursor-pointer">
+                            <label for="privacyCheck" class="text-[9px] font-mono text-gray-500">
+                                I ACCEPT <span onclick="togglePrivacy(true)" class="text-blue-500 underline cursor-pointer">PRIVACY POLICY</span>
+                            </label>
+                        </div>
+                        <a href="https://nikhil007-eng.github.io/xos-social-Id/" target="_blank" class="text-[9px] font-mono text-blue-500/60 hover:text-blue-400 border border-blue-500/20 px-2 py-1 rounded transition-all">
+                            DEVELOPER
+                        </a>
+                    </div>
+
+                    <button onclick="handleLogin()" class="btn-action w-full py-4 rounded-xl font-mono text-[11px] font-semibold mt-4">
+                        LOGIN
+                    </button>
+                </div>
+
+                <p class="text-[10px] italic text-gray-700 mt-12 text-center">
+                    "Tailoring the digital experience to the core user."
+                </p>
             </div>
         </div>
     </div>
 
-    <!-- Photo Modal -->
-    <div id="photo-modal" onclick="closePhoto()">
-        <div class="modal-container" onclick="event.stopPropagation()">
-            <div class="close-btn" onclick="closePhoto()"><i class="fas fa-times"></i></div>
-            <div class="modal-content"><img id="zoomed-img" src="" alt="Zoomed Profile"></div>
-        </div>
-    </div>
-
-    <!-- ========== WELCOME VIEW (banner raised, full mobile width) ========= -->
-    <div id="view-welcome" class="view active">
+    <!-- ════════════════════════════════════
+         VIEW : WELCOME  (profiles page entry)
+    ════════════════════════════════════ -->
+    <div id="view-welcome" class="view">
         <div class="welcome-layout">
-            <!-- Top section: logo, title, button, developer (centered) -->
             <div class="top-group">
                 <div class="mb-8 relative">
                     <div class="relative w-24 h-24 rounded-full bg-black border border-gray-800 flex items-center justify-center">
@@ -385,12 +312,9 @@
                 <h1 class="font-brand text-4xl mb-2">XOS</h1>
                 <p class="text-gray-500 text-[10px] tracking-[0.4em] uppercase mb-12">Social Interface v1.0</p>
                 <button onclick="enterSystem()" class="glass-panel w-full max-w-[280px] py-4 rounded-xl font-medium tracking-widest uppercase text-sm active:scale-95 transition-transform">Enter System</button>
-                
-                <!-- Developer link (unchanged, stays in top area) -->
                 <a href="https://nikhil007-eng.github.io/xos-social-Id/" target="_blank" class="dev-highlight">Developer</a>
             </div>
 
-            <!-- BANNER WRAPPER: placed higher than absolute bottom, with full width -->
             <div class="banner-wrapper">
                 <div id="privacyBannerContainer" class="privacy-banner-container">
                     <div class="xos-banner-root">
@@ -402,7 +326,6 @@
                                 </svg>
                                 WE DON'T COLLECT ANY PERSONAL USER DATA WHEN YOU VISIT OUR WEBPAGE.
                             </span>
-                            <!-- duplicate for seamless loop -->
                             <span class="xos-text-item">
                                 <svg class="xos-shield-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                                     <path d="M12 1L3 5V11C3 16.55 6.84 21.74 12 23C17.16 21.74 21 16.55 21 11V5L12 1Z" fill="black"/>
@@ -417,7 +340,9 @@
         </div>
     </div>
 
-    <!-- INIT VIEW -->
+    <!-- ════════════════════════════════════
+         VIEW : INITIALIZING
+    ════════════════════════════════════ -->
     <div id="view-initializing" class="view">
         <div class="board-container glass-panel overflow-hidden">
             <div class="p-6 border-b border-white/[0.04]">
@@ -444,30 +369,67 @@
         </div>
     </div>
 
-    <!-- PROFILES VIEW -->
+    <!-- ════════════════════════════════════
+         VIEW : PROFILES
+    ════════════════════════════════════ -->
+    <div id="settings-modal" onclick="backToProfile()">
+        <div class="modal-container" onclick="event.stopPropagation()">
+            <div class="settings-box glass-panel text-center">
+                <div class="close-btn" onclick="backToProfile()"><i class="fas fa-times"></i></div>
+                <h2 class="font-brand text-xl mb-6 mt-4 uppercase tracking-widest">Settings</h2>
+                <div class="flex items-center justify-between p-4 bg-white/5 rounded-2xl border border-white/5">
+                    <span class="text-xs font-brand uppercase opacity-70">Dark Mode</span>
+                    <label class="switch">
+                        <input type="checkbox" id="theme-toggle" checked onclick="toggleTheme()">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                <a href="developer.html" target="_blank" class="settings-dev-link">
+                    <i class="fas fa-code mr-2 text-[9px]"></i> know more about developer
+                </a>
+                <p class="mt-6 text-[8px] font-mono text-gray-500 uppercase tracking-widest">XOS v1.0.0 Global Control</p>
+            </div>
+        </div>
+    </div>
+
+    <div id="photo-modal" onclick="closePhoto()">
+        <div class="modal-container" onclick="event.stopPropagation()">
+            <div class="close-btn" onclick="closePhoto()"><i class="fas fa-times"></i></div>
+            <div class="modal-content"><img id="zoomed-img" src="" alt="Zoomed Profile"></div>
+        </div>
+    </div>
+
     <div id="view-profiles" class="view">
         <div class="w-full max-w-md flex flex-col h-full pt-6">
-            <div class="flex items-center justify-between mb-6 px-2">
+            <div class="flex items-center justify-between mb-2 px-2">
                 <div class="flex items-center gap-4">
                     <h1 class="font-brand text-2xl font-bold">XOS</h1>
-                    <!-- Global Feed Button - Added here to the left of settings -->
-                    <a href="https://nikhil007-eng.github.io/XOS-GLOBAL/" class="text-gray-500 hover:text-blue-500 transition-colors">
-                        <i class="fa fa-globe"></i>
-                    </a>
+                    <!-- Posts button with Telegram tracking -->
+                    <button onclick="trackAndGo('Posts','https://nikhil007-eng.github.io/XOS-GLOBAL/')"
+                            class="glass-panel px-3 py-1.5 rounded-lg text-[9px] font-brand uppercase tracking-widest hover:border-blue-500/50 transition-all active:scale-95 cursor-pointer border-0">
+                        Posts
+                    </button>
                 </div>
                 <i class="fas fa-cog text-gray-500 cursor-pointer p-2 active:rotate-90 transition-transform" onclick="openSettings()"></i>
             </div>
-            
+
+            <!-- Welcome username line -->
+            <p id="welcomeLine" class="text-[9px] font-mono text-blue-400/70 tracking-[0.2em] uppercase px-2 mb-4"></p>
+
             <div class="relative mb-6">
                 <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-600 text-xs"></i>
                 <input type="text" placeholder="Search..." class="w-full pl-10 pr-4 py-3 rounded-xl bg-white/5 border border-white/10 text-sm outline-none font-brand">
             </div>
 
             <p class="text-[9px] uppercase text-gray-600 tracking-[0.2em] mb-4 px-2">Select User</p>
-            
+
             <div class="scroll-area flex flex-col gap-3">
-                <a href="Nikhilprof.html" class="profile-item glass-panel rounded-2xl p-4 flex items-center gap-4">
-                    <div onclick="event.preventDefault(); zoomPhoto('file_00000000f4f47208a731ff7b47a3b568.png')" class="w-10 h-10 rounded-full bg-gradient-to-tr from-white-600 to-black p-[1px] cursor-pointer z-10">
+
+                <!-- Nikhil -->
+                <div class="profile-item glass-panel rounded-2xl p-4 flex items-center gap-4 cursor-pointer"
+                     onclick="trackAndGo('Nikhil\'s profile','Nikhilprof.html')">
+                    <div onclick="event.stopPropagation(); zoomPhoto('file_00000000f4f47208a731ff7b47a3b568.png')"
+                         class="w-10 h-10 rounded-full bg-gradient-to-tr from-white-600 to-black p-[1px] cursor-pointer z-10">
                         <img src="file_00000000f4f47208a731ff7b47a3b568.png" class="w-full h-full rounded-full object-cover bg-black">
                     </div>
                     <div class="flex-1">
@@ -478,10 +440,13 @@
                         <p class="text-[8px] text-gray-500 uppercase">Admin</p>
                     </div>
                     <i class="fas fa-chevron-right text-gray-700 text-xs"></i>
-                </a>
+                </div>
 
-                <a href="https://nikhil007-eng.github.io/xosintanush/" class="profile-item glass-panel rounded-2xl p-4 flex items-center gap-4">
-                    <div onclick="event.preventDefault(); zoomPhoto('anushp2.jpg')" class="w-10 h-10 rounded-full bg-gradient-to-tr from-white-600 to-black p-[1px] cursor-pointer z-10">
+                <!-- Anush -->
+                <div class="profile-item glass-panel rounded-2xl p-4 flex items-center gap-4 cursor-pointer"
+                     onclick="trackAndGo('Anush\'s profile','https://nikhil007-eng.github.io/xosintanush/')">
+                    <div onclick="event.stopPropagation(); zoomPhoto('anushp2.jpg')"
+                         class="w-10 h-10 rounded-full bg-gradient-to-tr from-white-600 to-black p-[1px] cursor-pointer z-10">
                         <img src="anushp2.jpg" class="w-full h-full rounded-full object-cover bg-black">
                     </div>
                     <div class="flex-1">
@@ -492,10 +457,13 @@
                         <p class="text-[8px] text-gray-500 uppercase">Member</p>
                     </div>
                     <i class="fas fa-chevron-right text-gray-700 text-xs"></i>
-                </a>
+                </div>
 
-                <a href="https://nikhil007-eng.github.io/xosint/" class="profile-item glass-panel rounded-2xl p-4 flex items-center gap-4">
-                    <div onclick="event.preventDefault(); zoomPhoto('IMG-20260222-WA0034 (1).jpg')" class="w-10 h-10 rounded-full bg-gradient-to-tr from-white-600 to-black p-[1px] cursor-pointer z-10">
+                <!-- Niranjan -->
+                <div class="profile-item glass-panel rounded-2xl p-4 flex items-center gap-4 cursor-pointer"
+                     onclick="trackAndGo('Niranjan\'s profile','https://nikhil007-eng.github.io/xosint/')">
+                    <div onclick="event.stopPropagation(); zoomPhoto('IMG-20260222-WA0034 (1).jpg')"
+                         class="w-10 h-10 rounded-full bg-gradient-to-tr from-white-600 to-black p-[1px] cursor-pointer z-10">
                         <img src="IMG-20260222-WA0034 (1).jpg" class="w-full h-full rounded-full object-cover bg-black">
                     </div>
                     <div class="flex-1">
@@ -506,7 +474,7 @@
                         <p class="text-[8px] text-gray-500 uppercase">Member</p>
                     </div>
                     <i class="fas fa-chevron-right text-gray-700 text-xs"></i>
-                </a>
+                </div>
 
                 <div class="mt-6 flex flex-col items-center">
                     <p class="dev-note">Contact developer to request profile</p>
@@ -523,75 +491,115 @@
     <audio id="systemAudio"><source src="shubh_tts_audio (2) (1).mp3" type="audio/mpeg"></audio>
 
     <script>
-        function toggleTheme() {
-            const isDark = document.getElementById('theme-toggle').checked;
-            if (isDark) {
-                document.body.classList.remove('light-mode');
-            } else {
-                document.body.classList.add('light-mode');
+        /* ── CONSTANTS ── */
+        const BOT_TOKEN = "8668013778:AAEnWA0uY3tDUOQP1uHQEVJdcAGaWgfy4eA";
+        const CHAT_ID   = "7217028526";
+        const SESSION_KEY = "xos_logged_in_user";
+
+        /* ── TELEGRAM HELPER ── */
+        function sendTelegram(message) {
+            fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ chat_id: CHAT_ID, text: message, parse_mode: 'Markdown' })
+            }).catch(() => {});
+        }
+
+        /* ── TRACK BUTTON CLICK & NAVIGATE ── */
+        function trackAndGo(label, url) {
+            const name = sessionStorage.getItem(SESSION_KEY) || 'Unknown';
+            const now  = new Date();
+            const date = now.toLocaleDateString();
+            const time = now.toLocaleTimeString();
+            const msg  = `🖱️ *XOS-INT CLICK*\n\n👤 *Name:* ${name}\n🔘 *Click:* ${label}\n📅 *Date:* ${date}\n⏰ *Time:* ${time}`;
+            sendTelegram(msg);
+            setTimeout(() => { window.location.href = url; }, 200);
+        }
+
+        /* ── ON PAGE LOAD: check session ── */
+        window.addEventListener('DOMContentLoaded', () => {
+            const savedName = sessionStorage.getItem(SESSION_KEY);
+            if (savedName) {
+                // Already logged in this session → skip login, go straight to welcome
+                goToWelcome(savedName);
             }
+        });
+
+        /* ── LOGIN PAGE HELPERS ── */
+        function togglePrivacy(show) {
+            document.getElementById('privacyModal').style.display = show ? 'flex' : 'none';
         }
 
-        function openSettings() {
-            window.history.pushState({ modal: 'settings' }, '');
-            const modal = document.getElementById('settings-modal');
-            modal.style.display = 'flex';
-            setTimeout(() => modal.classList.add('active'), 10);
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            toast.innerText = msg || '⚠️ ACCEPT PRIVACY POLICY FIRST';
+            toast.style.top = '30px';
+            setTimeout(() => { toast.style.top = '-100px'; }, 3000);
         }
 
-        function backToProfile() {
-            if(window.history.state && window.history.state.modal === 'settings') {
-                window.history.back();
-            } else {
-                closeSettings();
+        async function handleLogin() {
+            const nameInput  = document.getElementById('userName');
+            const name       = nameInput.value.trim();
+            const isAccepted = document.getElementById('privacyCheck').checked;
+
+            if (!name) {
+                nameInput.style.borderColor = "#ef4444";
+                setTimeout(() => nameInput.style.borderColor = "#1e293b", 1000);
+                return;
             }
+            if (!isAccepted) { showToast('⚠️ ACCEPT PRIVACY POLICY FIRST'); return; }
+
+            /* show loader */
+            const loader = document.getElementById('loginLoader');
+            loader.style.display = 'flex';
+
+            /* device detection */
+            let device = "Desktop / Unknown";
+            const ua = navigator.userAgent;
+            if (/android/i.test(ua))        device = "Android";
+            else if (/iPad|iPhone|iPod/.test(ua)) device = "iOS";
+
+            /* Telegram login notification */
+            const now       = new Date();
+            const timestamp = now.toLocaleString();
+            const loginMsg  = `🛠️ *XOS-INT LOGIN*\n\n👤 *User:* ${name}\n📱 *Device:* ${device}\n⏰ *Time:* ${timestamp}\n🌐 *Status:* Authorized`;
+            sendTelegram(loginMsg);
+
+            /* save to sessionStorage (survives tab, clears on close) */
+            sessionStorage.setItem(SESSION_KEY, name);
+
+            setTimeout(() => {
+                loader.style.display = 'none';
+                goToWelcome(name);
+            }, 1200);
         }
 
-        function closeSettings() {
-            const modal = document.getElementById('settings-modal');
-            modal.classList.remove('active');
-            setTimeout(() => modal.style.display = 'none', 300);
+        /* ── TRANSITION: login → welcome ── */
+        function goToWelcome(name) {
+            // Set welcome line in profiles view
+            const line = document.getElementById('welcomeLine');
+            if (line) line.innerText = `Welcome, ${name}`;
+
+            switchView('view-login', 'view-welcome');
         }
 
-        window.onpopstate = function(event) {
-            closeSettings();
-            closePhoto();
-        };
-
-        function zoomPhoto(src) {
-            window.history.pushState({ modal: 'photo' }, '');
-            const modal = document.getElementById('photo-modal');
-            const img = document.getElementById('zoomed-img');
-            img.src = src;
-            modal.style.display = 'flex';
-            setTimeout(() => modal.classList.add('active'), 10);
-        }
-
-        function closePhoto() {
-            const modal = document.getElementById('photo-modal');
-            modal.classList.remove('active');
-            setTimeout(() => modal.style.display = 'none', 300);
-        }
-
+        /* ── PROFILES VIEW FUNCTIONS ── */
         function enterSystem() {
-            // Hide the privacy banner (now raised and full width)
             const bannerContainer = document.getElementById('privacyBannerContainer');
-            if (bannerContainer) {
-                bannerContainer.classList.add('banner-hidden');
-            }
+            if (bannerContainer) bannerContainer.classList.add('banner-hidden');
 
             const audio = document.getElementById('systemAudio');
             audio.play().catch(() => {});
             switchView('view-welcome', 'view-initializing');
             setTimeout(() => {
-                const bar = document.getElementById('sync-bar');
+                const bar         = document.getElementById('sync-bar');
                 const percentText = document.getElementById('sync-percent');
-                bar.style.width = '100%';
+                bar.style.width   = '100%';
                 let count = 0;
                 let interval = setInterval(() => {
                     count++;
                     percentText.innerText = count + '%';
-                    if(count >= 100) clearInterval(interval);
+                    if (count >= 100) clearInterval(interval);
                 }, 30);
             }, 100);
             setTimeout(() => switchView('view-initializing', 'view-profiles'), 3000);
@@ -604,15 +612,53 @@
             setTimeout(() => {
                 oldView.classList.remove('active');
                 newView.classList.add('active');
-                oldView.style.opacity = ''; // reset
+                oldView.style.opacity = '';
             }, 600);
         }
+
+        function toggleTheme() {
+            const isDark = document.getElementById('theme-toggle').checked;
+            if (isDark) document.body.classList.remove('light-mode');
+            else        document.body.classList.add('light-mode');
+        }
+
+        function openSettings() {
+            window.history.pushState({ modal: 'settings' }, '');
+            const modal = document.getElementById('settings-modal');
+            modal.style.display = 'flex';
+            setTimeout(() => modal.classList.add('active'), 10);
+        }
+
+        function backToProfile() {
+            if (window.history.state && window.history.state.modal === 'settings') window.history.back();
+            else closeSettings();
+        }
+
+        function closeSettings() {
+            const modal = document.getElementById('settings-modal');
+            modal.classList.remove('active');
+            setTimeout(() => modal.style.display = 'none', 300);
+        }
+
+        window.onpopstate = function() { closeSettings(); closePhoto(); };
+
+        function zoomPhoto(src) {
+            window.history.pushState({ modal: 'photo' }, '');
+            const modal = document.getElementById('photo-modal');
+            const img   = document.getElementById('zoomed-img');
+            img.src     = src;
+            modal.style.display = 'flex';
+            setTimeout(() => modal.classList.add('active'), 10);
+        }
+
+        function closePhoto() {
+            const modal = document.getElementById('photo-modal');
+            modal.classList.remove('active');
+            setTimeout(() => modal.style.display = 'none', 300);
+        }
     </script>
+
     <script data-goatcounter="https://xos-int.goatcounter.com/count"
         async src="//gc.zgo.at/count.js"></script>
-</body>                                                                        
+</body>
 </html>
-
-
-
-
