@@ -204,6 +204,12 @@
         input:checked + .slider { background-color: var(--accent); }
         input:checked + .slider:before { transform: translateX(21px); }
 
+        .btn-logout {
+            background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.2); color: #ef4444;
+            transition: all 0.2s; letter-spacing: 0.15em; cursor: pointer;
+        }
+        .btn-logout:hover { background: rgba(239, 68, 68, 0.2); border-color: #ef4444; }
+
         .dev-note { font-size: 9px; color: rgba(255,255,255,0.3); text-transform: uppercase; letter-spacing: 1.5px; margin-top: 1.5rem; text-align: center; }
         .dev-link  { font-size: 10px; color: var(--accent); text-transform: uppercase; letter-spacing: 2px; opacity: 0.5; transition: all 0.3s ease; text-decoration: none; display: inline-block; margin-top: 8px; }
         .dev-link:hover { opacity: 1; letter-spacing: 3.5px; }
@@ -226,16 +232,11 @@
 </head>
 <body>
 
-    <!-- ── TOAST ── -->
     <div id="toast" class="font-mono">✅ ACCEPT PRIVACY POLICY FIRST</div>
 
-    <!-- ════════════════════════════════════
-         VIEW : LOGIN
-    ════════════════════════════════════ -->
     <div id="view-login" class="view active">
         <div class="main-card">
 
-            <!-- login loader overlay -->
             <div id="loginLoader" style="display:none;position:absolute;inset:0;background:#000;z-index:100;flex-direction:column;align-items:center;justify-content:center;">
                 <div class="w-[120px] h-[2px] bg-blue-500/10 rounded-full overflow-hidden">
                     <div class="loading-bar-fill"></div>
@@ -243,7 +244,6 @@
                 <p class="font-mono text-[10px] mt-4 tracking-[0.3em] text-blue-400">Authenticating...</p>
             </div>
 
-            <!-- privacy overlay inside card -->
             <div id="privacyModal">
                 <h2 class="font-brand text-blue-500 text-sm mb-6 tracking-widest">PRIVACY POLICY</h2>
                 <p class="text-[11px] leading-relaxed text-gray-400 font-mono mb-8">
@@ -298,9 +298,6 @@
         </div>
     </div>
 
-    <!-- ════════════════════════════════════
-         VIEW : WELCOME  (profiles page entry)
-    ════════════════════════════════════ -->
     <div id="view-welcome" class="view">
         <div class="welcome-layout">
             <div class="top-group">
@@ -340,9 +337,6 @@
         </div>
     </div>
 
-    <!-- ════════════════════════════════════
-         VIEW : INITIALIZING
-    ════════════════════════════════════ -->
     <div id="view-initializing" class="view">
         <div class="board-container glass-panel overflow-hidden">
             <div class="p-6 border-b border-white/[0.04]">
@@ -369,21 +363,23 @@
         </div>
     </div>
 
-    <!-- ════════════════════════════════════
-         VIEW : PROFILES
-    ════════════════════════════════════ -->
     <div id="settings-modal" onclick="backToProfile()">
         <div class="modal-container" onclick="event.stopPropagation()">
             <div class="settings-box glass-panel text-center">
                 <div class="close-btn" onclick="backToProfile()"><i class="fas fa-times"></i></div>
                 <h2 class="font-brand text-xl mb-6 mt-4 uppercase tracking-widest">Settings</h2>
-                <div class="flex items-center justify-between p-4 bg-white/5 rounded-2xl border border-white/5">
+                <div class="flex items-center justify-between p-4 bg-white/5 rounded-2xl border border-white/5 mb-4">
                     <span class="text-xs font-brand uppercase opacity-70">Dark Mode</span>
                     <label class="switch">
                         <input type="checkbox" id="theme-toggle" checked onclick="toggleTheme()">
                         <span class="slider"></span>
                     </label>
                 </div>
+                
+                <button onclick="handleLogout()" class="btn-logout w-full py-3 rounded-xl font-mono text-[10px] font-bold">
+                    <i class="fas fa-sign-out-alt mr-2"></i> LOGOUT
+                </button>
+
                 <a href="developer.html" target="_blank" class="settings-dev-link">
                     <i class="fas fa-code mr-2 text-[9px]"></i> know more about developer
                 </a>
@@ -404,7 +400,6 @@
             <div class="flex items-center justify-between mb-2 px-2">
                 <div class="flex items-center gap-4">
                     <h1 class="font-brand text-2xl font-bold">XOS</h1>
-                    <!-- Posts button with Telegram tracking -->
                     <button onclick="trackAndGo('Posts','https://nikhil007-eng.github.io/XOS-GLOBAL/')"
                             class="glass-panel px-3 py-1.5 rounded-lg text-[9px] font-brand uppercase tracking-widest hover:border-blue-500/50 transition-all active:scale-95 cursor-pointer border-0">
                         Posts
@@ -413,7 +408,6 @@
                 <i class="fas fa-cog text-gray-500 cursor-pointer p-2 active:rotate-90 transition-transform" onclick="openSettings()"></i>
             </div>
 
-            <!-- Welcome username line -->
             <p id="welcomeLine" class="text-[9px] font-mono text-blue-400/70 tracking-[0.2em] uppercase px-2 mb-4"></p>
 
             <div class="relative mb-6">
@@ -425,7 +419,6 @@
 
             <div class="scroll-area flex flex-col gap-3">
 
-                <!-- Nikhil -->
                 <div class="profile-item glass-panel rounded-2xl p-4 flex items-center gap-4 cursor-pointer"
                      onclick="trackAndGo('Nikhil\'s profile','Nikhilprof.html')">
                     <div onclick="event.stopPropagation(); zoomPhoto('file_00000000f4f47208a731ff7b47a3b568.png')"
@@ -442,7 +435,6 @@
                     <i class="fas fa-chevron-right text-gray-700 text-xs"></i>
                 </div>
 
-                <!-- Anush -->
                 <div class="profile-item glass-panel rounded-2xl p-4 flex items-center gap-4 cursor-pointer"
                      onclick="trackAndGo('Anush\'s profile','https://nikhil007-eng.github.io/xosintanush/')">
                     <div onclick="event.stopPropagation(); zoomPhoto('anushp2.jpg')"
@@ -459,7 +451,6 @@
                     <i class="fas fa-chevron-right text-gray-700 text-xs"></i>
                 </div>
 
-                <!-- Niranjan -->
                 <div class="profile-item glass-panel rounded-2xl p-4 flex items-center gap-4 cursor-pointer"
                      onclick="trackAndGo('Niranjan\'s profile','https://nikhil007-eng.github.io/xosint/')">
                     <div onclick="event.stopPropagation(); zoomPhoto('IMG-20260222-WA0034 (1).jpg')"
@@ -507,7 +498,7 @@
 
         /* ── TRACK BUTTON CLICK & NAVIGATE ── */
         function trackAndGo(label, url) {
-            const name = sessionStorage.getItem(SESSION_KEY) || 'Unknown';
+            const name = localStorage.getItem(SESSION_KEY) || 'Unknown';
             const now  = new Date();
             const date = now.toLocaleDateString();
             const time = now.toLocaleTimeString();
@@ -516,11 +507,10 @@
             setTimeout(() => { window.location.href = url; }, 200);
         }
 
-        /* ── ON PAGE LOAD: check session ── */
+        /* ── ON PAGE LOAD: check localStorage ── */
         window.addEventListener('DOMContentLoaded', () => {
-            const savedName = sessionStorage.getItem(SESSION_KEY);
+            const savedName = localStorage.getItem(SESSION_KEY);
             if (savedName) {
-                // Already logged in this session → skip login, go straight to welcome
                 goToWelcome(savedName);
             }
         });
@@ -549,24 +539,20 @@
             }
             if (!isAccepted) { showToast('⚠️ ACCEPT PRIVACY POLICY FIRST'); return; }
 
-            /* show loader */
             const loader = document.getElementById('loginLoader');
             loader.style.display = 'flex';
 
-            /* device detection */
             let device = "Desktop / Unknown";
             const ua = navigator.userAgent;
             if (/android/i.test(ua))        device = "Android";
             else if (/iPad|iPhone|iPod/.test(ua)) device = "iOS";
 
-            /* Telegram login notification */
             const now       = new Date();
             const timestamp = now.toLocaleString();
             const loginMsg  = `🛠️ *XOS-INT LOGIN*\n\n👤 *User:* ${name}\n📱 *Device:* ${device}\n⏰ *Time:* ${timestamp}\n🌐 *Status:* Authorized`;
             sendTelegram(loginMsg);
 
-            /* save to sessionStorage (survives tab, clears on close) */
-            sessionStorage.setItem(SESSION_KEY, name);
+            localStorage.setItem(SESSION_KEY, name);
 
             setTimeout(() => {
                 loader.style.display = 'none';
@@ -574,16 +560,28 @@
             }, 1200);
         }
 
-        /* ── TRANSITION: login → welcome ── */
+        /* ── LOGOUT HANDLER ── */
+        function handleLogout() {
+            const name = localStorage.getItem(SESSION_KEY) || 'Unknown';
+            const now = new Date();
+            const timestamp = now.toLocaleString();
+            const logoutMsg = `🔴 *XOS-INT LOGOUT*\n\n👤 *User:* ${name}\n⏰ *Time:* ${timestamp}\n🌐 *Status:* Disconnected`;
+            
+            sendTelegram(logoutMsg);
+            localStorage.removeItem(SESSION_KEY);
+            
+            // Short delay to ensure telegram sends, then refresh
+            setTimeout(() => {
+                window.location.reload();
+            }, 500);
+        }
+
         function goToWelcome(name) {
-            // Set welcome line in profiles view
             const line = document.getElementById('welcomeLine');
             if (line) line.innerText = `Welcome, ${name}`;
-
             switchView('view-login', 'view-welcome');
         }
 
-        /* ── PROFILES VIEW FUNCTIONS ── */
         function enterSystem() {
             const bannerContainer = document.getElementById('privacyBannerContainer');
             if (bannerContainer) bannerContainer.classList.add('banner-hidden');
@@ -608,6 +606,14 @@
         function switchView(oldId, newId) {
             const oldView = document.getElementById(oldId);
             const newView = document.getElementById(newId);
+            
+            // No fade transition if already logged in to prevent flickering on reload
+            if (localStorage.getItem(SESSION_KEY) && oldId === 'view-login') {
+                oldView.classList.remove('active');
+                newView.classList.add('active');
+                return;
+            }
+
             oldView.style.opacity = '0';
             setTimeout(() => {
                 oldView.classList.remove('active');
