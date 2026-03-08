@@ -399,13 +399,15 @@
         <div class="w-full max-w-md flex flex-col h-full pt-6">
             <div class="flex items-center justify-between mb-2 px-2">
                 <div class="flex items-center gap-4">
-                    <h1 class="font-brand text-2xl font-bold">XOS</h1>
+                    <h1 class="font-brand text-2xl font-bold"><span class="text-white">XOS</span><span class="text-blue-500"> INT</span></h1>
+                </div>
+                <div class="flex items-center gap-2">
                     <button onclick="trackAndGo('Posts','https://nikhil007-eng.github.io/XOS-GLOBAL/')"
                             class="glass-panel px-3 py-1.5 rounded-lg text-[9px] font-brand uppercase tracking-widest hover:border-blue-500/50 transition-all active:scale-95 cursor-pointer border-0">
                         Posts
                     </button>
+                    <i class="fas fa-cog text-gray-500 cursor-pointer p-2 active:rotate-90 transition-transform" onclick="openSettings()"></i>
                 </div>
-                <i class="fas fa-cog text-gray-500 cursor-pointer p-2 active:rotate-90 transition-transform" onclick="openSettings()"></i>
             </div>
 
             <p id="welcomeLine" class="text-[9px] font-mono text-blue-400/70 tracking-[0.2em] uppercase px-2 mb-4"></p>
