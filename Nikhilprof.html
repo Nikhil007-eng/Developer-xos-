@@ -7,15 +7,15 @@
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Orbitron:wght@500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Orbitron:wght@500;700&family=Space+Grotesk:wght@300;400;700&display=swap" rel="stylesheet">
 
     <style>
         :root {
-            --accent: #3b82f6;
+            --accent: #007aff;
             --admin-red: #ff3131;
-            --glass: rgba(10, 10, 12, 0.85);
-            --border: rgba(255, 255, 255, 0.08);
-            --bg-color: #000000; /* Pure AMOLED Black */
+            --glass: rgba(10, 10, 10, 0.8);
+            --border: #1a1a1a;
+            --bg-color: #000000;
             --text-main: #ffffff;
         }
 
@@ -30,11 +30,11 @@
 
         html, body {
             height: 100%; width: 100%; overflow: hidden; position: fixed;
-            background-color: var(--bg-color); color: var(--text-main); font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color); color: var(--text-main); font-family: 'Space Grotesk', sans-serif;
             transition: background-color 0.4s ease;
         }
 
-        .font-brand { font-family: 'Orbitron', sans-serif; letter-spacing: 2px; }
+        .font-brand { font-family: 'Space Grotesk', sans-serif; letter-spacing: 2px; text-transform: uppercase; }
 
         .glass-panel {
             background: var(--glass);
@@ -121,6 +121,9 @@
     </style>
 </head>
 <body>
+    <!-- REPLACE THIS URL WITH AN ACTUAL MP3 FILE URL -->
+    <audio id="bio-audio" src="https://example.com/your-actual-song.mp3" loop preload="auto"></audio>
+
     <div id="followers-modal" class="floating-modal" onclick="handleExit()">
         <div class="modal-box menu-window" onclick="event.stopPropagation()">
             <div class="flex justify-between items-center mb-8">
@@ -148,7 +151,8 @@
             </div>
         </div>
     </div>
-        <div id="menu-modal" class="floating-modal" onclick="handleExit()">
+    
+    <div id="menu-modal" class="floating-modal" onclick="handleExit()">
         <div class="modal-box menu-window" onclick="event.stopPropagation()">
             <div class="flex justify-between items-center mb-8">
                 <h3 class="font-brand text-[10px] text-blue-500 tracking-[0.3em]">SYSTEM OPTIONS</h3>
@@ -171,32 +175,12 @@
                     <p class="text-[9px] text-gray-500 font-brand mb-4 text-center">CONNECTIVITY</p>
                     <div class="flex justify-center gap-6">
                         <a href="https://x.com/Nikhil_X7" class="social-btn"><i class="fa-brands fa-x-twitter"></i></a>
-                        <a href="https://www.linkedin.com/in/nikhil-b-b41641363?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app" class="social-btn"><i class="fab fa-linkedin-in"></i></a>
-                        <a href="https://www.instagram.com/x0s.nikh_07?igsh=ZTc5YzM4ZDVhY3dw" class="social-btn"><i class="fab fa-instagram"></i></a>
-                        <a href="https://www.snapchat.com/add/xn14419?share_id=hlQweBbao7g&locale=en-IN" class="social-btn"><i class="fab fa-snapchat"></i></a>
+                        <a href="https://www.linkedin.com/in/nikhil-b-b41641363" class="social-btn"><i class="fab fa-linkedin-in"></i></a>
+                        <a href="https://www.instagram.com/x0s.nikh_07" class="social-btn"><i class="fab fa-instagram"></i></a>
+                        <a href="https://www.snapchat.com/add/xn14419" class="social-btn"><i class="fab fa-snapchat"></i></a>
                     </div>
                 </div>
             </div>
-        </div>
-    </div>
-    <div id="license-modal" class="floating-modal" onclick="handleExit()">
-        <div class="license-card font-brand" onclick="event.stopPropagation()">
-            <div class="flex justify-between text-[11px] text-[#7f8fb3] mb-6">
-                <div><span class="license-dot"></span>PROTOCOL : ACTIVE</div>
-                <div class="close-btn-circle" style="position: static; width: 24px; height: 24px; cursor: pointer;" onclick="handleExit()">
-                    <i class="fas fa-times text-[10px]"></i>
-                </div>
-            </div>
-            <div class="text-[32px] font-semibold tracking-wider">XOS <span class="text-[#2f7cff]">INT</span></div>
-            <div class="text-[11px] tracking-[4px] text-[#3a6fff] mt-1">SECURE LICENSE ACCESS</div>
-            <div class="h-[1px] bg-white/10 my-6"></div>
-            <div class="text-[12px] leading-[2] text-[#9fb3ff]">
-                <div><span class="text-[#4d7cff]">ID :</span> Nikhil@xos</div>
-                <div><span class="text-[#4d7cff]">ROLE :</span> Special Member</div>
-                <div><span class="text-[#4d7cff]">STATUS :</span> Authorized by admin</div>
-                <div><span class="text-[#4d7cff]">VALIDITY :</span> 2026 – </div>
-            </div>
-            <div class="mt-8 text-[10px] text-[#5a6d99] opacity-70 italic">“Tailoring the digital experience to the core user.”</div>
         </div>
     </div>
 
@@ -274,8 +258,18 @@
                             <i class="fas fa-check-circle red-tick-glow text-xs"></i>
                         </div>
                         <p class="text-[10px] text-blue-500 font-mono tracking-tighter">Nikhil@xos</p>
-                        <div class="flex gap-4 mt-3">
-                            <div onclick="openFollowers()" class="text-[10px] uppercase tracking-widest text-gray-400 active:text-white transition-colors cursor-pointer">Followers</div>
+                        
+                        <div class="flex flex-col gap-2 mt-3">
+                            <div onclick="openFollowers()" class="text-[10px] uppercase tracking-widest text-gray-400 active:text-white transition-colors cursor-pointer w-fit">Followers</div>
+                            
+                            <div class="flex items-center gap-2">
+                                <div onclick="toggleBioMusic()" class="text-blue-500 text-[9px] cursor-pointer transition-transform active:scale-90" id="bio-play-container">
+                                    <i class="fas fa-play" id="bio-play-icon"></i>
+                                </div>
+                                <a href="https://music.youtube.com/search?q=Song+Name" target="_blank" class="text-[9px] font-brand tracking-[1.5px] text-gray-500 hover:text-blue-400 transition-colors uppercase">
+                                    Song Name
+                                </a>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -380,6 +374,14 @@
             caption.innerText = post.caption;
             container.innerHTML = '';
 
+            // Auto-pause bio music correctly
+            const bioAudio = document.getElementById('bio-audio');
+            const bioIcon = document.getElementById('bio-play-icon');
+            if(!bioAudio.paused) {
+                bioAudio.pause();
+                bioIcon.className = "fas fa-play";
+            }
+
             if (post.type === 'video') {
                 container.innerHTML = `<video id="active-video" src="${post.src}" class="w-full h-full object-cover" autoplay loop playsinline></video>`;
             } else {
@@ -405,14 +407,12 @@
             const input = document.getElementById('comment-input');
             const text = input.value.trim();
             if (!text || activePostIndex === null) return;
-
             const postRef = ref(db, 'comments/' + activePostIndex);
             push(postRef, {
                 text: text,
                 time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
                 timestamp: Date.now()
             });
-            
             input.value = '';
         }
 
@@ -424,14 +424,12 @@
         function renderComments() {
             const list = document.getElementById('comment-list');
             const postRef = ref(db, 'comments/' + activePostIndex);
-
             onValue(postRef, (snapshot) => {
                 const data = snapshot.val();
                 if (!data) {
                     list.innerHTML = `<div class="text-white/20 text-center text-[10px] mt-10 uppercase tracking-widest">No conversation yet</div>`;
                     return;
                 }
-
                 const comments = Object.entries(data).map(([id, val]) => ({ id, ...val }));
                 list.innerHTML = comments.map(c => `
                     <div class="comment-item glass-panel p-3 rounded-2xl border border-white/5 relative">
@@ -469,10 +467,46 @@
                 });
             }, 300);
         }
+
+        // --- FIXED Bio Music Toggle with better error handling ---
+        window.toggleBioMusic = function() {
+            const audio = document.getElementById('bio-audio');
+            const icon = document.getElementById('bio-play-icon');
+            
+            if (!audio) return;
+            
+            if (audio.paused) {
+                // Try to play and update icon on success
+                audio.play().then(() => {
+                    icon.className = "fas fa-pause";
+                }).catch(e => {
+                    console.error("Playback failed:", e);
+                    icon.className = "fas fa-play";
+                    alert("Audio file not found! Please replace the src URL with a valid mp3 file.");
+                });
+            } else {
+                audio.pause();
+                icon.className = "fas fa-play";
+            }
+        }
+
+        // Reset icon when audio ends
+        const bioAudio = document.getElementById('bio-audio');
+        if (bioAudio) {
+            bioAudio.addEventListener('ended', function() {
+                document.getElementById('bio-play-icon').className = "fas fa-play";
+            });
+            
+            // Also handle when audio can't play
+            bioAudio.addEventListener('error', function() {
+                console.error("Audio failed to load");
+                document.getElementById('bio-play-icon').className = "fas fa-play";
+            });
+        }
+
         window.addEventListener('popstate', window.killAndHide);
         window.renderGrid();
     </script>
-    <script data-goatcounter="https://xos-int.goatcounter.com/count"
-        async src="//gc.zgo.at/count.js"></script>
+    <script data-goatcounter="https://xos-int.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
 </body>
 </html>
