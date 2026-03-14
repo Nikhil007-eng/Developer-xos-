@@ -6,38 +6,33 @@
     <title>XOS - Profile</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Orbitron:wght@500;700&family=Space+Grotesk:wght@300;400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;700&display=swap" rel="stylesheet">
     <style>
-        :root { --accent:#007aff; --glass:rgba(10,10,10,0.8); --border:#1a1a1a; --bg-color:#000; --text-main:#fff; }
-        body.light-mode { --bg-color:#f0f2f5; --glass:rgba(255,255,255,0.7); --border:rgba(0,0,0,0.1); --text-main:#1a1a1a; }
+        :root { --accent:#007aff; --glass:rgba(10,10,10,0.85); --border:#1a1a1a; --bg-color:#000; --text-main:#fff; }
         * { box-sizing:border-box; -webkit-tap-highlight-color:transparent; user-select:none; }
-        html,body { height:100%;width:100%;overflow:hidden;position:fixed;background-color:var(--bg-color);color:var(--text-main);font-family:'Space Grotesk',sans-serif;transition:background-color 0.4s; }
-        .font-brand { font-family:'Space Grotesk',sans-serif;letter-spacing:2px;text-transform:uppercase; }
-        .glass-panel { background:var(--glass);backdrop-filter:blur(25px) saturate(180%);-webkit-backdrop-filter:blur(25px) saturate(180%);border:1px solid var(--border); }
-        .main-container { height:100dvh;overflow-y:auto;touch-action:pan-y;padding-bottom:100px; }
-        .blue-tick-glow { color:var(--accent);animation:tickPulse 2s infinite ease-in-out; }
-        @keyframes tickPulse { 0%,100%{opacity:0.7;transform:scale(1);filter:drop-shadow(0 0 2px var(--accent))} 50%{opacity:1;transform:scale(1.1);filter:drop-shadow(0 0 8px var(--accent))} }
-        .floating-modal { position:fixed;inset:0;z-index:100;background:rgba(0,0,0,0.7);backdrop-filter:blur(15px);-webkit-backdrop-filter:blur(15px);display:none;align-items:center;justify-content:center;opacity:0;transition:opacity 0.3s; }
-        .floating-modal.active { display:flex;opacity:1; }
-        .modal-box { width:82vw;aspect-ratio:3/5;max-width:380px;max-height:85vh;background:#000;border:1px solid var(--border);border-radius:28px;overflow:hidden;position:relative;transform:scale(0.9);transition:transform 0.3s cubic-bezier(0.175,0.885,0.32,1.275);box-shadow:0 25px 50px -12px rgba(0,0,0,0.5); }
+        html,body { height:100%; width:100%; overflow:hidden; position:fixed; background-color:var(--bg-color); color:var(--text-main); font-family:'Space Grotesk',sans-serif; }
+        .font-brand { font-family:'Space Grotesk',sans-serif; letter-spacing:2px; text-transform:uppercase; }
+        .glass-panel { background:var(--glass); backdrop-filter:blur(25px) saturate(180%); -webkit-backdrop-filter:blur(25px) saturate(180%); border:1px solid var(--border); }
+        .main-container { height:100dvh; overflow-y:auto; touch-action:pan-y; padding-bottom:100px; }
+        .floating-modal { position:fixed; inset:0; z-index:100; background:rgba(0,0,0,0.8); backdrop-filter:blur(15px); -webkit-backdrop-filter:blur(15px); display:none; align-items:center; justify-content:center; opacity:0; transition:opacity 0.3s; }
+        .floating-modal.active { display:flex; opacity:1; }
+        .modal-box { width:85vw; max-width:400px; max-height:85vh; background:#000; border:1px solid var(--border); border-radius:32px; overflow:hidden; position:relative; transform:scale(0.9); transition:transform 0.3s cubic-bezier(0.175,0.885,0.32,1.275); }
         .floating-modal.active .modal-box { transform:scale(1); }
-        .square-modal { aspect-ratio:1/1!important;width:85vw!important;max-width:400px!important;border-radius:32px!important; }
-        .menu-window { height:auto!important;padding:30px;background:var(--glass);border:1px solid var(--border); }
-        .close-btn-circle { position:absolute;top:15px;right:15px;width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.1);color:white;display:flex;align-items:center;justify-content:center;z-index:110;cursor:pointer; }
-        .loader { position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:#000;z-index:5;transition:opacity 0.5s; }
-        .spinner { width:22px;height:22px;border:2px solid rgba(255,255,255,0.1);border-top:2px solid var(--accent);border-radius:50%;animation:spin 0.8s linear infinite; }
-        @keyframes spin { to{transform:rotate(360deg)} }
-        .social-btn { width:45px;height:45px;border-radius:14px;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,0.05);border:1px solid var(--border);transition:0.3s;color:var(--text-main);text-decoration:none; }
-        .edit-input { width:100%;background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:14px;padding:12px 16px;color:#fff;font-size:12px;outline:none;transition:0.3s; }
-        .edit-label { font-size:8px;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:2px;margin-bottom:6px;display:block;margin-left:4px; }
-        .upload-btn { background:rgba(0,122,255,0.1);border:1px dashed var(--accent);color:var(--accent);padding:12px;border-radius:12px;text-align:center;font-size:10px;cursor:pointer; }
+        .close-btn-circle { width:36px; height:36px; border-radius:50%; background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.1); color:white; display:flex; align-items:center; justify-content:center; cursor:pointer; }
+        .edit-input { width:100%; background:rgba(255,255,255,0.05); border:1px solid var(--border); border-radius:14px; padding:12px 16px; color:#fff; font-size:12px; outline:none; }
+        .edit-input:focus { border-color:var(--accent); }
+        .edit-label { font-size:8px; color:rgba(255,255,255,0.3); text-transform:uppercase; letter-spacing:2px; margin-bottom:6px; display:block; }
+        .upload-trigger { background:rgba(0,122,255,0.1); border:1px dashed var(--accent); color:var(--accent); padding:14px; border-radius:14px; text-align:center; font-size:10px; cursor:pointer; transition: 0.2s; }
+        .upload-trigger:active { background:rgba(0,122,255,0.2); transform: scale(0.98); }
+        .spinner { width:24px; height:24px; border:2px solid rgba(255,255,255,0.1); border-top-color:var(--accent); border-radius:50%; animation:rot 0.8s linear infinite; }
+        @keyframes rot { to { transform:rotate(360deg); } }
     </style>
 </head>
 <body>
 
 <div id="loading-screen" style="position:fixed;inset:0;background:#000;z-index:999;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:16px;">
     <div class="spinner"></div>
-    <p class="font-brand" style="font-size:9px;color:rgba(255,255,255,0.3);letter-spacing:3px;">LOADING PROFILE</p>
+    <p class="font-brand" style="font-size:9px;color:rgba(255,255,255,0.2);letter-spacing:4px;">SYNCING_XOS</p>
 </div>
 
 <div id="profile-root" style="display:none;"></div>
@@ -59,263 +54,232 @@ try {
         appId:"1:288849938458:web:d615242bb9f1e1ee0fe9a3"
     });
     db = firebase.database();
-} catch(e) {}
+} catch(e) { console.error("Firebase Init Error"); }
 
 const urlParams = new URLSearchParams(window.location.search);
 const userId = urlParams.get('u') || '';
 if (!userId) window.location.href = 'index.html';
 
-// Correct history stack initialization
-if(!history.state) {
-    history.replaceState({ screen: 'profile_root' }, '', window.location.href);
+// Initialize History state correctly for the base page
+if (!history.state) {
+    history.replaceState({ screen: 'profile_base' }, '', window.location.href);
 }
 
-function loadProfileData() {
-    if (db) {
-        db.ref('profiles/' + userId).on('value', snap => {
-            const p = snap.val();
-            if (!p) { window.location.href = 'index.html'; return; }
-            buildProfile(p);
-        });
-    }
+function initProfile() {
+    db.ref('profiles/' + userId).on('value', snap => {
+        const p = snap.val();
+        if (!p) { window.location.href = 'index.html'; return; }
+        renderProfile(p);
+    });
 }
-loadProfileData();
+initProfile();
 
-function buildProfile(p) {
-    const name     = p.name || userId;
-    const nameLow  = p.id   || name.toLowerCase();
-    const photo    = p.photo || '';
-    const username = nameLow + '@xos';
-    const audio    = p.audio || '';
-    const songName = p.songName || 'Bio Song';
+function renderProfile(p) {
+    const name = p.name || userId;
+    const nameLow = userId; // Always use the URL parameter for the path
+    const photo = p.photo || '';
+    const audio = p.audio || '';
+    const songName = p.songName || 'System Track';
     const songLink = p.songLink || '';
-    const social   = p.social || {};
 
-    document.title = 'XOS - ' + name;
-    const audioEl = document.getElementById('bio-audio');
-    if (audioEl && audioEl.src !== audio) audioEl.src = audio;
-
-    const songDisplay = audio || songLink ? `
-        <div class="flex items-center gap-2">
-            <div onclick="toggleBioMusic()" class="text-blue-500 text-[10px] cursor-pointer transition-transform active:scale-90">
-                <i class="fas fa-play" id="bio-play-icon"></i>
-            </div>
-            ${songLink 
-                ? `<a href="${songLink}" target="_blank" class="text-[9px] font-brand tracking-[1.5px] text-gray-400 hover:text-blue-500 transition-colors uppercase underline-offset-4 decoration-blue-500/30">${songName}</a>`
-                : `<span class="text-[9px] font-brand tracking-[1.5px] text-gray-500 uppercase">${songName}</span>`
-            }
-        </div>` : '';
+    const bioAudio = document.getElementById('bio-audio');
+    if (audio && bioAudio.src !== audio) bioAudio.src = audio;
 
     document.getElementById('profile-root').innerHTML = `
     <div id="menu-modal" class="floating-modal" onclick="handleExit()">
-        <div class="modal-box menu-window" onclick="event.stopPropagation()">
-            <div class="flex justify-between items-center mb-8">
-                <h3 class="font-brand text-[10px] text-blue-500 tracking-[0.3em]">SYSTEM OPTIONS</h3>
-                <div class="close-btn-circle" style="position:static;width:30px;height:30px;" onclick="handleExit()"><i class="fas fa-times text-xs"></i></div>
+        <div class="modal-box p-8" onclick="event.stopPropagation()">
+            <div class="flex justify-between items-center mb-10">
+                <h3 class="font-brand text-[10px] text-blue-500 tracking-[0.4em]">SYSTEM</h3>
+                <div class="close-btn-circle" onclick="handleExit()"><i class="fas fa-times text-xs"></i></div>
             </div>
             <div class="space-y-4">
-                <div onclick="openEditAuth()" class="flex items-center gap-4 p-4 glass-panel rounded-2xl active:scale-95 transition-transform cursor-pointer">
-                    <i class="fas fa-user-edit text-blue-500"></i><span class="text-xs font-brand">EDIT PROFILE</span>
-                </div>
-                <div onclick="shareProfile()" class="flex items-center gap-4 p-4 glass-panel rounded-2xl active:scale-95 cursor-pointer">
-                    <i class="fas fa-share-alt text-blue-500"></i><span class="text-xs font-brand">SHARE PROFILE</span>
-                </div>
+                <button onclick="openEditAuth()" class="w-full glass-panel p-5 rounded-2xl flex items-center gap-4 active:scale-95 transition-all">
+                    <i class="fas fa-fingerprint text-blue-500"></i>
+                    <span class="text-xs font-brand tracking-widest">EDIT PROFILE</span>
+                </button>
+                <button onclick="navigator.share({url:window.location.href})" class="w-full glass-panel p-5 rounded-2xl flex items-center gap-4 active:scale-95 transition-all">
+                    <i class="fas fa-share-nodes text-blue-500"></i>
+                    <span class="text-xs font-brand tracking-widest">SHARE UPLINK</span>
+                </button>
             </div>
         </div>
     </div>
 
     <div id="edit-auth-modal" class="floating-modal" onclick="handleExit()">
-        <div class="modal-box menu-window" onclick="event.stopPropagation()">
-            <div class="flex justify-between items-center mb-6">
-                <h3 class="font-brand text-[10px] text-blue-500 tracking-[0.3em]">AUTHORIZATION</h3>
-                <div class="close-btn-circle" style="position:static;width:30px;height:30px;" onclick="handleExit()"><i class="fas fa-times text-xs"></i></div>
-            </div>
-            <input type="password" id="edit-auth-input" class="edit-input mb-4" placeholder="••••••••">
-            <button onclick="checkEditAuth('${nameLow}')" class="w-full bg-blue-600/20 border border-blue-500 text-blue-500 font-brand text-[10px] py-4 rounded-xl tracking-[2px]">VERIFY UPLINK</button>
+        <div class="modal-box p-8" onclick="event.stopPropagation()">
+            <h3 class="font-brand text-[10px] text-blue-500 mb-8 tracking-[0.4em]">AUTHORIZE</h3>
+            <input type="password" id="auth-code" class="edit-input mb-4" placeholder="••••••••">
+            <button onclick="checkAuth('${nameLow}')" class="w-full bg-blue-600/20 border border-blue-500 text-blue-500 py-4 rounded-xl font-brand text-[10px] tracking-widest">VERIFY</button>
         </div>
     </div>
 
     <div id="edit-profile-modal" class="floating-modal" onclick="handleExit()">
-        <div class="modal-box glass-panel flex flex-col h-[85vh]" onclick="event.stopPropagation()">
-            <div class="p-6 border-b border-white/10 flex justify-between items-center bg-black">
-                <h3 class="font-brand text-[10px] text-blue-500 tracking-[0.3em]">MANAGE PROFILE</h3>
-                <div class="close-btn-circle" style="position:static;width:30px;height:30px;" onclick="handleExit()"><i class="fas fa-times text-xs"></i></div>
+        <div class="modal-box flex flex-col h-[85vh]" onclick="event.stopPropagation()">
+            <div class="p-6 border-b border-white/5 flex justify-between items-center bg-black">
+                <h3 class="font-brand text-[10px] text-blue-500 tracking-[0.4em]">MOD_SYSTEM</h3>
+                <div class="close-btn-circle" onclick="handleExit()"><i class="fas fa-times text-xs"></i></div>
             </div>
             <div class="flex-1 overflow-y-auto p-6 space-y-6">
-                <div><label class="edit-label">Name</label><input type="text" id="edit-name" class="edit-input" value="${name}"></div>
+                <div><label class="edit-label">Display Name</label><input type="text" id="up-name" class="edit-input" value="${name}"></div>
                 
                 <div>
-                    <label class="edit-label">Profile Asset</label>
-                    <div class="upload-btn" onclick="document.getElementById('file-photo').click()">
-                        <i class="fas fa-camera mr-2"></i>REPLACE PHOTO
+                    <label class="edit-label">Profile Identity</label>
+                    <div class="upload-trigger" onclick="document.getElementById('in-photo').click()">
+                        <i class="fas fa-image-portrait mr-2"></i>REPLACE_PHOTO
                     </div>
-                    <input type="file" id="file-photo" class="hidden" accept="image/*" onchange="uploadAsset(this, 'photo')">
-                    <p id="up-photo-status" class="text-[8px] text-gray-500 mt-2 uppercase"></p>
+                    <input type="file" id="in-photo" class="hidden" accept="image/*" onchange="uploadFile(this, 'photo')">
+                    <p id="st-photo" class="text-[8px] text-gray-600 mt-2 uppercase tracking-tighter"></p>
                 </div>
 
-                <div class="pt-2 border-t border-white/5">
-                    <p class="text-[9px] text-blue-500/50 font-brand mb-4">BIO SOUNDSCAPE</p>
+                <div class="pt-4 border-t border-white/5">
+                    <p class="text-[9px] text-blue-500/40 font-brand mb-4 tracking-[0.3em]">SOUNDSCAPE</p>
                     <div class="space-y-4">
                         <div>
-                            <label class="edit-label">Upload Bio Song</label>
-                            <div class="upload-btn" onclick="document.getElementById('file-audio').click()">
-                                <i class="fas fa-music mr-2"></i>UPLOAD MP3
+                            <label class="edit-label">Bio Audio</label>
+                            <div class="upload-trigger" onclick="document.getElementById('in-audio').click()">
+                                <i class="fas fa-waveform-lines mr-2"></i>UPLOAD_SOUND
                             </div>
-                            <input type="file" id="file-audio" class="hidden" accept="audio/*" onchange="uploadAsset(this, 'audio')">
-                            <p id="up-audio-status" class="text-[8px] text-gray-500 mt-2 uppercase"></p>
+                            <input type="file" id="in-audio" class="hidden" accept="audio/*" onchange="uploadFile(this, 'audio')">
+                            <p id="st-audio" class="text-[8px] text-gray-600 mt-2 uppercase tracking-tighter"></p>
                         </div>
-                        <div><label class="edit-label">YT Music URL</label><input type="text" id="edit-songLink" class="edit-input" value="${songLink}"></div>
+                        <div><label class="edit-label">YouTube Music Link</label><input type="text" id="up-yt" class="edit-input" value="${songLink}"></div>
                     </div>
                 </div>
             </div>
-            <div class="p-6 bg-black border-t border-white/10">
-                <button onclick="saveProfileChanges('${nameLow}')" class="w-full bg-blue-600 text-white font-brand text-[10px] py-4 rounded-xl tracking-[2px]">COMMIT CHANGES</button>
+            <div class="p-6 bg-black border-t border-white/5">
+                <button onclick="saveChanges()" class="w-full bg-blue-600 py-4 rounded-xl font-brand text-[10px] tracking-widest active:scale-95 transition-all">COMMIT_CHANGES</button>
             </div>
         </div>
     </div>
 
-    <div id="floating-post" class="floating-modal" onclick="handleExit()"><div class="modal-box glass-panel" onclick="event.stopPropagation()"><div class="close-btn-circle" onclick="handleExit()"><i class="fas fa-times"></i></div><div id="media-container" class="h-full w-full"></div><audio id="post-audio"></audio></div></div>
-    <div id="profile-modal" class="floating-modal" onclick="handleExit()"><div class="modal-box square-modal glass-panel" onclick="event.stopPropagation()"><div class="close-btn-circle" onclick="handleExit()"><i class="fas fa-times"></i></div><img src="${photo}" class="w-full h-full object-cover"></div></div>
-
     <div class="main-container">
         <div class="flex justify-between items-center px-6 py-8">
-            <button onclick="history.back()" class="glass-panel w-10 h-10 rounded-full flex items-center justify-center text-gray-400 active:scale-90"><i class="fas fa-chevron-left"></i></button>
-            <span class="font-brand text-[9px] text-gray-500 tracking-[0.4em]">MEMBER // PROFILE</span>
-            <button onclick="openMenu()" class="glass-panel w-10 h-10 rounded-xl flex items-center justify-center text-white active:scale-90"><i class="fas fa-bars-staggered"></i></button>
+            <button onclick="history.back()" class="glass-panel w-10 h-10 rounded-full flex items-center justify-center text-gray-500 active:scale-90 transition-all"><i class="fas fa-chevron-left"></i></button>
+            <span class="font-brand text-[9px] text-gray-500 tracking-[0.4em]">XOS // PROFILE</span>
+            <button onclick="openModal('menu-modal')" class="glass-panel w-10 h-10 rounded-xl flex items-center justify-center text-white active:scale-90 transition-all"><i class="fas fa-bars-staggered"></i></button>
         </div>
 
-        <div class="px-6 mb-8">
-            <div class="glass-panel p-6 rounded-[32px]">
+        <div class="px-6 mb-10">
+            <div class="glass-panel p-7 rounded-[36px] relative overflow-hidden">
                 <div class="flex items-center gap-6">
-                    <div onclick="openProfile()" class="w-20 h-20 rounded-2xl overflow-hidden border border-white/10"><img src="${photo}" class="w-full h-full object-cover"></div>
+                    <div class="w-20 h-20 rounded-2xl overflow-hidden border border-white/5"><img src="${photo}" class="w-full h-full object-cover"></div>
                     <div class="flex-1">
-                        <div class="flex items-center gap-2"><h1 class="font-brand text-xl">${name.toUpperCase()}</h1><i class="fas fa-check-circle blue-tick-glow text-xs"></i></div>
-                        <p class="text-[10px] text-blue-500 font-mono tracking-tighter">${username}</p>
-                        <div class="mt-3">${songDisplay}</div>
+                        <div class="flex items-center gap-2"><h1 class="font-brand text-lg">${name}</h1><i class="fas fa-check-circle text-blue-500 text-[10px]"></i></div>
+                        <p class="text-[10px] text-blue-500/50 font-mono tracking-tighter">${nameLow}@xos</p>
+                        <div class="mt-3">
+                            <div class="flex items-center gap-2">
+                                <div onclick="toggleBio()" class="text-blue-500 text-[11px] cursor-pointer"><i class="fas fa-play" id="play-icon"></i></div>
+                                ${songLink ? `<a href="${songLink}" target="_blank" class="text-[9px] font-brand tracking-[2px] text-gray-500 uppercase hover:text-blue-400"> ${songName}</a>` : `<span class="text-[9px] font-brand tracking-[2px] text-gray-600 uppercase">${songName}</span>`}
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <div class="px-6">
-            <div id="posts-grid" class="grid grid-cols-2 gap-3"></div>
-        </div>
+        <div class="px-6 grid grid-cols-2 gap-3" id="posts-grid"></div>
     </div>
     `;
 
     document.getElementById('loading-screen').classList.add('hidden');
     document.getElementById('profile-root').style.display = 'block';
-
-    setupProfileJS(nameLow);
+    
+    loadPosts(nameLow);
 }
 
-function setupProfileJS(nameLow) {
-    let POSTS = [];
-    
-    // Cloudinary Config
-    const CLOUD = "dptphdatf";
-    const PRESET = "vagprxhr";
+// Logic Suite
+let uploaded = { photo: null, audio: null };
 
-    window.toggleBioMusic = function() {
-        const audio = document.getElementById('bio-audio');
-        const icon  = document.getElementById('bio-play-icon');
-        if (audio.paused) { audio.play().then(() => icon.className='fas fa-pause').catch(()=>icon.className='fas fa-play'); }
-        else { audio.pause(); icon.className = 'fas fa-play'; }
-    };
+function openModal(id) {
+    history.pushState({ modal: id }, '', '');
+    const m = document.getElementById(id);
+    m.style.display = 'flex';
+    setTimeout(() => m.classList.add('active'), 10);
+}
 
-    // Data Load
-    db.ref(nameLow + '/posts').on('value', snap => {
-        POSTS = [];
-        const data = snap.val();
-        if (data) Object.entries(data).sort((a,b)=>(b[1].timestamp||0)-(a[1].timestamp||0)).forEach(([id,v])=>POSTS.push({id,...v}));
-        renderGrid();
+function handleExit() { history.back(); }
+
+window.onpopstate = (e) => {
+    document.querySelectorAll('.floating-modal').forEach(m => {
+        m.classList.remove('active');
+        setTimeout(() => m.style.display = 'none', 300);
     });
+    // Natural browser behavior handles the "back to where it came from" for profile_base
+};
 
-    function renderGrid() {
-        const grid = document.getElementById('posts-grid');
-        grid.innerHTML = POSTS.map((p, i) => `
-            <div class="glass-panel aspect-square rounded-2xl overflow-hidden active:scale-95 transition-transform" onclick="openPost(${i})">
-                ${p.type==='video' ? `<video src="${p.src}" class="w-full h-full object-cover opacity-50" muted></video>` : `<img src="${p.src}" class="w-full h-full object-cover opacity-80">`}
-            </div>
-        `).join('') || '<div class="col-span-2 text-center py-20 opacity-20 text-[10px]">NO_DATA</div>';
-    }
-
-    // Modal Handling
-    window.openPost = (i) => {
-        history.pushState({modal:'floating-post'},'');
-        const p = POSTS[i];
-        document.getElementById('media-container').innerHTML = p.type==='video' ? `<video src="${p.src}" autoplay loop muted class="w-full h-full object-cover"></video>` : `<img src="${p.src}" class="w-full h-full object-cover">`;
-        if(p.audio) { const a = document.getElementById('post-audio'); a.src=p.audio; a.play(); }
-        const m = document.getElementById('floating-post'); m.style.display='flex'; setTimeout(()=>m.classList.add('active'),10);
-    };
-
-    window.openMenu = () => { history.pushState({modal:'menu-modal'},''); const m=document.getElementById('menu-modal'); m.style.display='flex'; setTimeout(()=>m.classList.add('active'),10); };
-    window.openProfile = () => { history.pushState({modal:'profile-modal'},''); const m=document.getElementById('profile-modal'); m.style.display='flex'; setTimeout(()=>m.classList.add('active'),10); };
-    window.openEditAuth = () => { history.pushState({modal:'edit-auth-modal'},''); document.getElementById('menu-modal').classList.remove('active'); setTimeout(()=>{document.getElementById('menu-modal').style.display='none'; const m=document.getElementById('edit-auth-modal'); m.style.display='flex'; setTimeout(()=>m.classList.add('active'),10);},300); };
-
-    window.checkEditAuth = (id) => {
-        if (document.getElementById('edit-auth-input').value === id + '@432') {
-            document.getElementById('edit-auth-modal').classList.remove('active');
-            setTimeout(() => {
-                document.getElementById('edit-auth-modal').style.display='none';
-                history.replaceState({modal:'edit-profile-modal'},'','');
-                const m = document.getElementById('edit-profile-modal');
-                m.style.display='flex';
-                setTimeout(()=>m.classList.add('active'),10);
-            }, 300);
-        } else alert('ACCESS_DENIED');
-    };
-
-    // Asset Upload
-    let uploadedUrls = { photo: null, audio: null };
-    window.uploadAsset = async (input, type) => {
-        if(!input.files[0]) return;
-        const status = document.getElementById(`up-${type}-status`);
-        status.textContent = "Processing...";
-        const fd = new FormData();
-        fd.append('file', input.files[0]);
-        fd.append('upload_preset', PRESET);
-        try {
-            const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD}/${type==='audio'?'video':'image'}/upload`, { method:'POST', body:fd });
-            const data = await res.json();
-            uploadedUrls[type] = data.secure_url;
-            status.textContent = "✓ Uploaded";
-            status.style.color = "var(--accent)";
-        } catch(e) { status.textContent = "Upload Failed"; }
-    };
-
-    window.saveProfileChanges = (id) => {
-        const ytLink = document.getElementById('edit-songLink').value;
-        let sName = document.getElementById('edit-name').value + "'s Anthem";
-        if(ytLink.includes('music.youtube.com')) sName = ytLink.split('v=')[1]?.split('&')[0] || "YT Track";
-        
-        const updates = {
-            name: document.getElementById('edit-name').value,
-            songLink: ytLink,
-            songName: sName
-        };
-        if(uploadedUrls.photo) updates.photo = uploadedUrls.photo;
-        if(uploadedUrls.audio) updates.audio = uploadedUrls.audio;
-
-        db.ref('profiles/' + userId).update(updates).then(() => history.back());
-    };
-
-    window.handleExit = () => history.back();
-
-    window.onpopstate = (e) => {
-        if (!e.state || e.state.screen === 'profile_root') {
-            ['floating-post','profile-modal','menu-modal','edit-auth-modal','edit-profile-modal'].forEach(id=>{
-                const el=document.getElementById(id); if(el){el.classList.remove('active');setTimeout(()=>el.style.display='none',300);}
-            });
-            const v = document.getElementById('active-video'); if(v) v.src='';
-            const a = document.getElementById('post-audio'); if(a) a.src='';
-        } else if (!e.state) {
-            window.location.href = 'index.html';
-        }
-    };
-    
-    window.shareProfile = () => { navigator.share({ title: name + ' / XOS', url: window.location.href }).catch(()=>{}); };
+function toggleBio() {
+    const a = document.getElementById('bio-audio');
+    const i = document.getElementById('play-icon');
+    if (a.paused) { a.play(); i.className = 'fas fa-pause'; }
+    else { a.pause(); i.className = 'fas fa-play'; }
 }
+
+function openEditAuth() {
+    document.getElementById('menu-modal').classList.remove('active');
+    setTimeout(() => {
+        document.getElementById('menu-modal').style.display = 'none';
+        openModal('edit-auth-modal');
+    }, 300);
+}
+
+function checkAuth(id) {
+    if (document.getElementById('auth-code').value === id + '@432') {
+        document.getElementById('edit-auth-modal').classList.remove('active');
+        setTimeout(() => {
+            document.getElementById('edit-auth-modal').style.display = 'none';
+            openModal('edit-profile-modal');
+        }, 300);
+    } else alert('UNAUTHORIZED');
+}
+
+async function uploadFile(input, type) {
+    if (!input.files[0]) return;
+    const st = document.getElementById(`st-${type}`);
+    st.textContent = "UPLOADING...";
+    const fd = new FormData();
+    fd.append('file', input.files[0]);
+    fd.append('upload_preset', 'vagprxhr');
+    try {
+        const res = await fetch(`https://api.cloudinary.com/v1_1/dptphdatf/${type==='audio'?'video':'image'}/upload`, { method:'POST', body:fd });
+        const d = await res.json();
+        uploaded[type] = d.secure_url;
+        st.textContent = "✓ READY";
+        st.style.color = "var(--accent)";
+    } catch(e) { st.textContent = "ERROR"; }
+}
+
+function saveChanges() {
+    const yt = document.getElementById('up-yt').value;
+    let sName = document.getElementById('up-name').value + "'s Anthem";
+    if (yt.includes('music.youtube.com')) {
+        const id = yt.split('v=')[1]?.split('&')[0];
+        sName = "YT_TRACK_" + (id ? id.substring(0,6) : "BIO");
+    }
+    
+    const data = {
+        name: document.getElementById('up-name').value,
+        songLink: yt,
+        songName: sName
+    };
+    if (uploaded.photo) data.photo = uploaded.photo;
+    if (uploaded.audio) data.audio = uploaded.audio;
+
+    db.ref('profiles/' + userId).update(data).then(() => history.back());
+}
+
+function loadPosts(id) {
+    db.ref(id + '/posts').on('value', snap => {
+        const posts = [];
+        const data = snap.val();
+        if (data) Object.entries(data).sort((a,b)=>b[1].timestamp-a[1].timestamp).forEach(([k,v])=>posts.push(v));
+        document.getElementById('posts-grid').innerHTML = posts.map(p => `
+            <div class="glass-panel aspect-square rounded-2xl overflow-hidden active:scale-95 transition-all">
+                ${p.type==='video' ? `<video src="${p.src}" class="w-full h-full object-cover opacity-50"></video>` : `<img src="${p.src}" class="w-full h-full object-cover opacity-80">`}
+            </div>
+        `).join('') || '<div class="col-span-2 text-center py-20 opacity-10 text-[10px] tracking-widest">EMPTY_FEED</div>';
+    });
+}
+
 </script>
 </body>
 </html>
