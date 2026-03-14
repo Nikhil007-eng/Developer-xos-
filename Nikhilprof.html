@@ -363,31 +363,32 @@
         <div class="px-6">
             <div class="flex justify-between items-center mb-6 px-2">
                 <span class="font-brand text-[9px] text-gray-500 uppercase tracking-[0.3em]">Posts</span>
-                <button onclick="openAuth()" class="w-8 h-8 glass-panel rounded-lg flex items-center justify-center text-xs text-white"><i class="fas fa-plus"></i></button>
+                <button onclick="window.location.href='nikhil_admin.html'" class="w-8 h-8 glass-panel rounded-lg flex items-center justify-center text-xs text-white"><i class="fas fa-plus"></i></button>
             </div>
             <div id="posts-grid" class="grid grid-cols-2 gap-3"></div>
         </div>
     </div>
 
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getDatabase, ref, push, onValue, remove } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
+    <script>
+        let db = null;
+        try {
+            firebase.initializeApp({
+                apiKey: "AIzaSyAUk6bBCFPoq-Tu-AiX1nD3LFvhc6g7B7g",
+                authDomain: "steel-melody-464711-d6.firebaseapp.com",
+                projectId: "steel-melody-464711-d6",
+                storageBucket: "steel-melody-464711-d6.firebasestorage.app",
+                messagingSenderId: "288849938458",
+                appId: "1:288849938458:web:d615242bb9f1e1ee0fe9a3",
+                databaseURL: "https://steel-melody-464711-d6-default-rtdb.firebaseio.com"
+            });
+            db = firebase.database();
+        } catch(e) {}
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyAUk6bBCFPoq-Tu-AiX1nD3LFvhc6g7B7g",
-            authDomain: "steel-melody-464711-d6.firebaseapp.com",
-            projectId: "steel-melody-464711-d6",
-            storageBucket: "steel-melody-464711-d6.firebasestorage.app",
-            messagingSenderId: "288849938458",
-            appId: "1:288849938458:web:d615242bb9f1e1ee0fe9a3",
-            measurementId: "G-NGF1EMPTEP",
-            databaseURL: "https://steel-melody-464711-d6-default-rtdb.firebaseio.com"
-        };
-
-        const app = initializeApp(firebaseConfig);
-        const db = getDatabase(app);
-
-        const POSTS_DATA = [{ type: 'image', src: 'Picsart_26-02-28_14-41-10-477.jpg', audio: 'From_The_Start(256k).mp3', caption: 'image/audio test' }];
+        // Keep original hardcoded post + merge with Firebase posts
+        const STATIC_POSTS = [{ type: 'image', src: 'Picsart_26-02-28_14-41-10-477.jpg', audio: 'From_The_Start(256k).mp3', caption: 'image/audio test' }];
+        let POSTS_DATA = [...STATIC_POSTS];
         let activePostIndex = null;
 
         const TELEGRAM_TOKEN = "8668013778:AAEnWA0uY3tDUOQP1uHQEVJdcAGaWgfy4eA";
@@ -395,14 +396,9 @@
         const SESSION_KEY = "xos_logged_in_user";
 
         window.toggleDarkMode = () => document.body.classList.toggle('light-mode');
-        window.openAuth = () => document.getElementById('auth-portal').style.display = 'flex';
+        window.openAuth = () => window.location.href = 'nikhil_admin.html';
         window.closeAuth = () => document.getElementById('auth-portal').style.display = 'none';
-        
-        window.verifyAccess = () => {
-            if(document.getElementById('auth-key').value === "nyna") {
-                window.location.href = "Https://forms.gle/muG9miN9GJKpVMhn6";
-            } else { alert("ACCESS DENIED"); }
-        }
+        window.verifyAccess = () => { window.location.href = 'nikhil_admin.html'; }
 
         window.openFollowers = () => {
             window.history.pushState({ modal: 'active' }, "");
@@ -526,15 +522,15 @@
             const input = document.getElementById('comment-input');
             const text = input.value.trim();
             if (!text || activePostIndex === null) return;
-            push(ref(db, 'comments/' + activePostIndex), { text: text, time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }), timestamp: Date.now() });
+            if(db) db.ref('comments/' + activePostIndex).push({ text: text, time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }), timestamp: Date.now() });
             input.value = '';
         }
 
-        window.deleteComment = function(id) { remove(ref(db, `comments/${activePostIndex}/${id}`)); }
+        window.deleteComment = function(id) { if(db) db.ref('comments/' + activePostIndex + '/' + id).remove(); }
 
         function renderComments() {
             const list = document.getElementById('comment-list');
-            onValue(ref(db, 'comments/' + activePostIndex), (snapshot) => {
+            if(db) db.ref('comments/' + activePostIndex).on('value', (snapshot) => {
                 const data = snapshot.val();
                 if (!data) { list.innerHTML = `<div class="text-white/20 text-center text-[10px] mt-10 uppercase tracking-widest">No conversation yet</div>`; return; }
                 const comments = Object.entries(data).map(([id, val]) => ({ id, ...val }));
@@ -571,7 +567,24 @@
         }
 
         window.addEventListener('popstate', window.killAndHide);
-        window.renderGrid();
+
+        // Load posts from Firebase (nikhil/posts) and merge with static post
+        if (db) {
+            db.ref('nikhil/posts').on('value', (snapshot) => {
+                const data = snapshot.val();
+                const firebasePosts = [];
+                if (data) {
+                    Object.entries(data)
+                        .sort((a, b) => (b[1].timestamp || 0) - (a[1].timestamp || 0))
+                        .forEach(([id, val]) => firebasePosts.push({ id, ...val }));
+                }
+                // Static post first, then Firebase posts newest first
+                POSTS_DATA = [...STATIC_POSTS, ...firebasePosts];
+                window.renderGrid();
+            });
+        } else {
+            window.renderGrid();
+        }
     </script>
 </body>
 </html>
