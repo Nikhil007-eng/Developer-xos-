@@ -28,7 +28,8 @@
 
 <div id="loading-screen" style="position:fixed;inset:0;background:#000;z-index:999;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:16px;">
     <div class="spinner"></div>
-    <p id="loading-text" class="font-brand" style="font-size:9px;color:rgba(255,255,255,0.2);letter-spacing:4px;">SYNCING_XOS</p>
+    <p id="loading-text" class="font-brand" style="font-size:9px;color:rgba(255,255,255,0.2);letter-spacing:4px;">INITIALIZING_STREAM</p>
+    <button id="force-btn" onclick="revealUI()" style="display:none; margin-top:20px; font-size:8px; color:var(--accent); border:1px solid var(--accent); padding:8px 16px; border-radius:20px;">FORCE REVEAL</button>
 </div>
 
 <div id="profile-root" style="display:none;"></div>
@@ -38,8 +39,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
 <script>
 
-// --- FIREBASE INITIALIZATION ---
-let db = null;
+// 1. Firebase Setup
 const firebaseConfig = {
     apiKey: "AIzaSyAUk6bBCFPoq-Tu-AiX1nD3LFvhc6g7B7g",
     authDomain: "steel-melody-464711-d6.firebaseapp.com",
@@ -50,40 +50,44 @@ const firebaseConfig = {
     appId: "1:288849938458:web:d615242bb9f1e1ee0fe9a3"
 };
 
-try {
-    const app = firebase.initializeApp(firebaseConfig);
-    db = firebase.database();
-} catch(e) {
-    document.getElementById('loading-text').textContent = "CONFIG_ERROR";
-}
+const app = firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
 
-// --- DATA FETCHING ---
+// 2. Navigation Handling
 const urlParams = new URLSearchParams(window.location.search);
 const userId = urlParams.get('u');
 
 if (!userId) {
     window.location.href = 'index.html';
-} else {
-    // Start listener with error handling
-    db.ref('profiles/' + userId).on('value', snap => {
-        const p = snap.val();
-        if (p) {
-            renderProfile(p);
-        } else {
-            document.getElementById('loading-text').textContent = "USER_NOT_FOUND";
-            setTimeout(() => window.location.href = 'index.html', 2000);
-        }
-    }, error => {
-        document.getElementById('loading-text').textContent = "PERMISSION_DENIED";
-        console.error(error);
-    });
 }
 
-function renderProfile(p) {
+// 3. Show "Force" button if load takes too long
+setTimeout(() => { document.getElementById('force-btn').style.display = 'block'; }, 5000);
+
+function revealUI() {
+    document.getElementById('loading-screen').classList.add('hidden');
+    document.getElementById('profile-root').style.display = 'block';
+}
+
+// 4. Core Profile Fetch
+db.ref('profiles/' + userId).on('value', snap => {
+    const data = snap.val();
+    if (data) {
+        renderUI(data);
+        revealUI();
+    } else {
+        document.getElementById('loading-text').textContent = "ERROR: PROFILE_NOT_DEFINED";
+    }
+}, err => {
+    document.getElementById('loading-text').textContent = "ERROR: ACCESS_DENIED";
+    console.error(err);
+});
+
+function renderUI(p) {
     const name = p.name || "UNNAMED";
     const photo = p.photo || "";
     const audio = p.audio || "";
-    const songName = p.songName || "XOS_SEQUENCE";
+    const songName = p.songName || "XOS_DEFAULT";
     const songLink = p.songLink || "";
 
     document.getElementById('bio-audio').src = audio;
@@ -91,10 +95,10 @@ function renderProfile(p) {
     document.getElementById('profile-root').innerHTML = `
     <div id="menu-modal" class="floating-modal" onclick="handleExit()">
         <div class="modal-box p-8" onclick="event.stopPropagation()">
-            <h3 class="font-brand text-[10px] text-blue-500 mb-8 tracking-[0.4em]">SYSTEM</h3>
+            <h3 class="font-brand text-[10px] text-blue-500 mb-8 tracking-[0.4em]">SYSTEM_MOD</h3>
             <div class="space-y-4">
-                <button onclick="openEditAuth()" class="w-full glass-panel p-5 rounded-2xl flex items-center gap-4 active:scale-95 transition-all">
-                    <i class="fas fa-fingerprint text-blue-500"></i>
+                <button onclick="openEditAuth()" class="w-full glass-panel p-5 rounded-2xl flex items-center gap-4">
+                    <i class="fas fa-key text-blue-500"></i>
                     <span class="text-xs font-brand tracking-widest">EDIT PROFILE</span>
                 </button>
             </div>
@@ -103,36 +107,36 @@ function renderProfile(p) {
 
     <div id="edit-auth-modal" class="floating-modal" onclick="handleExit()">
         <div class="modal-box p-8" onclick="event.stopPropagation()">
-            <h3 class="font-brand text-[10px] text-blue-500 mb-8 tracking-[0.4em]">AUTHORIZE</h3>
-            <input type="password" id="auth-code" class="edit-input mb-4" placeholder="••••••••">
-            <button onclick="checkAuth('${userId}')" class="w-full bg-blue-600/20 border border-blue-500 text-blue-500 py-4 rounded-xl font-brand text-[10px]">VERIFY</button>
+            <h3 class="font-brand text-[10px] text-blue-500 mb-8 tracking-[0.4em]">VERIFY_ACCESS</h3>
+            <input type="password" id="auth-code" class="edit-input mb-4" placeholder="ACCESS_CODE">
+            <button onclick="checkAuth('${userId}')" class="w-full bg-blue-600/20 border border-blue-500 text-blue-500 py-4 rounded-xl font-brand text-[10px]">EXECUTE</button>
         </div>
     </div>
 
     <div id="edit-profile-modal" class="floating-modal" onclick="handleExit()">
         <div class="modal-box flex flex-col h-[85vh]" onclick="event.stopPropagation()">
             <div class="p-6 border-b border-white/5 flex justify-between items-center">
-                <h3 class="font-brand text-[10px] text-blue-500 tracking-[0.4em]">MOD_SYSTEM</h3>
+                <h3 class="font-brand text-[10px] text-blue-500 tracking-[0.4em]">DATA_MANAGEMENT</h3>
                 <div onclick="handleExit()" class="text-white opacity-40"><i class="fas fa-times"></i></div>
             </div>
             <div class="flex-1 overflow-y-auto p-6 space-y-6">
-                <div><label class="edit-label">Name</label><input type="text" id="up-name" class="edit-input" value="${name}"></div>
+                <div><label class="edit-label">Identity Name</label><input type="text" id="up-name" class="edit-input" value="${name}"></div>
                 <div>
-                    <label class="edit-label">Identity Asset</label>
-                    <div class="upload-trigger" onclick="document.getElementById('in-photo').click()">UPLOAD PHOTO</div>
-                    <input type="file" id="in-photo" class="hidden" accept="image/*" onchange="uploadAsset(this, 'photo')">
+                    <label class="edit-label">Visual Asset</label>
+                    <div class="upload-trigger" onclick="document.getElementById('in-photo').click()">REPLACE_IDENTITY_PHOTO</div>
+                    <input type="file" id="in-photo" class="hidden" accept="image/*" onchange="processUpload(this, 'photo')">
                     <p id="st-photo" class="text-[8px] text-gray-600 mt-2 uppercase"></p>
                 </div>
                 <div>
-                    <label class="edit-label">Bio Sound</label>
-                    <div class="upload-trigger" onclick="document.getElementById('in-audio').click()">UPLOAD AUDIO</div>
-                    <input type="file" id="in-audio" class="hidden" accept="audio/*" onchange="uploadAsset(this, 'audio')">
+                    <label class="edit-label">Atmospheric Sound</label>
+                    <div class="upload-trigger" onclick="document.getElementById('in-audio').click()">UPLOAD_NEW_AUDIO</div>
+                    <input type="file" id="in-audio" class="hidden" accept="audio/*" onchange="processUpload(this, 'audio')">
                     <p id="st-audio" class="text-[8px] text-gray-600 mt-2 uppercase"></p>
                 </div>
-                <div><label class="edit-label">YT Music Link</label><input type="text" id="up-yt" class="edit-input" value="${songLink}"></div>
+                <div><label class="edit-label">YouTube Music Uplink</label><input type="text" id="up-yt" class="edit-input" value="${songLink}"></div>
             </div>
             <div class="p-6 bg-black border-t border-white/5">
-                <button onclick="commitChanges()" class="w-full bg-blue-600 py-4 rounded-xl font-brand text-[10px]">COMMIT_CHANGES</button>
+                <button onclick="commitProfile()" class="w-full bg-blue-600 py-4 rounded-xl font-brand text-[10px]">COMMIT_CHANGES</button>
             </div>
         </div>
     </div>
@@ -140,7 +144,7 @@ function renderProfile(p) {
     <div class="main-container">
         <div class="flex justify-between items-center px-6 py-8">
             <button onclick="history.back()" class="glass-panel w-10 h-10 rounded-full flex items-center justify-center text-gray-500"><i class="fas fa-chevron-left"></i></button>
-            <span class="font-brand text-[9px] text-gray-500 tracking-[0.4em]">XOS // PROFILE</span>
+            <span class="font-brand text-[9px] text-gray-500 tracking-[0.4em]">XOS // STREAM</span>
             <button onclick="openModal('menu-modal')" class="glass-panel w-10 h-10 rounded-xl flex items-center justify-center text-white"><i class="fas fa-bars-staggered"></i></button>
         </div>
 
@@ -149,10 +153,10 @@ function renderProfile(p) {
                 <div class="flex items-center gap-6">
                     <div class="w-20 h-20 rounded-2xl overflow-hidden border border-white/5"><img src="${photo}" class="w-full h-full object-cover"></div>
                     <div class="flex-1">
-                        <div class="flex items-center gap-2 font-brand text-lg uppercase">${name} <i class="fas fa-check-circle text-blue-500 text-[10px]"></i></div>
-                        <p class="text-[10px] text-blue-500/50 font-mono tracking-tighter">${userId}@xos</p>
+                        <div class="flex items-center gap-2 font-brand text-lg">${name} <i class="fas fa-check-circle text-blue-500 text-[10px]"></i></div>
+                        <p class="text-[10px] text-blue-500/50 font-mono">${userId}@xos</p>
                         <div class="mt-3 flex items-center gap-2">
-                            <div onclick="togglePlay()" id="play-btn" class="text-blue-500 cursor-pointer"><i class="fas fa-play"></i></div>
+                            <div onclick="toggleAudio()" id="play-btn" class="text-blue-500 cursor-pointer"><i class="fas fa-play"></i></div>
                             ${songLink ? `<a href="${songLink}" target="_blank" class="text-[9px] font-brand tracking-[2px] text-gray-500 uppercase"> ▶️ ${songName}</a>` : `<span class="text-[9px] font-brand tracking-[2px] text-gray-600 uppercase">${songName}</span>`}
                         </div>
                     </div>
@@ -163,13 +167,11 @@ function renderProfile(p) {
     </div>
     `;
 
-    document.getElementById('loading-screen').classList.add('hidden');
-    document.getElementById('profile-root').style.display = 'block';
     loadPosts(userId);
 }
 
 // Logic Suite
-let uploads = { photo: null, audio: null };
+let uploadRegistry = { photo: null, audio: null };
 
 function openModal(id) {
     history.pushState({ modal: id }, '', '');
@@ -187,7 +189,7 @@ window.onpopstate = () => {
     });
 };
 
-function togglePlay() {
+function toggleAudio() {
     const a = document.getElementById('bio-audio');
     const b = document.getElementById('play-btn');
     if (a.paused) { a.play(); b.innerHTML = '<i class="fas fa-pause"></i>'; }
@@ -209,10 +211,10 @@ function checkAuth(id) {
             document.getElementById('edit-auth-modal').style.display = 'none';
             openModal('edit-profile-modal');
         }, 300);
-    } else alert('UNAUTHORIZED');
+    } else alert('UNAUTHORIZED_ACCESS');
 }
 
-async function uploadAsset(input, type) {
+async function processUpload(input, type) {
     const st = document.getElementById(`st-${type}`);
     st.textContent = "UPLOADING...";
     const fd = new FormData();
@@ -221,13 +223,13 @@ async function uploadAsset(input, type) {
     try {
         const res = await fetch(`https://api.cloudinary.com/v1_1/dptphdatf/${type==='audio'?'video':'image'}/upload`, { method:'POST', body:fd });
         const d = await res.json();
-        uploads[type] = d.secure_url;
-        st.textContent = "✓ READY";
+        uploadRegistry[type] = d.secure_url;
+        st.textContent = "✓ ASSET_SYNCED";
         st.style.color = "#007aff";
-    } catch(e) { st.textContent = "FAILED"; }
+    } catch(e) { st.textContent = "SYNC_FAILED"; }
 }
 
-function commitChanges() {
+function commitProfile() {
     const yt = document.getElementById('up-yt').value;
     let sName = document.getElementById('up-name').value + "'s Anthem";
     if (yt.includes('music.youtube.com')) {
@@ -240,8 +242,8 @@ function commitChanges() {
         songLink: yt,
         songName: sName
     };
-    if (uploads.photo) data.photo = uploads.photo;
-    if (uploads.audio) data.audio = uploads.audio;
+    if (uploadRegistry.photo) data.photo = uploadRegistry.photo;
+    if (uploadRegistry.audio) data.audio = uploadRegistry.audio;
 
     db.ref('profiles/' + userId).update(data).then(() => history.back());
 }
