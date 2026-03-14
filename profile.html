@@ -6,30 +6,49 @@
     <title>XOS - Profile</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Orbitron:wght@500;700&family=Space+Grotesk:wght@300;400;700&display=swap" rel="stylesheet">
     <style>
-        :root { --accent:#007aff; --glass:rgba(10,10,10,0.85); --border:#1a1a1a; --bg-color:#000; --text-main:#fff; }
+        :root { --accent:#007aff; --glass:rgba(10,10,10,0.8); --border:#1a1a1a; --bg-color:#000; --text-main:#fff; }
+        body.light-mode { --bg-color:#f0f2f5; --glass:rgba(255,255,255,0.7); --border:rgba(0,0,0,0.1); --text-main:#1a1a1a; }
         * { box-sizing:border-box; -webkit-tap-highlight-color:transparent; user-select:none; }
-        html,body { height:100%; width:100%; overflow:hidden; position:fixed; background-color:var(--bg-color); color:var(--text-main); font-family:'Space Grotesk',sans-serif; }
-        .font-brand { font-family:'Space Grotesk',sans-serif; letter-spacing:2px; text-transform:uppercase; }
-        .glass-panel { background:var(--glass); backdrop-filter:blur(25px) saturate(180%); -webkit-backdrop-filter:blur(25px) saturate(180%); border:1px solid var(--border); }
-        .main-container { height:100dvh; overflow-y:auto; touch-action:pan-y; padding-bottom:100px; }
-        .floating-modal { position:fixed; inset:0; z-index:100; background:rgba(0,0,0,0.8); backdrop-filter:blur(15px); display:none; align-items:center; justify-content:center; opacity:0; transition:opacity 0.3s; }
-        .floating-modal.active { display:flex; opacity:1; }
-        .modal-box { width:85vw; max-width:400px; background:#000; border:1px solid var(--border); border-radius:32px; overflow:hidden; transform:scale(0.9); transition:transform 0.3s cubic-bezier(0.175,0.885,0.32,1.275); }
+        html,body { height:100%;width:100%;overflow:hidden;position:fixed;background-color:var(--bg-color);color:var(--text-main);font-family:'Space Grotesk',sans-serif;transition:background-color 0.4s; }
+        .font-brand { font-family:'Space Grotesk',sans-serif;letter-spacing:2px;text-transform:uppercase; }
+        .glass-panel { background:var(--glass);backdrop-filter:blur(25px) saturate(180%);-webkit-backdrop-filter:blur(25px) saturate(180%);border:1px solid var(--border); }
+        .main-container { height:100dvh;overflow-y:auto;touch-action:pan-y;padding-bottom:100px; }
+        .blue-tick-glow { color:var(--accent);animation:tickPulse 2s infinite ease-in-out; }
+        @keyframes tickPulse { 0%,100%{opacity:0.7;transform:scale(1);filter:drop-shadow(0 0 2px var(--accent))} 50%{opacity:1;transform:scale(1.1);filter:drop-shadow(0 0 8px var(--accent))} }
+        .floating-modal { position:fixed;inset:0;z-index:100;background:rgba(0,0,0,0.7);backdrop-filter:blur(15px);-webkit-backdrop-filter:blur(15px);display:none;align-items:center;justify-content:center;opacity:0;transition:opacity 0.3s; }
+        .floating-modal.active { display:flex;opacity:1; }
+        .modal-box { width:82vw;aspect-ratio:3/5;max-width:380px;max-height:85vh;background:#000;border:1px solid var(--border);border-radius:28px;overflow:hidden;position:relative;transform:scale(0.9);transition:transform 0.3s cubic-bezier(0.175,0.885,0.32,1.275);box-shadow:0 25px 50px -12px rgba(0,0,0,0.5); }
         .floating-modal.active .modal-box { transform:scale(1); }
-        .edit-input { width:100%; background:rgba(255,255,255,0.05); border:1px solid var(--border); border-radius:14px; padding:12px 16px; color:#fff; font-size:12px; outline:none; }
-        .upload-trigger { background:rgba(0,122,255,0.1); border:1px dashed var(--accent); color:var(--accent); padding:14px; border-radius:14px; text-align:center; font-size:10px; cursor:pointer; }
-        .spinner { width:24px; height:24px; border:2px solid rgba(255,255,255,0.1); border-top-color:var(--accent); border-radius:50%; animation:rot 0.8s linear infinite; }
-        @keyframes rot { to { transform:rotate(360deg); } }
+        .square-modal { aspect-ratio:1/1!important;width:85vw!important;max-width:400px!important;border-radius:32px!important; }
+        .menu-window { height:auto!important;padding:30px;background:var(--glass);border:1px solid var(--border); }
+        .close-btn-circle { position:absolute;top:15px;right:15px;width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.1);color:white;display:flex;align-items:center;justify-content:center;z-index:110;cursor:pointer; }
+        .caption-container { position:absolute;bottom:0;left:0;right:0;padding:24px 20px;background:linear-gradient(transparent,rgba(0,0,0,0.9));z-index:10; }
+        .loader { position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:#000;z-index:5;transition:opacity 0.5s; }
+        .spinner { width:30px;height:30px;border:2px solid rgba(255,255,255,0.1);border-top:2px solid var(--accent);border-radius:50%;animation:spin 0.8s linear infinite; }
+        @keyframes spin { to{transform:rotate(360deg)} }
+        .social-btn { width:45px;height:45px;border-radius:14px;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,0.05);border:1px solid var(--border);transition:0.3s;color:var(--text-main);text-decoration:none; }
+        .social-btn:active { transform:scale(0.9);background:var(--accent); }
+        .toggle-track { width:50px;height:26px;background:var(--accent);border-radius:20px;position:relative;cursor:pointer;transition:0.3s; }
+        .toggle-thumb { width:20px;height:20px;background:white;border-radius:50%;position:absolute;top:3px;left:26px;transition:0.3s; }
+        .light-mode .toggle-track { background:rgba(0,0,0,0.1); }
+        .light-mode .toggle-thumb { left:4px; }
+        #loading-screen { position:fixed;inset:0;background:#000;z-index:999;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:16px; }
+        #loading-screen.hidden { display:none; }
+        
+        /* Edit Section Utils */
+        .edit-input { width:100%;background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:14px;padding:12px 16px;color:#fff;font-size:12px;outline:none;transition:0.3s; }
+        .edit-input:focus { border-color:var(--accent);background:rgba(255,255,255,0.08); }
+        .edit-label { font-size:8px;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:2px;margin-bottom:6px;display:block;margin-left:4px; }
+        .custom-scrollbar::-webkit-scrollbar { width:0; }
     </style>
 </head>
 <body>
 
-<div id="loading-screen" style="position:fixed;inset:0;background:#000;z-index:999;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:16px;">
+<div id="loading-screen">
     <div class="spinner"></div>
-    <p id="loading-text" class="font-brand" style="font-size:9px;color:rgba(255,255,255,0.2);letter-spacing:4px;">INITIALIZING_STREAM</p>
-    <button id="force-btn" onclick="revealUI()" style="display:none; margin-top:20px; font-size:8px; color:var(--accent); border:1px solid var(--accent); padding:8px 16px; border-radius:20px;">FORCE REVEAL</button>
+    <p class="font-brand" style="font-size:9px;color:rgba(255,255,255,0.3);letter-spacing:3px;">LOADING PROFILE</p>
 </div>
 
 <div id="profile-root" style="display:none;"></div>
@@ -39,226 +58,457 @@
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
 <script>
 
-// 1. Firebase Setup
-const firebaseConfig = {
-    apiKey: "AIzaSyAUk6bBCFPoq-Tu-AiX1nD3LFvhc6g7B7g",
-    authDomain: "steel-melody-464711-d6.firebaseapp.com",
-    databaseURL: "https://steel-melody-464711-d6-default-rtdb.firebaseio.com",
-    projectId: "steel-melody-464711-d6",
-    storageBucket: "steel-melody-464711-d6.firebasestorage.app",
-    messagingSenderId: "288849938458",
-    appId: "1:288849938458:web:d615242bb9f1e1ee0fe9a3"
-};
+let db = null;
+try {
+    firebase.initializeApp({
+        apiKey:"AIzaSyAUk6bBCFPoq-Tu-AiX1nD3LFvhc6g7B7g",
+        authDomain:"steel-melody-464711-d6.firebaseapp.com",
+        databaseURL:"https://steel-melody-464711-d6-default-rtdb.firebaseio.com",
+        projectId:"steel-melody-464711-d6",
+        storageBucket:"steel-melody-464711-d6.firebasestorage.app",
+        messagingSenderId:"288849938458",
+        appId:"1:288849938458:web:d615242bb9f1e1ee0fe9a3"
+    });
+    db = firebase.database();
+} catch(e) {}
 
-const app = firebase.initializeApp(firebaseConfig);
-const db = firebase.database();
-
-// 2. Navigation Handling
 const urlParams = new URLSearchParams(window.location.search);
-const userId = urlParams.get('u');
+const userId = urlParams.get('u') || '';
+if (!userId) window.location.href = 'index.html';
 
-if (!userId) {
-    window.location.href = 'index.html';
-}
+history.replaceState({ screen: 'profile_root' }, '', window.location.href);
 
-// 3. Show "Force" button if load takes too long
-setTimeout(() => { document.getElementById('force-btn').style.display = 'block'; }, 5000);
-
-function revealUI() {
-    document.getElementById('loading-screen').classList.add('hidden');
-    document.getElementById('profile-root').style.display = 'block';
-}
-
-// 4. Core Profile Fetch
-db.ref('profiles/' + userId).on('value', snap => {
-    const data = snap.val();
-    if (data) {
-        renderUI(data);
-        revealUI();
-    } else {
-        document.getElementById('loading-text').textContent = "ERROR: PROFILE_NOT_DEFINED";
+function loadProfileData() {
+    if (db) {
+        db.ref('profiles/' + userId).on('value', snap => {
+            const p = snap.val();
+            if (!p) { window.location.href = 'index.html'; return; }
+            buildProfile(p);
+        });
     }
-}, err => {
-    document.getElementById('loading-text').textContent = "ERROR: ACCESS_DENIED";
-    console.error(err);
-});
+}
+loadProfileData();
 
-function renderUI(p) {
-    const name = p.name || "UNNAMED";
-    const photo = p.photo || "";
-    const audio = p.audio || "";
-    const songName = p.songName || "XOS_DEFAULT";
-    const songLink = p.songLink || "";
+function buildProfile(p) {
+    const name     = p.name || userId;
+    const nameLow  = p.id   || name.toLowerCase();
+    const photo    = p.photo || '';
+    const username = nameLow + '@xos';
+    const audio    = p.audio || '';
+    const songName = p.songName || 'Bio Song';
+    const songLink = p.songLink || '';
+    const social   = p.social || {};
 
-    document.getElementById('bio-audio').src = audio;
+    const twitterUrl   = (social.twitter   && social.twitter.trim())   ? social.twitter.trim()   : 'https://x.com';
+    const linkedinUrl  = (social.linkedin  && social.linkedin.trim())  ? social.linkedin.trim()  : 'https://linkedin.com';
+    const instagramUrl = (social.instagram && social.instagram.trim()) ? social.instagram.trim() : 'https://instagram.com';
+    const snapchatUrl  = (social.snapchat  && social.snapchat.trim())  ? social.snapchat.trim()  : 'https://snapchat.com';
+
+    document.title = 'XOS - ' + name;
+    const audioEl = document.getElementById('bio-audio');
+    if (audioEl && audioEl.src !== audio) audioEl.src = audio;
+
+    const songSection = audio ? `
+        <div class="flex items-center gap-2">
+            <div onclick="toggleBioMusic()" class="text-blue-500 text-[9px] cursor-pointer transition-transform active:scale-90">
+                <i class="fas fa-play" id="bio-play-icon"></i>
+            </div>
+            ${songLink
+                ? `<a href="${songLink}" target="_blank" class="text-[9px] font-brand tracking-[1.5px] text-gray-500 hover:text-blue-400 transition-colors uppercase">${songName}</a>`
+                : `<span class="text-[9px] font-brand tracking-[1.5px] text-gray-500 uppercase">${songName}</span>`
+            }
+        </div>` : '';
 
     document.getElementById('profile-root').innerHTML = `
+    <div id="followers-modal" class="floating-modal" onclick="handleExit()">
+        <div class="modal-box menu-window" onclick="event.stopPropagation()">
+            <div class="flex justify-between items-center mb-8">
+                <h3 class="font-brand text-[10px] text-blue-500 tracking-[0.3em]">FOLLOWERS</h3>
+                <div class="close-btn-circle" style="position:static;width:30px;height:30px;" onclick="handleExit()"><i class="fas fa-times text-xs"></i></div>
+            </div>
+            <div class="flex flex-col gap-4">
+                <a href="Nikhilprof.html" class="block group">
+                    <div class="relative p-4 rounded-xl border border-white/10 bg-white/5 backdrop-blur-md group-active:scale-95 transition-all duration-300">
+                        <div class="flex items-center gap-4">
+                            <div class="w-12 h-12 rounded-lg overflow-hidden border border-white/20"><img src="file_00000000f4f47208a731ff7b47a3b568.png" class="w-full h-full object-cover"></div>
+                            <div><p class="text-xs font-semibold tracking-wide text-white">Nikhil</p><p class="text-[9px] text-red-400 uppercase tracking-widest mt-1 opacity-80">System Admin</p></div>
+                            <i class="fas fa-chevron-right ml-auto text-[10px] text-gray-600"></i>
+                        </div>
+                    </div>
+                </a>
+                <p class="text-[9px] text-center text-gray-700 font-brand mt-6 uppercase tracking-[0.2em]">End of Directory</p>
+            </div>
+        </div>
+    </div>
+
     <div id="menu-modal" class="floating-modal" onclick="handleExit()">
-        <div class="modal-box p-8" onclick="event.stopPropagation()">
-            <h3 class="font-brand text-[10px] text-blue-500 mb-8 tracking-[0.4em]">SYSTEM_MOD</h3>
-            <div class="space-y-4">
-                <button onclick="openEditAuth()" class="w-full glass-panel p-5 rounded-2xl flex items-center gap-4">
-                    <i class="fas fa-key text-blue-500"></i>
-                    <span class="text-xs font-brand tracking-widest">EDIT PROFILE</span>
-                </button>
+        <div class="modal-box menu-window" onclick="event.stopPropagation()">
+            <div class="flex justify-between items-center mb-8">
+                <h3 class="font-brand text-[10px] text-blue-500 tracking-[0.3em]">SYSTEM OPTIONS</h3>
+                <div class="close-btn-circle" style="position:static;width:30px;height:30px;" onclick="handleExit()"><i class="fas fa-times text-xs"></i></div>
+            </div>
+            <div class="space-y-6">
+                <div class="flex items-center justify-between p-4 glass-panel rounded-2xl">
+                    <span class="text-xs font-brand">DARK MODE</span>
+                    <div class="toggle-track" onclick="document.body.classList.toggle('light-mode')"><div class="toggle-thumb"></div></div>
+                </div>
+                <div onclick="openLicense()" class="flex items-center gap-4 p-4 glass-panel rounded-2xl active:scale-95 transition-transform cursor-pointer">
+                    <i class="fas fa-id-card text-blue-500"></i><span class="text-xs font-brand">VIEW LICENSE</span>
+                </div>
+                
+                <div class="border-t border-white/10 my-2"></div>
+                
+                <div onclick="openEditAuth()" class="flex items-center gap-4 p-4 glass-panel rounded-2xl active:scale-95 transition-transform cursor-pointer">
+                    <i class="fas fa-user-edit text-blue-500"></i><span class="text-xs font-brand">EDIT PROFILE</span>
+                </div>
+
+                <div onclick="shareProfile()" class="flex items-center gap-4 p-4 glass-panel rounded-2xl active:scale-95 cursor-pointer">
+                    <i class="fas fa-share-alt text-blue-500"></i><span class="text-xs font-brand">SHARE PROFILE</span>
+                </div>
+
+                <div class="pt-4">
+                    <p class="text-[9px] text-gray-500 font-brand mb-4 text-center">CONNECTIVITY</p>
+                    <div class="flex justify-center gap-4">
+                        <a href="${twitterUrl}" target="_blank" class="social-btn"><i class="fa-brands fa-x-twitter"></i></a>
+                        <a href="${linkedinUrl}" target="_blank" class="social-btn"><i class="fab fa-linkedin-in"></i></a>
+                        <a href="${instagramUrl}" target="_blank" class="social-btn"><i class="fab fa-instagram"></i></a>
+                        <a href="${snapchatUrl}" target="_blank" class="social-btn"><i class="fab fa-snapchat"></i></a>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 
     <div id="edit-auth-modal" class="floating-modal" onclick="handleExit()">
-        <div class="modal-box p-8" onclick="event.stopPropagation()">
-            <h3 class="font-brand text-[10px] text-blue-500 mb-8 tracking-[0.4em]">VERIFY_ACCESS</h3>
-            <input type="password" id="auth-code" class="edit-input mb-4" placeholder="ACCESS_CODE">
-            <button onclick="checkAuth('${userId}')" class="w-full bg-blue-600/20 border border-blue-500 text-blue-500 py-4 rounded-xl font-brand text-[10px]">EXECUTE</button>
+        <div class="modal-box menu-window" onclick="event.stopPropagation()">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="font-brand text-[10px] text-blue-500 tracking-[0.3em]">AUTHORIZATION</h3>
+                <div class="close-btn-circle" style="position:static;width:30px;height:30px;" onclick="handleExit()"><i class="fas fa-times text-xs"></i></div>
+            </div>
+            <p class="text-[10px] text-gray-500 mb-6 uppercase tracking-wider">Enter access code to manage ${nameLow}</p>
+            <input type="password" id="edit-auth-input" class="edit-input mb-4" placeholder="••••••••">
+            <button onclick="checkEditAuth('${nameLow}')" class="w-full bg-blue-600/20 border border-blue-500 text-blue-500 font-brand text-[10px] py-4 rounded-xl tracking-[2px] active:scale-95 transition-transform">VERIFY UPLINK</button>
         </div>
     </div>
 
     <div id="edit-profile-modal" class="floating-modal" onclick="handleExit()">
-        <div class="modal-box flex flex-col h-[85vh]" onclick="event.stopPropagation()">
-            <div class="p-6 border-b border-white/5 flex justify-between items-center">
-                <h3 class="font-brand text-[10px] text-blue-500 tracking-[0.4em]">DATA_MANAGEMENT</h3>
-                <div onclick="handleExit()" class="text-white opacity-40"><i class="fas fa-times"></i></div>
+        <div class="modal-box glass-panel flex flex-col h-[85vh]" onclick="event.stopPropagation()">
+            <div class="p-6 border-b border-white/10 flex justify-between items-center bg-black">
+                <h3 class="font-brand text-[10px] text-blue-500 tracking-[0.3em]">MANAGE PROFILE</h3>
+                <div class="close-btn-circle" style="position:static;width:30px;height:30px;" onclick="handleExit()"><i class="fas fa-times text-xs"></i></div>
             </div>
-            <div class="flex-1 overflow-y-auto p-6 space-y-6">
-                <div><label class="edit-label">Identity Name</label><input type="text" id="up-name" class="edit-input" value="${name}"></div>
-                <div>
-                    <label class="edit-label">Visual Asset</label>
-                    <div class="upload-trigger" onclick="document.getElementById('in-photo').click()">REPLACE_IDENTITY_PHOTO</div>
-                    <input type="file" id="in-photo" class="hidden" accept="image/*" onchange="processUpload(this, 'photo')">
-                    <p id="st-photo" class="text-[8px] text-gray-600 mt-2 uppercase"></p>
+            <div class="flex-1 overflow-y-auto p-6 space-y-6 custom-scrollbar">
+                <div><label class="edit-label">Display Name</label><input type="text" id="edit-name" class="edit-input" value="${name}"></div>
+                <div><label class="edit-label">Profile Photo URL</label><input type="text" id="edit-photo" class="edit-input" value="${photo}"></div>
+                <div class="pt-2 border-t border-white/5"><p class="text-[9px] text-blue-500/50 font-brand mb-4 tracking-widest">BIO MUSIC</p>
+                    <div class="space-y-4">
+                        <div><label class="edit-label">Audio URL</label><input type="text" id="edit-audio" class="edit-input" value="${audio}"></div>
+                        <div><label class="edit-label">Song Name</label><input type="text" id="edit-songName" class="edit-input" value="${songName}"></div>
+                        <div><label class="edit-label">Track Link</label><input type="text" id="edit-songLink" class="edit-input" value="${songLink}"></div>
+                    </div>
                 </div>
-                <div>
-                    <label class="edit-label">Atmospheric Sound</label>
-                    <div class="upload-trigger" onclick="document.getElementById('in-audio').click()">UPLOAD_NEW_AUDIO</div>
-                    <input type="file" id="in-audio" class="hidden" accept="audio/*" onchange="processUpload(this, 'audio')">
-                    <p id="st-audio" class="text-[8px] text-gray-600 mt-2 uppercase"></p>
+                <div class="pt-2 border-t border-white/5"><p class="text-[9px] text-blue-500/50 font-brand mb-4 tracking-widest">SOCIAL UPLINKS</p>
+                    <div class="space-y-4">
+                        <div><label class="edit-label">Twitter/X</label><input type="text" id="edit-twitter" class="edit-input" value="${social.twitter || ''}"></div>
+                        <div><label class="edit-label">LinkedIn</label><input type="text" id="edit-linkedin" class="edit-input" value="${social.linkedin || ''}"></div>
+                        <div><label class="edit-label">Instagram</label><input type="text" id="edit-instagram" class="edit-input" value="${social.instagram || ''}"></div>
+                        <div><label class="edit-label">Snapchat</label><input type="text" id="edit-snapchat" class="edit-input" value="${social.snapchat || ''}"></div>
+                    </div>
                 </div>
-                <div><label class="edit-label">YouTube Music Uplink</label><input type="text" id="up-yt" class="edit-input" value="${songLink}"></div>
             </div>
-            <div class="p-6 bg-black border-t border-white/5">
-                <button onclick="commitProfile()" class="w-full bg-blue-600 py-4 rounded-xl font-brand text-[10px]">COMMIT_CHANGES</button>
+            <div class="p-6 bg-black border-t border-white/10">
+                <button onclick="saveProfileChanges('${nameLow}')" class="w-full bg-blue-600 border border-blue-400 text-white font-brand text-[10px] py-4 rounded-xl tracking-[2px] active:scale-95 transition-transform shadow-[0_0_20px_rgba(0,122,255,0.3)]">COMMIT CHANGES</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="license-modal" class="floating-modal" onclick="handleExit()">
+        <div class="modal-box menu-window" onclick="event.stopPropagation()">
+            <div class="flex justify-between items-center mb-8">
+                <h3 class="font-brand text-[10px] text-blue-500 tracking-[0.3em]">SYSTEM LICENSE</h3>
+                <div class="close-btn-circle" style="position:static;width:30px;height:30px;" onclick="handleExit()"><i class="fas fa-times text-xs"></i></div>
+            </div>
+            <div class="license-card">
+                <img src="${photo}" class="license-photo">
+                <div style="flex:1;">
+                    <p class="license-label">NAME</p><p class="license-value">${name}</p>
+                    <p class="license-label">ROLE</p><p class="license-value">SYSTEM MEMBER</p>
+                    <p class="license-label">STATUS</p><p class="license-value"><span class="license-dot"></span>AUTHORISED</p>
+                    <p class="license-label">VALIDITY</p><p class="license-value">2026-</p>
+                </div>
+            </div>
+            <p class="text-[7px] font-mono text-blue-500/40 mt-6 text-center tracking-[0.5em] uppercase">Security Clearance Level 3</p>
+        </div>
+    </div>
+
+    <div id="floating-post" class="floating-modal" onclick="handleExit()">
+        <div class="modal-box glass-panel" onclick="event.stopPropagation()">
+            <div id="media-loader" class="loader"><div class="spinner"></div></div>
+            <div class="close-btn-circle" onclick="handleExit()"><i class="fas fa-times"></i></div>
+            <div onclick="toggleComments()" class="absolute bottom-6 right-6 z-50 w-10 h-10 glass-panel rounded-full flex items-center justify-center text-white active:scale-90 transition-transform cursor-pointer border border-white/20">
+                <i class="fas fa-comment-dots text-sm"></i>
+            </div>
+            <div class="h-full w-full relative overflow-hidden">
+                <div id="media-container" class="w-full h-full"></div>
+                <audio id="post-audio"></audio>
+                <div class="caption-container"><p id="post-caption" class="text-xs font-light text-gray-300 leading-relaxed"></p></div>
+                <div id="comment-sidebar" class="glass-panel backdrop-blur-3xl" style="position:absolute;left:0;right:0;bottom:-75%;width:100%;height:75%;z-index:120;transition:bottom 0.5s cubic-bezier(0.19,1,0.22,1);display:flex;flex-direction:column;border-top:1px solid var(--border);border-radius:32px 32px 0 0;">
+                    <div class="p-6 flex flex-col h-full">
+                        <div class="flex justify-between items-center mb-6">
+                            <h3 class="font-brand text-[9px] text-blue-500 tracking-widest">comments</h3>
+                            <button onclick="toggleComments()" class="text-white/40"><i class="fas fa-chevron-down"></i></button>
+                        </div>
+                        <div id="comment-list" class="flex-1 overflow-y-auto space-y-4 custom-scrollbar pr-2"></div>
+                        <div class="mt-4 flex gap-2">
+                            <input type="text" id="comment-input" class="flex-1 bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-xs text-white outline-none font-light" placeholder="Type a comment...">
+                            <button onclick="addComment()" class="w-11 h-11 glass-panel rounded-xl flex items-center justify-center text-blue-500 active:scale-90 transition-transform"><i class="fas fa-paper-plane text-xs"></i></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="profile-modal" class="floating-modal" onclick="handleExit()">
+        <div class="modal-box square-modal glass-panel" onclick="event.stopPropagation()">
+            <div class="close-btn-circle" onclick="handleExit()"><i class="fas fa-times"></i></div>
+            <div class="h-full w-full relative">
+                <img src="${photo}" class="w-full h-full object-cover">
+                <div class="caption-container">
+                    <p class="font-brand text-[10px] text-blue-500 tracking-widest">SYSTEM MEMBER</p>
+                    <p class="text-[8px] text-gray-400">DATA SECURED</p>
+                </div>
             </div>
         </div>
     </div>
 
     <div class="main-container">
         <div class="flex justify-between items-center px-6 py-8">
-            <button onclick="history.back()" class="glass-panel w-10 h-10 rounded-full flex items-center justify-center text-gray-500"><i class="fas fa-chevron-left"></i></button>
-            <span class="font-brand text-[9px] text-gray-500 tracking-[0.4em]">XOS // STREAM</span>
-            <button onclick="openModal('menu-modal')" class="glass-panel w-10 h-10 rounded-xl flex items-center justify-center text-white"><i class="fas fa-bars-staggered"></i></button>
+            <button onclick="history.back()" class="glass-panel w-10 h-10 rounded-full flex items-center justify-center text-gray-400 active:scale-90 transition-transform"><i class="fas fa-chevron-left"></i></button>
+            <span class="font-brand text-[9px] text-gray-500 tracking-[0.4em]">MEMBER // PROFILE</span>
+            <button onclick="openMenu()" class="glass-panel w-10 h-10 rounded-xl flex items-center justify-center text-white active:scale-90 transition-transform"><i class="fas fa-bars-staggered"></i></button>
         </div>
 
-        <div class="px-6 mb-10">
-            <div class="glass-panel p-7 rounded-[36px]">
+        <div class="px-6 mb-8">
+            <div class="glass-panel p-6 rounded-[32px] relative">
                 <div class="flex items-center gap-6">
-                    <div class="w-20 h-20 rounded-2xl overflow-hidden border border-white/5"><img src="${photo}" class="w-full h-full object-cover"></div>
+                    <div onclick="openProfile()" class="relative w-20 h-20 rounded-2xl overflow-hidden border border-white/10 cursor-pointer active:scale-95 transition-transform">
+                        <img src="${photo}" class="w-full h-full object-cover">
+                    </div>
                     <div class="flex-1">
-                        <div class="flex items-center gap-2 font-brand text-lg">${name} <i class="fas fa-check-circle text-blue-500 text-[10px]"></i></div>
-                        <p class="text-[10px] text-blue-500/50 font-mono">${userId}@xos</p>
-                        <div class="mt-3 flex items-center gap-2">
-                            <div onclick="toggleAudio()" id="play-btn" class="text-blue-500 cursor-pointer"><i class="fas fa-play"></i></div>
-                            ${songLink ? `<a href="${songLink}" target="_blank" class="text-[9px] font-brand tracking-[2px] text-gray-500 uppercase"> ▶️ ${songName}</a>` : `<span class="text-[9px] font-brand tracking-[2px] text-gray-600 uppercase">${songName}</span>`}
+                        <div class="flex items-center gap-2">
+                            <h1 class="font-brand text-xl">${name.toUpperCase()}</h1>
+                            <i class="fas fa-check-circle blue-tick-glow text-xs"></i>
+                        </div>
+                        <p class="text-[10px] text-blue-500 font-mono tracking-tighter">${username}</p>
+                        <div class="flex flex-col gap-2 mt-3">
+                            <div onclick="openFollowers()" class="text-[10px] uppercase tracking-widest text-gray-400 active:text-white transition-colors cursor-pointer w-fit">Followers</div>
+                            ${songSection}
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-        <div class="px-6 grid grid-cols-2 gap-3" id="posts-grid"></div>
+
+        <div class="px-6">
+            <div class="flex justify-between items-center mb-6 px-2">
+                <span class="font-brand text-[9px] text-gray-500 uppercase tracking-[0.3em]">Posts</span>
+            </div>
+            <div id="posts-grid" class="grid grid-cols-2 gap-3">
+                <div style="grid-column:span 2;text-align:center;padding:40px 0;color:rgba(255,255,255,0.15);font-size:10px;text-transform:uppercase;letter-spacing:2px;">No posts yet</div>
+            </div>
+        </div>
     </div>
     `;
 
-    loadPosts(userId);
+    document.getElementById('loading-screen').classList.add('hidden');
+    document.getElementById('profile-root').style.display = 'block';
+
+    setupProfileJS(nameLow, name, audio);
 }
 
-// Logic Suite
-let uploadRegistry = { photo: null, audio: null };
+function setupProfileJS(nameLow, name, audioSrc) {
+    let POSTS_DATA = [];
+    let activePostIndex = null;
 
-function openModal(id) {
-    history.pushState({ modal: id }, '', '');
-    const m = document.getElementById(id);
-    m.style.display = 'flex';
-    setTimeout(() => m.classList.add('active'), 10);
-}
+    window.toggleBioMusic = function() {
+        const audio = document.getElementById('bio-audio');
+        const icon  = document.getElementById('bio-play-icon');
+        if (!icon || !audioSrc) return;
+        if (audio.paused) { audio.play().then(() => icon.className='fas fa-pause').catch(()=>icon.className='fas fa-play'); }
+        else { audio.pause(); icon.className = 'fas fa-play'; }
+    };
 
-function handleExit() { history.back(); }
-
-window.onpopstate = () => {
-    document.querySelectorAll('.floating-modal').forEach(m => {
-        m.classList.remove('active');
-        setTimeout(() => m.style.display = 'none', 300);
-    });
-};
-
-function toggleAudio() {
-    const a = document.getElementById('bio-audio');
-    const b = document.getElementById('play-btn');
-    if (a.paused) { a.play(); b.innerHTML = '<i class="fas fa-pause"></i>'; }
-    else { a.pause(); b.innerHTML = '<i class="fas fa-play"></i>'; }
-}
-
-function openEditAuth() {
-    document.getElementById('menu-modal').classList.remove('active');
-    setTimeout(() => {
-        document.getElementById('menu-modal').style.display = 'none';
-        openModal('edit-auth-modal');
-    }, 300);
-}
-
-function checkAuth(id) {
-    if (document.getElementById('auth-code').value === id + '@432') {
-        document.getElementById('edit-auth-modal').classList.remove('active');
-        setTimeout(() => {
-            document.getElementById('edit-auth-modal').style.display = 'none';
-            openModal('edit-profile-modal');
-        }, 300);
-    } else alert('UNAUTHORIZED_ACCESS');
-}
-
-async function processUpload(input, type) {
-    const st = document.getElementById(`st-${type}`);
-    st.textContent = "UPLOADING...";
-    const fd = new FormData();
-    fd.append('file', input.files[0]);
-    fd.append('upload_preset', 'vagprxhr');
-    try {
-        const res = await fetch(`https://api.cloudinary.com/v1_1/dptphdatf/${type==='audio'?'video':'image'}/upload`, { method:'POST', body:fd });
-        const d = await res.json();
-        uploadRegistry[type] = d.secure_url;
-        st.textContent = "✓ ASSET_SYNCED";
-        st.style.color = "#007aff";
-    } catch(e) { st.textContent = "SYNC_FAILED"; }
-}
-
-function commitProfile() {
-    const yt = document.getElementById('up-yt').value;
-    let sName = document.getElementById('up-name').value + "'s Anthem";
-    if (yt.includes('music.youtube.com')) {
-        const id = yt.split('v=')[1]?.split('&')[0];
-        sName = id ? "YT_TRACK_" + id.substring(0,5) : "YT_TRACK";
+    if (db) {
+        db.ref(nameLow + '/posts').on('value', snap => {
+            POSTS_DATA = [];
+            const data = snap.val();
+            if (data) {
+                Object.entries(data)
+                    .sort((a,b) => (b[1].timestamp||0)-(a[1].timestamp||0))
+                    .forEach(([id,v]) => POSTS_DATA.push({id,...v}));
+            }
+            renderGrid();
+        });
     }
 
-    const data = {
-        name: document.getElementById('up-name').value,
-        songLink: yt,
-        songName: sName
+    function renderGrid() {
+        const grid = document.getElementById('posts-grid');
+        if (!grid) return;
+        grid.innerHTML = '';
+        if (!POSTS_DATA.length) {
+            grid.innerHTML = '<div style="grid-column:span 2;text-align:center;padding:40px 0;color:rgba(255,255,255,0.15);font-size:10px;text-transform:uppercase;letter-spacing:2px;">No posts yet</div>';
+            return;
+        }
+        POSTS_DATA.forEach((post, index) => {
+            const item = document.createElement('div');
+            item.className = 'glass-panel aspect-square rounded-2xl overflow-hidden active:scale-95 transition-transform relative';
+            item.style.cursor = 'pointer';
+            item.onclick = () => openPost(index);
+            item.innerHTML = post.type === 'video'
+                ? `<video src="${post.src}" class="w-full h-full object-cover opacity-50" muted></video>`
+                : `<img src="${post.src}" class="w-full h-full object-cover opacity-80">`;
+            grid.appendChild(item);
+        });
+    }
+
+    window.openPost = function(index) {
+        activePostIndex = index;
+        history.pushState({ modal: 'floating-post' }, '', '');
+        const post = POSTS_DATA[index];
+        const container = document.getElementById('media-container');
+        const audio     = document.getElementById('post-audio');
+        const caption   = document.getElementById('post-caption');
+        const loader    = document.getElementById('media-loader');
+        loader.style.opacity = '1';
+        caption.innerText = post.caption || '';
+        container.innerHTML = '';
+        const bioAudio = document.getElementById('bio-audio');
+        const bioIcon  = document.getElementById('bio-play-icon');
+        if (bioAudio && !bioAudio.paused) { bioAudio.pause(); if(bioIcon) bioIcon.className='fas fa-play'; }
+        if (post.type === 'video') container.innerHTML = `<video id="active-video" src="${post.src}" class="w-full h-full object-cover" autoplay loop playsinline></video>`;
+        else container.innerHTML = `<img src="${post.src}" class="w-full h-full object-cover">`;
+        if (post.audio) { audio.src = post.audio; audio.play().catch(()=>{}); }
+        renderComments();
+        const modal = document.getElementById('floating-post');
+        modal.style.display = 'flex';
+        setTimeout(() => { modal.classList.add('active'); loader.style.opacity = '0'; }, 10);
     };
-    if (uploadRegistry.photo) data.photo = uploadRegistry.photo;
-    if (uploadRegistry.audio) data.audio = uploadRegistry.audio;
 
-    db.ref('profiles/' + userId).update(data).then(() => history.back());
-}
+    window.openFollowers = () => { history.pushState({modal:'followers-modal'},''); const m=document.getElementById('followers-modal'); m.style.display='flex'; setTimeout(()=>m.classList.add('active'),10); };
+    window.openMenu      = () => { history.pushState({modal:'menu-modal'},''); const m=document.getElementById('menu-modal'); m.style.display='flex'; setTimeout(()=>m.classList.add('active'),10); };
+    window.openProfile   = () => { history.pushState({modal:'profile-modal'},''); const m=document.getElementById('profile-modal'); m.style.display='flex'; setTimeout(()=>m.classList.add('active'),10); };
+    window.openLicense   = () => {
+        history.pushState({modal:'license-modal'},'');
+        const menu=document.getElementById('menu-modal');
+        menu.classList.remove('active');
+        setTimeout(() => { menu.style.display='none'; const m=document.getElementById('license-modal'); m.style.display='flex'; setTimeout(()=>m.classList.add('active'),10); }, 300);
+    };
 
-function loadPosts(id) {
-    db.ref(id + '/posts').on('value', snap => {
-        const posts = [];
-        const data = snap.val();
-        if (data) Object.entries(data).forEach(([k,v]) => posts.push(v));
-        document.getElementById('posts-grid').innerHTML = posts.map(p => `
-            <div class="glass-panel aspect-square rounded-2xl overflow-hidden opacity-80">
-                ${p.type==='video' ? `<video src="${p.src}" muted loop autoplay class="w-full h-full object-cover"></video>` : `<img src="${p.src}" class="w-full h-full object-cover">`}
-            </div>
-        `).join('') || '<div class="col-span-2 text-center py-10 opacity-10 text-[9px]">EMPTY_GRID</div>';
-    });
+    // --- Edit Auth & Profile Logic ---
+    window.openEditAuth = () => {
+        history.pushState({modal:'edit-auth-modal'},'');
+        document.getElementById('menu-modal').classList.remove('active');
+        setTimeout(() => {
+            document.getElementById('menu-modal').style.display='none';
+            const m = document.getElementById('edit-auth-modal');
+            m.style.display='flex';
+            setTimeout(()=>m.classList.add('active'),10);
+        }, 300);
+    };
+
+    window.checkEditAuth = (id) => {
+        const code = document.getElementById('edit-auth-input').value;
+        if (code === id + '@432') {
+            document.getElementById('edit-auth-modal').classList.remove('active');
+            setTimeout(() => {
+                document.getElementById('edit-auth-modal').style.display='none';
+                history.replaceState({modal:'edit-profile-modal'},'','');
+                const m = document.getElementById('edit-profile-modal');
+                m.style.display='flex';
+                setTimeout(()=>m.classList.add('active'),10);
+            }, 300);
+        } else {
+            alert('AUTHORIZATION FAILED');
+        }
+    };
+
+    window.saveProfileChanges = (id) => {
+        const updates = {
+            name: document.getElementById('edit-name').value,
+            photo: document.getElementById('edit-photo').value,
+            audio: document.getElementById('edit-audio').value,
+            songName: document.getElementById('edit-songName').value,
+            songLink: document.getElementById('edit-songLink').value,
+            social: {
+                twitter: document.getElementById('edit-twitter').value,
+                linkedin: document.getElementById('edit-linkedin').value,
+                instagram: document.getElementById('edit-instagram').value,
+                snapchat: document.getElementById('edit-snapchat').value
+            }
+        };
+        db.ref('profiles/' + userId).update(updates).then(() => {
+            handleExit();
+        });
+    };
+
+    window.handleExit = function() { history.back(); };
+
+    window.killAndHide = function() {
+        const video = document.getElementById('active-video');
+        if (video) { video.pause(); video.src=''; }
+        const audio = document.getElementById('post-audio');
+        if (audio) { audio.pause(); audio.currentTime=0; audio.src=''; }
+        document.getElementById('comment-sidebar').classList.remove('open');
+        ['floating-post','profile-modal','menu-modal','license-modal','followers-modal','edit-auth-modal','edit-profile-modal'].forEach(id => {
+            const el=document.getElementById(id);
+            if(el){el.classList.remove('active');setTimeout(()=>el.style.display='none',300);}
+        });
+    };
+
+    window.onpopstate = (e) => {
+        if (e.state && (e.state.modal || e.state.screen)) { killAndHide(); } 
+        else { window.location.href = 'index.html'; }
+    };
+
+    window.addComment = function() {
+        const input = document.getElementById('comment-input');
+        const text = input.value.trim();
+        if (!text || activePostIndex === null) return;
+        if (db) db.ref(nameLow + '/comments/' + activePostIndex).push({ text, time: new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}), timestamp: Date.now() });
+        input.value = '';
+    };
+
+    window.deleteComment = function(id) {
+        if (db) db.ref(nameLow + '/comments/' + activePostIndex + '/' + id).remove();
+    };
+
+    function renderComments() {
+        const list = document.getElementById('comment-list');
+        if (!db) return;
+        db.ref(nameLow + '/comments/' + activePostIndex).on('value', snap => {
+            const data = snap.val();
+            if (!data) { list.innerHTML = '<div class="text-white/20 text-center text-[10px] mt-10 uppercase tracking-widest">No conversation yet</div>'; return; }
+            const comments = Object.entries(data).map(([id,v]) => ({id,...v}));
+            list.innerHTML = comments.map(c => `
+                <div class="comment-item glass-panel p-3 rounded-2xl border border-white/5">
+                    <div class="flex justify-between items-start mb-1">
+                        <span class="text-[9px] text-blue-500/60 font-mono">${c.time}</span>
+                        <button onclick="window.deleteComment('${c.id}')" class="text-white/20"><i class="fas fa-trash text-[9px]"></i></button>
+                    </div>
+                    <p class="text-xs text-white/80 font-light leading-relaxed">${c.text}</p>
+                </div>
+            `).join('');
+            list.scrollTop = list.scrollHeight;
+        });
+    }
+
+    window.shareProfile = () => {
+        const url = window.location.href;
+        if (navigator.share) navigator.share({ title: name + ' / XOS', url }).catch(()=>{});
+        else { navigator.clipboard.writeText(url).then(()=>alert('Link copied!')).catch(()=>{}); }
+    };
+    window.toggleComments = () => document.getElementById('comment-sidebar').classList.toggle('open');
 }
 </script>
 </body>
