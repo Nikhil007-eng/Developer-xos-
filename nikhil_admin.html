@@ -83,13 +83,12 @@
         <button id="auth-btn" class="btn-primary" style="margin-top:18px;" onclick="doAuth()">
             <i class="fas fa-arrow-right" style="margin-right:6px;"></i>AUTHENTICATE
         </button>
-        <a href="index.html" style="display:block;margin-top:14px;font-size:9px;color:rgba(255,255,255,0.2);text-transform:uppercase;letter-spacing:2px;text-decoration:none;">← Cancel</a>
     </div>
 </div>
 
 <div class="screen off" id="s-posts">
     <div style="padding:20px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);">
-        <a href="index.html" class="btn-icon"><i class="fas fa-chevron-left"></i></a>
+        <button class="btn-icon" onclick="goBack()"><i class="fas fa-chevron-left"></i></button>
         <span class="brand" style="font-size:9px;color:rgba(255,255,255,0.35);letter-spacing:0.4em;">PROFILE FEED</span>
         <button class="btn-icon" style="background:rgba(0,122,255,0.12);border-color:rgba(0,122,255,0.4);color:var(--accent);" onclick="goUpload()"><i class="fas fa-plus"></i></button>
     </div>
@@ -100,7 +99,7 @@
 
 <div class="screen off" id="s-upload">
     <div style="padding:20px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);">
-        <button class="btn-icon" onclick="history.back()"><i class="fas fa-chevron-left"></i></button>
+        <button class="btn-icon" onclick="goPosts()"><i class="fas fa-chevron-left"></i></button>
         <span class="brand" style="font-size:9px;color:rgba(255,255,255,0.35);letter-spacing:0.4em;">CREATE POST</span>
         <div style="width:36px;"></div>
     </div>
@@ -188,9 +187,23 @@
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
 <script>
 
+// ── HISTORY API ───────────────────────────────────────────────────────────────
+// Push a state on load so phone back button returns to profile
+history.replaceState({ page: 'admin' }, '', window.location.href);
+
+function goBack() {
+    window.location.href = 'Nikhilprof.html';
+}
+
+// Phone back button / swipe back → go to profile
+window.addEventListener('popstate', function(e) {
+    window.location.href = 'Nikhilprof.html';
+});
+
 const CLOUD  = "dptphdatf";
 const PRESET = "vagprxhr";
-const _P     = [110, 121, 110, 105, 107, 104, 105, 108]; // nynikhil
+// PASSWORD: nynikhil
+const _P     = [110, 121, 110, 105, 107, 104, 105, 108]; 
 
 let db = null;
 try {
@@ -205,18 +218,6 @@ try {
     });
     db = firebase.database();
 } catch(e) {}
-
-// HISTORY API LOGIC
-function show(id, push = true) {
-    document.querySelectorAll('.screen').forEach(s => s.classList.add('off'));
-    document.getElementById(id).classList.remove('off');
-    if (push) history.pushState({screen: id}, "", "");
-}
-
-window.onpopstate = (e) => {
-    if (e.state && e.state.screen) show(e.state.screen, false);
-    else window.location.href = "index.html";
-};
 
 // AUTH LOGIC
 window.addEventListener('DOMContentLoaded', () => {
@@ -239,6 +240,11 @@ function doAuth() {
         document.getElementById('pwd').value = '';
         setTimeout(() => err.style.display = 'none', 2000);
     }
+}
+
+function show(id) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.add('off'));
+    document.getElementById(id).classList.remove('off');
 }
 
 function goUpload() { resetForm(); show('s-upload'); }
@@ -276,9 +282,11 @@ function renderGrid() {
     `).join('');
 }
 
-function delPost(id) { if (confirm('Erase this post?')) db.ref('nikhil/posts/'+id).remove(); }
+function delPost(id) { 
+    if (confirm('Erase this post?')) db.ref('nikhil/posts/'+id).remove(); 
+}
 
-// UPLOAD ENGINE (WITH COMPRESSION)
+// OPTIMIZED UPLOAD ENGINE
 async function compressImage(file) {
     return new Promise((resolve) => {
         const reader = new FileReader();
