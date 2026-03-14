@@ -23,22 +23,11 @@
         .floating-modal.active .modal-box { transform:scale(1); }
         .square-modal { aspect-ratio:1/1!important;width:85vw!important;max-width:400px!important;border-radius:32px!important; }
         .menu-window { height:auto!important;padding:30px;background:var(--glass);border:1px solid var(--border); }
-        #license-modal .modal-box { aspect-ratio:auto!important;height:auto!important;padding-bottom:30px; }
-        .license-card { width:100%;padding:20px;border-radius:20px;background:linear-gradient(145deg,#0a0a0a,#111);border:1px solid rgba(255,255,255,0.08);display:flex;gap:20px;align-items:center; }
-        .license-photo { width:85px;height:85px;border-radius:12px;border:1px solid var(--accent);object-fit:cover; }
-        .license-label { font-size:8px;color:#4b5563;font-family:'Orbitron';letter-spacing:1px;margin-bottom:2px; }
-        .license-value { font-size:11px;color:#eaf1ff;margin-bottom:6px;font-weight:600;text-transform:uppercase; }
-        .license-dot { width:5px;height:5px;background:var(--accent);border-radius:50%;display:inline-block;margin-right:4px; }
         .close-btn-circle { position:absolute;top:15px;right:15px;width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.1);color:white;display:flex;align-items:center;justify-content:center;z-index:110;cursor:pointer; }
         .caption-container { position:absolute;bottom:0;left:0;right:0;padding:24px 20px;background:linear-gradient(transparent,rgba(0,0,0,0.9));z-index:10; }
         .loader { position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:#000;z-index:5;transition:opacity 0.5s; }
         .spinner { width:30px;height:30px;border:2px solid rgba(255,255,255,0.1);border-top:2px solid var(--accent);border-radius:50%;animation:spin 0.8s linear infinite; }
         @keyframes spin { to{transform:rotate(360deg)} }
-        #comment-sidebar { position:absolute;left:0;right:0;bottom:-75%;width:100%;height:75%;z-index:120;transition:bottom 0.5s cubic-bezier(0.19,1,0.22,1);display:flex;flex-direction:column;border-top:1px solid var(--border);border-radius:32px 32px 0 0; }
-        #comment-sidebar.open { bottom:0; }
-        .custom-scrollbar::-webkit-scrollbar { width:0; }
-        .comment-item { animation:fadeInScale 0.4s ease-out forwards; }
-        @keyframes fadeInScale { from{opacity:0;transform:scale(0.95)} to{opacity:1;transform:scale(1)} }
         .social-btn { width:45px;height:45px;border-radius:14px;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,0.05);border:1px solid var(--border);transition:0.3s;color:var(--text-main);text-decoration:none; }
         .social-btn:active { transform:scale(0.9);background:var(--accent); }
         .toggle-track { width:50px;height:26px;background:var(--accent);border-radius:20px;position:relative;cursor:pointer;transition:0.3s; }
@@ -47,6 +36,12 @@
         .light-mode .toggle-thumb { left:4px; }
         #loading-screen { position:fixed;inset:0;background:#000;z-index:999;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:16px; }
         #loading-screen.hidden { display:none; }
+        
+        /* Edit Section Utils */
+        .edit-input { width:100%;background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:14px;padding:12px 16px;color:#fff;font-size:12px;outline:none;transition:0.3s; }
+        .edit-input:focus { border-color:var(--accent);background:rgba(255,255,255,0.08); }
+        .edit-label { font-size:8px;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:2px;margin-bottom:6px;display:block;margin-left:4px; }
+        .custom-scrollbar::-webkit-scrollbar { width:0; }
     </style>
 </head>
 <body>
@@ -81,15 +76,18 @@ const urlParams = new URLSearchParams(window.location.search);
 const userId = urlParams.get('u') || '';
 if (!userId) window.location.href = 'index.html';
 
-history.replaceState({ page: 'profile' }, '', window.location.href);
+history.replaceState({ screen: 'profile_root' }, '', window.location.href);
 
-if (db) {
-    db.ref('profiles/' + userId).once('value', snap => {
-        const p = snap.val();
-        if (!p) { window.location.href = 'index.html'; return; }
-        buildProfile(p);
-    });
+function loadProfileData() {
+    if (db) {
+        db.ref('profiles/' + userId).on('value', snap => {
+            const p = snap.val();
+            if (!p) { window.location.href = 'index.html'; return; }
+            buildProfile(p);
+        });
+    }
 }
+loadProfileData();
 
 function buildProfile(p) {
     const name     = p.name || userId;
@@ -101,17 +99,14 @@ function buildProfile(p) {
     const songLink = p.songLink || '';
     const social   = p.social || {};
 
-    // Social URLs with fallback to open the app
     const twitterUrl   = (social.twitter   && social.twitter.trim())   ? social.twitter.trim()   : 'https://x.com';
     const linkedinUrl  = (social.linkedin  && social.linkedin.trim())  ? social.linkedin.trim()  : 'https://linkedin.com';
     const instagramUrl = (social.instagram && social.instagram.trim()) ? social.instagram.trim() : 'https://instagram.com';
     const snapchatUrl  = (social.snapchat  && social.snapchat.trim())  ? social.snapchat.trim()  : 'https://snapchat.com';
 
     document.title = 'XOS - ' + name;
-
-    if (audio) {
-        document.getElementById('bio-audio').src = audio;
-    }
+    const audioEl = document.getElementById('bio-audio');
+    if (audioEl && audioEl.src !== audio) audioEl.src = audio;
 
     const songSection = audio ? `
         <div class="flex items-center gap-2">
@@ -160,10 +155,17 @@ function buildProfile(p) {
                 <div onclick="openLicense()" class="flex items-center gap-4 p-4 glass-panel rounded-2xl active:scale-95 transition-transform cursor-pointer">
                     <i class="fas fa-id-card text-blue-500"></i><span class="text-xs font-brand">VIEW LICENSE</span>
                 </div>
+                
                 <div class="border-t border-white/10 my-2"></div>
+                
+                <div onclick="openEditAuth()" class="flex items-center gap-4 p-4 glass-panel rounded-2xl active:scale-95 transition-transform cursor-pointer">
+                    <i class="fas fa-user-edit text-blue-500"></i><span class="text-xs font-brand">EDIT PROFILE</span>
+                </div>
+
                 <div onclick="shareProfile()" class="flex items-center gap-4 p-4 glass-panel rounded-2xl active:scale-95 cursor-pointer">
                     <i class="fas fa-share-alt text-blue-500"></i><span class="text-xs font-brand">SHARE PROFILE</span>
                 </div>
+
                 <div class="pt-4">
                     <p class="text-[9px] text-gray-500 font-brand mb-4 text-center">CONNECTIVITY</p>
                     <div class="flex justify-center gap-4">
@@ -173,6 +175,49 @@ function buildProfile(p) {
                         <a href="${snapchatUrl}" target="_blank" class="social-btn"><i class="fab fa-snapchat"></i></a>
                     </div>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="edit-auth-modal" class="floating-modal" onclick="handleExit()">
+        <div class="modal-box menu-window" onclick="event.stopPropagation()">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="font-brand text-[10px] text-blue-500 tracking-[0.3em]">AUTHORIZATION</h3>
+                <div class="close-btn-circle" style="position:static;width:30px;height:30px;" onclick="handleExit()"><i class="fas fa-times text-xs"></i></div>
+            </div>
+            <p class="text-[10px] text-gray-500 mb-6 uppercase tracking-wider">Enter access code to manage ${nameLow}</p>
+            <input type="password" id="edit-auth-input" class="edit-input mb-4" placeholder="••••••••">
+            <button onclick="checkEditAuth('${nameLow}')" class="w-full bg-blue-600/20 border border-blue-500 text-blue-500 font-brand text-[10px] py-4 rounded-xl tracking-[2px] active:scale-95 transition-transform">VERIFY UPLINK</button>
+        </div>
+    </div>
+
+    <div id="edit-profile-modal" class="floating-modal" onclick="handleExit()">
+        <div class="modal-box glass-panel flex flex-col h-[85vh]" onclick="event.stopPropagation()">
+            <div class="p-6 border-b border-white/10 flex justify-between items-center bg-black">
+                <h3 class="font-brand text-[10px] text-blue-500 tracking-[0.3em]">MANAGE PROFILE</h3>
+                <div class="close-btn-circle" style="position:static;width:30px;height:30px;" onclick="handleExit()"><i class="fas fa-times text-xs"></i></div>
+            </div>
+            <div class="flex-1 overflow-y-auto p-6 space-y-6 custom-scrollbar">
+                <div><label class="edit-label">Display Name</label><input type="text" id="edit-name" class="edit-input" value="${name}"></div>
+                <div><label class="edit-label">Profile Photo URL</label><input type="text" id="edit-photo" class="edit-input" value="${photo}"></div>
+                <div class="pt-2 border-t border-white/5"><p class="text-[9px] text-blue-500/50 font-brand mb-4 tracking-widest">BIO MUSIC</p>
+                    <div class="space-y-4">
+                        <div><label class="edit-label">Audio URL</label><input type="text" id="edit-audio" class="edit-input" value="${audio}"></div>
+                        <div><label class="edit-label">Song Name</label><input type="text" id="edit-songName" class="edit-input" value="${songName}"></div>
+                        <div><label class="edit-label">Track Link</label><input type="text" id="edit-songLink" class="edit-input" value="${songLink}"></div>
+                    </div>
+                </div>
+                <div class="pt-2 border-t border-white/5"><p class="text-[9px] text-blue-500/50 font-brand mb-4 tracking-widest">SOCIAL UPLINKS</p>
+                    <div class="space-y-4">
+                        <div><label class="edit-label">Twitter/X</label><input type="text" id="edit-twitter" class="edit-input" value="${social.twitter || ''}"></div>
+                        <div><label class="edit-label">LinkedIn</label><input type="text" id="edit-linkedin" class="edit-input" value="${social.linkedin || ''}"></div>
+                        <div><label class="edit-label">Instagram</label><input type="text" id="edit-instagram" class="edit-input" value="${social.instagram || ''}"></div>
+                        <div><label class="edit-label">Snapchat</label><input type="text" id="edit-snapchat" class="edit-input" value="${social.snapchat || ''}"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="p-6 bg-black border-t border-white/10">
+                <button onclick="saveProfileChanges('${nameLow}')" class="w-full bg-blue-600 border border-blue-400 text-white font-brand text-[10px] py-4 rounded-xl tracking-[2px] active:scale-95 transition-transform shadow-[0_0_20px_rgba(0,122,255,0.3)]">COMMIT CHANGES</button>
             </div>
         </div>
     </div>
@@ -207,7 +252,7 @@ function buildProfile(p) {
                 <div id="media-container" class="w-full h-full"></div>
                 <audio id="post-audio"></audio>
                 <div class="caption-container"><p id="post-caption" class="text-xs font-light text-gray-300 leading-relaxed"></p></div>
-                <div id="comment-sidebar" class="glass-panel backdrop-blur-3xl">
+                <div id="comment-sidebar" class="glass-panel backdrop-blur-3xl" style="position:absolute;left:0;right:0;bottom:-75%;width:100%;height:75%;z-index:120;transition:bottom 0.5s cubic-bezier(0.19,1,0.22,1);display:flex;flex-direction:column;border-top:1px solid var(--border);border-radius:32px 32px 0 0;">
                     <div class="p-6 flex flex-col h-full">
                         <div class="flex justify-between items-center mb-6">
                             <h3 class="font-brand text-[9px] text-blue-500 tracking-widest">comments</h3>
@@ -216,9 +261,7 @@ function buildProfile(p) {
                         <div id="comment-list" class="flex-1 overflow-y-auto space-y-4 custom-scrollbar pr-2"></div>
                         <div class="mt-4 flex gap-2">
                             <input type="text" id="comment-input" class="flex-1 bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-xs text-white outline-none font-light" placeholder="Type a comment...">
-                            <button onclick="addComment()" class="w-11 h-11 glass-panel rounded-xl flex items-center justify-center text-blue-500 active:scale-90 transition-transform">
-                                <i class="fas fa-paper-plane text-xs"></i>
-                            </button>
+                            <button onclick="addComment()" class="w-11 h-11 glass-panel rounded-xl flex items-center justify-center text-blue-500 active:scale-90 transition-transform"><i class="fas fa-paper-plane text-xs"></i></button>
                         </div>
                     </div>
                 </div>
@@ -331,7 +374,7 @@ function setupProfileJS(nameLow, name, audioSrc) {
 
     window.openPost = function(index) {
         activePostIndex = index;
-        window.history.pushState({ modal: 'active' }, '');
+        history.pushState({ modal: 'floating-post' }, '', '');
         const post = POSTS_DATA[index];
         const container = document.getElementById('media-container');
         const audio     = document.getElementById('post-audio');
@@ -350,6 +393,82 @@ function setupProfileJS(nameLow, name, audioSrc) {
         const modal = document.getElementById('floating-post');
         modal.style.display = 'flex';
         setTimeout(() => { modal.classList.add('active'); loader.style.opacity = '0'; }, 10);
+    };
+
+    window.openFollowers = () => { history.pushState({modal:'followers-modal'},''); const m=document.getElementById('followers-modal'); m.style.display='flex'; setTimeout(()=>m.classList.add('active'),10); };
+    window.openMenu      = () => { history.pushState({modal:'menu-modal'},''); const m=document.getElementById('menu-modal'); m.style.display='flex'; setTimeout(()=>m.classList.add('active'),10); };
+    window.openProfile   = () => { history.pushState({modal:'profile-modal'},''); const m=document.getElementById('profile-modal'); m.style.display='flex'; setTimeout(()=>m.classList.add('active'),10); };
+    window.openLicense   = () => {
+        history.pushState({modal:'license-modal'},'');
+        const menu=document.getElementById('menu-modal');
+        menu.classList.remove('active');
+        setTimeout(() => { menu.style.display='none'; const m=document.getElementById('license-modal'); m.style.display='flex'; setTimeout(()=>m.classList.add('active'),10); }, 300);
+    };
+
+    // --- Edit Auth & Profile Logic ---
+    window.openEditAuth = () => {
+        history.pushState({modal:'edit-auth-modal'},'');
+        document.getElementById('menu-modal').classList.remove('active');
+        setTimeout(() => {
+            document.getElementById('menu-modal').style.display='none';
+            const m = document.getElementById('edit-auth-modal');
+            m.style.display='flex';
+            setTimeout(()=>m.classList.add('active'),10);
+        }, 300);
+    };
+
+    window.checkEditAuth = (id) => {
+        const code = document.getElementById('edit-auth-input').value;
+        if (code === id + '@432') {
+            document.getElementById('edit-auth-modal').classList.remove('active');
+            setTimeout(() => {
+                document.getElementById('edit-auth-modal').style.display='none';
+                history.replaceState({modal:'edit-profile-modal'},'','');
+                const m = document.getElementById('edit-profile-modal');
+                m.style.display='flex';
+                setTimeout(()=>m.classList.add('active'),10);
+            }, 300);
+        } else {
+            alert('AUTHORIZATION FAILED');
+        }
+    };
+
+    window.saveProfileChanges = (id) => {
+        const updates = {
+            name: document.getElementById('edit-name').value,
+            photo: document.getElementById('edit-photo').value,
+            audio: document.getElementById('edit-audio').value,
+            songName: document.getElementById('edit-songName').value,
+            songLink: document.getElementById('edit-songLink').value,
+            social: {
+                twitter: document.getElementById('edit-twitter').value,
+                linkedin: document.getElementById('edit-linkedin').value,
+                instagram: document.getElementById('edit-instagram').value,
+                snapchat: document.getElementById('edit-snapchat').value
+            }
+        };
+        db.ref('profiles/' + userId).update(updates).then(() => {
+            handleExit();
+        });
+    };
+
+    window.handleExit = function() { history.back(); };
+
+    window.killAndHide = function() {
+        const video = document.getElementById('active-video');
+        if (video) { video.pause(); video.src=''; }
+        const audio = document.getElementById('post-audio');
+        if (audio) { audio.pause(); audio.currentTime=0; audio.src=''; }
+        document.getElementById('comment-sidebar').classList.remove('open');
+        ['floating-post','profile-modal','menu-modal','license-modal','followers-modal','edit-auth-modal','edit-profile-modal'].forEach(id => {
+            const el=document.getElementById(id);
+            if(el){el.classList.remove('active');setTimeout(()=>el.style.display='none',300);}
+        });
+    };
+
+    window.onpopstate = (e) => {
+        if (e.state && (e.state.modal || e.state.screen)) { killAndHide(); } 
+        else { window.location.href = 'index.html'; }
     };
 
     window.addComment = function() {
@@ -384,42 +503,12 @@ function setupProfileJS(nameLow, name, audioSrc) {
         });
     }
 
-    window.openFollowers = () => { window.history.pushState({modal:'active'},''); const m=document.getElementById('followers-modal'); m.style.display='flex'; setTimeout(()=>m.classList.add('active'),10); };
-    window.openMenu     = () => { window.history.pushState({modal:'active'},''); const m=document.getElementById('menu-modal'); m.style.display='flex'; setTimeout(()=>m.classList.add('active'),10); };
-    window.openProfile  = () => { window.history.pushState({modal:'active'},''); const m=document.getElementById('profile-modal'); m.style.display='flex'; setTimeout(()=>m.classList.add('active'),10); };
-    window.openLicense  = () => {
-        window.history.pushState({modal:'active'},'');
-        document.getElementById('menu-modal').classList.remove('active');
-        setTimeout(() => { document.getElementById('menu-modal').style.display='none'; const m=document.getElementById('license-modal'); m.style.display='flex'; setTimeout(()=>m.classList.add('active'),10); }, 300);
-    };
     window.shareProfile = () => {
         const url = window.location.href;
         if (navigator.share) navigator.share({ title: name + ' / XOS', url }).catch(()=>{});
-        else navigator.clipboard.writeText(url).then(()=>alert('Link copied!')).catch(()=>{});
+        else { navigator.clipboard.writeText(url).then(()=>alert('Link copied!')).catch(()=>{}); }
     };
     window.toggleComments = () => document.getElementById('comment-sidebar').classList.toggle('open');
-
-    window.handleExit = function() {
-        if (window.history.state && window.history.state.modal === 'active') window.history.back();
-        else killAndHide();
-    };
-
-    window.killAndHide = function() {
-        const video = document.getElementById('active-video');
-        if (video) { video.pause(); video.src=''; }
-        const audio = document.getElementById('post-audio');
-        if (audio) { audio.pause(); audio.currentTime=0; audio.src=''; }
-        document.getElementById('comment-sidebar').classList.remove('open');
-        ['floating-post','profile-modal','menu-modal','license-modal','followers-modal'].forEach(id => {
-            const el=document.getElementById(id);
-            if(el){el.classList.remove('active');setTimeout(()=>el.style.display='none',300);}
-        });
-    };
-
-    window.addEventListener('popstate', () => {
-        if (window.history.state && window.history.state.page === 'profile') window.location.href = 'index.html';
-        else killAndHide();
-    });
 }
 </script>
 </body>
