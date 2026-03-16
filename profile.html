@@ -17,7 +17,8 @@
         .main-container { height:100dvh;overflow-y:auto;touch-action:pan-y;padding-bottom:100px; }
         .blue-tick-glow { color:var(--accent);animation:tickPulse 2s infinite ease-in-out; }
         @keyframes tickPulse { 0%,100%{opacity:0.7;transform:scale(1);filter:drop-shadow(0 0 2px var(--accent))} 50%{opacity:1;transform:scale(1.1);filter:drop-shadow(0 0 8px var(--accent))} }
-        .floating-modal { position:fixed;inset:0;z-index:100;background:rgba(0,0,0,0.7);backdrop-filter:blur(15px);-webkit-backdrop-filter:blur(15px);display:none;align-items:center;justify-content:center;opacity:0;transition:opacity 0.3s; }
+
+        .floating-modal { position:fixed;inset:0;z-index:100;background:rgba(0,0,0,0.75);backdrop-filter:blur(15px);-webkit-backdrop-filter:blur(15px);display:none;align-items:center;justify-content:center;opacity:0;transition:opacity 0.3s; }
         .floating-modal.active { display:flex;opacity:1; }
         .modal-box { width:82vw;aspect-ratio:3/5;max-width:380px;max-height:85vh;background:#000;border:1px solid var(--border);border-radius:28px;overflow:hidden;position:relative;transform:scale(0.9);transition:transform 0.3s cubic-bezier(0.175,0.885,0.32,1.275);box-shadow:0 25px 50px -12px rgba(0,0,0,0.5); }
         .floating-modal.active .modal-box { transform:scale(1); }
@@ -34,14 +35,44 @@
         .toggle-thumb { width:20px;height:20px;background:white;border-radius:50%;position:absolute;top:3px;left:26px;transition:0.3s; }
         .light-mode .toggle-track { background:rgba(0,0,0,0.1); }
         .light-mode .toggle-thumb { left:4px; }
+
+        /* Comment sidebar */
+        #comment-sidebar { position:absolute;left:0;right:0;bottom:-75%;width:100%;height:75%;z-index:120;transition:bottom 0.5s cubic-bezier(0.19,1,0.22,1);display:flex;flex-direction:column;border-top:1px solid var(--border);border-radius:32px 32px 0 0; }
+        #comment-sidebar.open { bottom:0; }
+        .custom-scrollbar::-webkit-scrollbar { width:0; }
+        .comment-item { animation:fadeInScale 0.4s ease-out forwards; }
+        @keyframes fadeInScale { from{opacity:0;transform:scale(0.95)} to{opacity:1;transform:scale(1)} }
+
         #loading-screen { position:fixed;inset:0;background:#000;z-index:999;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:16px; }
         #loading-screen.hidden { display:none; }
-        
-        /* Edit Section Utils */
-        .edit-input { width:100%;background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:14px;padding:12px 16px;color:#fff;font-size:12px;outline:none;transition:0.3s; }
-        .edit-input:focus { border-color:var(--accent);background:rgba(255,255,255,0.08); }
+
+        /* Edit form */
+        .edit-input { width:100%;background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:14px;padding:12px 16px;color:#fff;font-size:12px;outline:none;transition:0.3s;font-family:'Space Grotesk'; }
+        .edit-input:focus { border-color:var(--accent); }
         .edit-label { font-size:8px;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:2px;margin-bottom:6px;display:block;margin-left:4px; }
-        .custom-scrollbar::-webkit-scrollbar { width:0; }
+
+        /* Photo upload slot in edit */
+        .photo-slot { border:2px dashed rgba(0,122,255,0.25);border-radius:14px;padding:14px;text-align:center;position:relative;cursor:pointer;transition:all 0.25s;min-height:80px;display:flex;align-items:center;justify-content:center; }
+        .photo-slot:hover { border-color:var(--accent);background:rgba(0,122,255,0.04); }
+        .photo-slot input { position:absolute;inset:0;opacity:0;width:100%;height:100%;cursor:pointer; }
+        .photo-slot img { width:50px;height:50px;border-radius:50%;object-fit:cover;border:2px solid var(--accent);margin:0 auto 4px;display:block; }
+
+        /* Avatar toggle in card */
+        .avatar-wrap { position:relative;width:100%;height:100%;border-radius:16px;overflow:hidden; }
+        .avatar-wrap img { position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:opacity 0.7s ease; }
+        .avatar-wrap .av2 { opacity:0; }
+
+        /* Progress */
+        .ep-prog { height:3px;background:rgba(255,255,255,0.06);border-radius:10px;overflow:hidden;margin-top:8px;display:none; }
+        .ep-prog-fill { height:100%;background:var(--accent);width:0%;transition:width 0.2s;border-radius:10px; }
+        .ep-spin { width:16px;height:16px;border:2px solid rgba(255,255,255,0.1);border-top-color:var(--accent);border-radius:50%;animation:spin 0.7s linear infinite;display:inline-block;vertical-align:middle;margin-right:6px; }
+
+        /* license card styles */
+        .license-card { width:100%;padding:20px;border-radius:20px;background:linear-gradient(145deg,#0a0a0a,#111);border:1px solid rgba(255,255,255,0.08);display:flex;gap:20px;align-items:center; }
+        .license-photo { width:85px;height:85px;border-radius:12px;border:1px solid var(--accent);object-fit:cover; }
+        .license-label { font-size:8px;color:#4b5563;font-family:'Orbitron';letter-spacing:1px;margin-bottom:2px; }
+        .license-value { font-size:11px;color:#eaf1ff;margin-bottom:6px;font-weight:600;text-transform:uppercase; }
+        .license-dot { width:5px;height:5px;background:var(--accent);border-radius:50%;display:inline-block;margin-right:4px; }
     </style>
 </head>
 <body>
@@ -58,6 +89,10 @@
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
 <script>
 
+const CLOUD  = "dptphdatf";
+const PRESET = "vagprxhr";
+const EDIT_AUTH_SUFFIX = '@432'; // code = username + @432
+
 let db = null;
 try {
     firebase.initializeApp({
@@ -73,53 +108,59 @@ try {
 } catch(e) {}
 
 const urlParams = new URLSearchParams(window.location.search);
-const userId = urlParams.get('u') || '';
-if (!userId) window.location.href = 'index.html';
+const userId = (urlParams.get('u') || '').toLowerCase();
+if (!userId) window.location.replace('profiles.html');
 
 history.replaceState({ screen: 'profile_root' }, '', window.location.href);
 
-function loadProfileData() {
-    if (db) {
-        db.ref('profiles/' + userId).on('value', snap => {
-            const p = snap.val();
-            if (!p) { window.location.href = 'index.html'; return; }
-            buildProfile(p);
-        });
-    }
-}
-loadProfileData();
+// ── LOAD ──────────────────────────────────────────────────────────────────────
+db.ref('profiles/' + userId).on('value', snap => {
+    const p = snap.val();
+    if (!p) { window.location.replace('profiles.html'); return; }
+    buildProfile(p);
+});
 
+// ── BUILD ─────────────────────────────────────────────────────────────────────
 function buildProfile(p) {
-    const name     = p.name || userId;
-    const nameLow  = p.id   || name.toLowerCase();
+    const name     = p.name  || userId;
+    const nameLow  = p.id    || name.toLowerCase();
     const photo    = p.photo || '';
+    const photo2   = p.photo2 || '';
     const username = nameLow + '@xos';
-    const audio    = p.audio || '';
+    const audioSrc = p.audio || '';
     const songName = p.songName || 'Bio Song';
     const songLink = p.songLink || '';
     const social   = p.social || {};
+    const tw = social.twitter   || 'https://x.com';
+    const li = social.linkedin  || 'https://linkedin.com';
+    const ig = social.instagram || 'https://instagram.com';
+    const sc = social.snapchat  || 'https://snapchat.com';
 
-    const twitterUrl   = (social.twitter   && social.twitter.trim())   ? social.twitter.trim()   : 'https://x.com';
-    const linkedinUrl  = (social.linkedin  && social.linkedin.trim())  ? social.linkedin.trim()  : 'https://linkedin.com';
-    const instagramUrl = (social.instagram && social.instagram.trim()) ? social.instagram.trim() : 'https://instagram.com';
-    const snapchatUrl  = (social.snapchat  && social.snapchat.trim())  ? social.snapchat.trim()  : 'https://snapchat.com';
-
-    document.title = 'XOS - ' + name;
+    document.title = 'XOS – ' + name;
     const audioEl = document.getElementById('bio-audio');
-    if (audioEl && audioEl.src !== audio) audioEl.src = audio;
+    if (audioEl && audioSrc) audioEl.src = audioSrc;
 
-    const songSection = audio ? `
+    const songSection = audioSrc ? `
         <div class="flex items-center gap-2">
             <div onclick="toggleBioMusic()" class="text-blue-500 text-[9px] cursor-pointer transition-transform active:scale-90">
                 <i class="fas fa-play" id="bio-play-icon"></i>
             </div>
             ${songLink
                 ? `<a href="${songLink}" target="_blank" class="text-[9px] font-brand tracking-[1.5px] text-gray-500 hover:text-blue-400 transition-colors uppercase">${songName}</a>`
-                : `<span class="text-[9px] font-brand tracking-[1.5px] text-gray-500 uppercase">${songName}</span>`
-            }
+                : `<span class="text-[9px] font-brand tracking-[1.5px] text-gray-500 uppercase">${songName}</span>`}
         </div>` : '';
 
+    // Avatar HTML — toggle if photo2 exists
+    const avatarHtml = photo2
+        ? `<div class="avatar-wrap">
+               <img class="av1" src="${photo}">
+               <img class="av2" src="${photo2}">
+           </div>`
+        : `<div class="avatar-wrap"><img class="av1" src="${photo}" onerror="this.style.background='#222'"></div>`;
+
     document.getElementById('profile-root').innerHTML = `
+
+    <!-- FOLLOWERS -->
     <div id="followers-modal" class="floating-modal" onclick="handleExit()">
         <div class="modal-box menu-window" onclick="event.stopPropagation()">
             <div class="flex justify-between items-center mb-8">
@@ -127,11 +168,16 @@ function buildProfile(p) {
                 <div class="close-btn-circle" style="position:static;width:30px;height:30px;" onclick="handleExit()"><i class="fas fa-times text-xs"></i></div>
             </div>
             <div class="flex flex-col gap-4">
-                <a href="Nikhilprof.html" class="block group">
+                <a href="profiles.html" class="block group">
                     <div class="relative p-4 rounded-xl border border-white/10 bg-white/5 backdrop-blur-md group-active:scale-95 transition-all duration-300">
                         <div class="flex items-center gap-4">
-                            <div class="w-12 h-12 rounded-lg overflow-hidden border border-white/20"><img src="file_00000000f4f47208a731ff7b47a3b568.png" class="w-full h-full object-cover"></div>
-                            <div><p class="text-xs font-semibold tracking-wide text-white">Nikhil</p><p class="text-[9px] text-red-400 uppercase tracking-widest mt-1 opacity-80">System Admin</p></div>
+                            <div class="w-12 h-12 rounded-lg overflow-hidden border border-white/20">
+                                <img src="file_00000000f4f47208a731ff7b47a3b568.png" class="w-full h-full object-cover">
+                            </div>
+                            <div>
+                                <p class="text-xs font-semibold tracking-wide text-white">Nikhil</p>
+                                <p class="text-[9px] text-red-400 uppercase tracking-widest mt-1 opacity-80">System Admin</p>
+                            </div>
                             <i class="fas fa-chevron-right ml-auto text-[10px] text-gray-600"></i>
                         </div>
                     </div>
@@ -141,13 +187,14 @@ function buildProfile(p) {
         </div>
     </div>
 
+    <!-- MENU -->
     <div id="menu-modal" class="floating-modal" onclick="handleExit()">
         <div class="modal-box menu-window" onclick="event.stopPropagation()">
             <div class="flex justify-between items-center mb-8">
                 <h3 class="font-brand text-[10px] text-blue-500 tracking-[0.3em]">SYSTEM OPTIONS</h3>
                 <div class="close-btn-circle" style="position:static;width:30px;height:30px;" onclick="handleExit()"><i class="fas fa-times text-xs"></i></div>
             </div>
-            <div class="space-y-6">
+            <div class="space-y-4">
                 <div class="flex items-center justify-between p-4 glass-panel rounded-2xl">
                     <span class="text-xs font-brand">DARK MODE</span>
                     <div class="toggle-track" onclick="document.body.classList.toggle('light-mode')"><div class="toggle-thumb"></div></div>
@@ -155,30 +202,27 @@ function buildProfile(p) {
                 <div onclick="openLicense()" class="flex items-center gap-4 p-4 glass-panel rounded-2xl active:scale-95 transition-transform cursor-pointer">
                     <i class="fas fa-id-card text-blue-500"></i><span class="text-xs font-brand">VIEW LICENSE</span>
                 </div>
-                
                 <div class="border-t border-white/10 my-2"></div>
-                
                 <div onclick="openEditAuth()" class="flex items-center gap-4 p-4 glass-panel rounded-2xl active:scale-95 transition-transform cursor-pointer">
                     <i class="fas fa-user-edit text-blue-500"></i><span class="text-xs font-brand">EDIT PROFILE</span>
                 </div>
-
                 <div onclick="shareProfile()" class="flex items-center gap-4 p-4 glass-panel rounded-2xl active:scale-95 cursor-pointer">
                     <i class="fas fa-share-alt text-blue-500"></i><span class="text-xs font-brand">SHARE PROFILE</span>
                 </div>
-
-                <div class="pt-4">
+                <div class="pt-2">
                     <p class="text-[9px] text-gray-500 font-brand mb-4 text-center">CONNECTIVITY</p>
                     <div class="flex justify-center gap-4">
-                        <a href="${twitterUrl}" target="_blank" class="social-btn"><i class="fa-brands fa-x-twitter"></i></a>
-                        <a href="${linkedinUrl}" target="_blank" class="social-btn"><i class="fab fa-linkedin-in"></i></a>
-                        <a href="${instagramUrl}" target="_blank" class="social-btn"><i class="fab fa-instagram"></i></a>
-                        <a href="${snapchatUrl}" target="_blank" class="social-btn"><i class="fab fa-snapchat"></i></a>
+                        <a href="${tw}" target="_blank" class="social-btn"><i class="fa-brands fa-x-twitter"></i></a>
+                        <a href="${li}" target="_blank" class="social-btn"><i class="fab fa-linkedin-in"></i></a>
+                        <a href="${ig}" target="_blank" class="social-btn"><i class="fab fa-instagram"></i></a>
+                        <a href="${sc}" target="_blank" class="social-btn"><i class="fab fa-snapchat"></i></a>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
+    <!-- EDIT AUTH -->
     <div id="edit-auth-modal" class="floating-modal" onclick="handleExit()">
         <div class="modal-box menu-window" onclick="event.stopPropagation()">
             <div class="flex justify-between items-center mb-6">
@@ -186,42 +230,90 @@ function buildProfile(p) {
                 <div class="close-btn-circle" style="position:static;width:30px;height:30px;" onclick="handleExit()"><i class="fas fa-times text-xs"></i></div>
             </div>
             <p class="text-[10px] text-gray-500 mb-6 uppercase tracking-wider">Enter access code to manage ${nameLow}</p>
-            <input type="password" id="edit-auth-input" class="edit-input mb-4" placeholder="••••••••">
+            <input type="password" id="edit-auth-input" class="edit-input mb-4" placeholder="code = username@432">
             <button onclick="checkEditAuth('${nameLow}')" class="w-full bg-blue-600/20 border border-blue-500 text-blue-500 font-brand text-[10px] py-4 rounded-xl tracking-[2px] active:scale-95 transition-transform">VERIFY UPLINK</button>
         </div>
     </div>
 
+    <!-- EDIT PROFILE -->
     <div id="edit-profile-modal" class="floating-modal" onclick="handleExit()">
-        <div class="modal-box glass-panel flex flex-col h-[85vh]" onclick="event.stopPropagation()">
-            <div class="p-6 border-b border-white/10 flex justify-between items-center bg-black">
+        <div class="modal-box glass-panel" style="aspect-ratio:unset;height:88vh;max-height:88vh;display:flex;flex-direction:column;" onclick="event.stopPropagation()">
+            <div class="p-5 border-b border-white/10 flex justify-between items-center" style="background:#000;flex-shrink:0;">
                 <h3 class="font-brand text-[10px] text-blue-500 tracking-[0.3em]">MANAGE PROFILE</h3>
                 <div class="close-btn-circle" style="position:static;width:30px;height:30px;" onclick="handleExit()"><i class="fas fa-times text-xs"></i></div>
             </div>
-            <div class="flex-1 overflow-y-auto p-6 space-y-6 custom-scrollbar">
-                <div><label class="edit-label">Display Name</label><input type="text" id="edit-name" class="edit-input" value="${name}"></div>
-                <div><label class="edit-label">Profile Photo URL</label><input type="text" id="edit-photo" class="edit-input" value="${photo}"></div>
-                <div class="pt-2 border-t border-white/5"><p class="text-[9px] text-blue-500/50 font-brand mb-4 tracking-widest">BIO MUSIC</p>
+            <div style="flex:1;overflow-y:auto;padding:20px;" class="space-y-5 custom-scrollbar">
+
+                <div><label class="edit-label">Display Name</label><input type="text" id="edit-name" class="edit-input" value="${name}" oninput="this.value=this.value.replace(/[^a-zA-Z]/g,'')"></div>
+
+                <!-- Photo 1 upload -->
+                <div>
+                    <label class="edit-label">Profile Photo 1</label>
+                    <div class="photo-slot" id="ep-slot-1">
+                        <input type="file" accept="image/*" onchange="onEpPhoto(event,1)">
+                        <div id="ep-ph-1">
+                            <i class="fas fa-camera" style="font-size:18px;color:rgba(0,122,255,0.4);display:block;margin-bottom:4px;"></i>
+                            <p style="font-size:8px;color:rgba(255,255,255,0.2);text-transform:uppercase;letter-spacing:1px;">
+                                ${photo ? 'Change Photo 1' : 'Upload Photo 1'}
+                            </p>
+                            ${photo ? `<img src="${photo}" style="width:40px;height:40px;border-radius:50%;object-fit:cover;border:1px solid rgba(0,122,255,0.4);margin:6px auto 0;display:block;">` : ''}
+                        </div>
+                        <div id="ep-pv-1" style="display:none;">
+                            <img id="ep-img-1" style="width:50px;height:50px;border-radius:50%;object-fit:cover;border:2px solid var(--accent);margin:0 auto 4px;display:block;">
+                            <p style="font-size:8px;color:rgba(255,255,255,0.3);text-align:center;text-transform:uppercase;letter-spacing:1px;">Photo 1 ✓</p>
+                        </div>
+                    </div>
+                    <div class="ep-prog" id="ep-prog-1"><div class="ep-prog-fill" id="ep-prog-fill-1"></div></div>
+                </div>
+
+                <!-- Photo 2 upload -->
+                <div>
+                    <label class="edit-label">Profile Photo 2 (optional — toggles with photo 1)</label>
+                    <div class="photo-slot" id="ep-slot-2">
+                        <input type="file" accept="image/*" onchange="onEpPhoto(event,2)">
+                        <div id="ep-ph-2">
+                            <i class="fas fa-camera" style="font-size:18px;color:rgba(0,122,255,0.25);display:block;margin-bottom:4px;"></i>
+                            <p style="font-size:8px;color:rgba(255,255,255,0.15);text-transform:uppercase;letter-spacing:1px;">
+                                ${photo2 ? 'Change Photo 2' : 'Upload Photo 2'}
+                            </p>
+                            ${photo2 ? `<img src="${photo2}" style="width:40px;height:40px;border-radius:50%;object-fit:cover;border:1px solid rgba(0,122,255,0.3);margin:6px auto 0;display:block;">` : ''}
+                        </div>
+                        <div id="ep-pv-2" style="display:none;">
+                            <img id="ep-img-2" style="width:50px;height:50px;border-radius:50%;object-fit:cover;border:2px solid var(--accent);margin:0 auto 4px;display:block;">
+                            <p style="font-size:8px;color:rgba(255,255,255,0.3);text-align:center;text-transform:uppercase;letter-spacing:1px;">Photo 2 ✓</p>
+                        </div>
+                    </div>
+                    <div class="ep-prog" id="ep-prog-2"><div class="ep-prog-fill" id="ep-prog-fill-2"></div></div>
+                </div>
+
+                <div class="border-t border-white/5 pt-4">
+                    <p class="text-[9px] text-blue-500/50 font-brand mb-4 tracking-widest">BIO MUSIC</p>
                     <div class="space-y-4">
-                        <div><label class="edit-label">Audio URL</label><input type="text" id="edit-audio" class="edit-input" value="${audio}"></div>
+                        <div><label class="edit-label">Audio URL</label><input type="text" id="edit-audio" class="edit-input" value="${audioSrc}"></div>
                         <div><label class="edit-label">Song Name</label><input type="text" id="edit-songName" class="edit-input" value="${songName}"></div>
                         <div><label class="edit-label">Track Link</label><input type="text" id="edit-songLink" class="edit-input" value="${songLink}"></div>
                     </div>
                 </div>
-                <div class="pt-2 border-t border-white/5"><p class="text-[9px] text-blue-500/50 font-brand mb-4 tracking-widest">SOCIAL UPLINKS</p>
+
+                <div class="border-t border-white/5 pt-4">
+                    <p class="text-[9px] text-blue-500/50 font-brand mb-4 tracking-widest">SOCIAL UPLINKS</p>
                     <div class="space-y-4">
-                        <div><label class="edit-label">Twitter/X</label><input type="text" id="edit-twitter" class="edit-input" value="${social.twitter || ''}"></div>
-                        <div><label class="edit-label">LinkedIn</label><input type="text" id="edit-linkedin" class="edit-input" value="${social.linkedin || ''}"></div>
-                        <div><label class="edit-label">Instagram</label><input type="text" id="edit-instagram" class="edit-input" value="${social.instagram || ''}"></div>
-                        <div><label class="edit-label">Snapchat</label><input type="text" id="edit-snapchat" class="edit-input" value="${social.snapchat || ''}"></div>
+                        <div><label class="edit-label">Twitter / X</label><input type="url" id="edit-twitter" class="edit-input" value="${social.twitter||''}"></div>
+                        <div><label class="edit-label">LinkedIn</label><input type="url" id="edit-linkedin" class="edit-input" value="${social.linkedin||''}"></div>
+                        <div><label class="edit-label">Instagram</label><input type="url" id="edit-instagram" class="edit-input" value="${social.instagram||''}"></div>
+                        <div><label class="edit-label">Snapchat</label><input type="url" id="edit-snapchat" class="edit-input" value="${social.snapchat||''}"></div>
                     </div>
                 </div>
+
+                <p id="ep-save-label" style="font-size:9px;color:rgba(255,255,255,0.3);text-align:center;min-height:14px;text-transform:uppercase;letter-spacing:1px;"></p>
             </div>
-            <div class="p-6 bg-black border-t border-white/10">
-                <button onclick="saveProfileChanges('${nameLow}')" class="w-full bg-blue-600 border border-blue-400 text-white font-brand text-[10px] py-4 rounded-xl tracking-[2px] active:scale-95 transition-transform shadow-[0_0_20px_rgba(0,122,255,0.3)]">COMMIT CHANGES</button>
+            <div style="padding:16px;background:#000;border-top:1px solid rgba(255,255,255,0.06);flex-shrink:0;">
+                <button id="ep-save-btn" onclick="saveProfileChanges('${nameLow}')" class="w-full bg-blue-600/20 border border-blue-500 text-blue-500 font-brand text-[10px] py-4 rounded-xl tracking-[2px] active:scale-95 transition-transform">COMMIT CHANGES</button>
             </div>
         </div>
     </div>
 
+    <!-- LICENSE -->
     <div id="license-modal" class="floating-modal" onclick="handleExit()">
         <div class="modal-box menu-window" onclick="event.stopPropagation()">
             <div class="flex justify-between items-center mb-8">
@@ -229,18 +321,19 @@ function buildProfile(p) {
                 <div class="close-btn-circle" style="position:static;width:30px;height:30px;" onclick="handleExit()"><i class="fas fa-times text-xs"></i></div>
             </div>
             <div class="license-card">
-                <img src="${photo}" class="license-photo">
+                <img id="lic-photo" src="${photo}" class="license-photo" onerror="this.style.background='#222'">
                 <div style="flex:1;">
-                    <p class="license-label">NAME</p><p class="license-value">${name}</p>
+                    <p class="license-label">NAME</p><p class="license-value" id="lic-name">${name}</p>
                     <p class="license-label">ROLE</p><p class="license-value">SYSTEM MEMBER</p>
                     <p class="license-label">STATUS</p><p class="license-value"><span class="license-dot"></span>AUTHORISED</p>
-                    <p class="license-label">VALIDITY</p><p class="license-value">2026-</p>
+                    <p class="license-label">VALIDITY</p><p class="license-value">2026–</p>
                 </div>
             </div>
             <p class="text-[7px] font-mono text-blue-500/40 mt-6 text-center tracking-[0.5em] uppercase">Security Clearance Level 3</p>
         </div>
     </div>
 
+    <!-- POST VIEWER -->
     <div id="floating-post" class="floating-modal" onclick="handleExit()">
         <div class="modal-box glass-panel" onclick="event.stopPropagation()">
             <div id="media-loader" class="loader"><div class="spinner"></div></div>
@@ -252,28 +345,30 @@ function buildProfile(p) {
                 <div id="media-container" class="w-full h-full"></div>
                 <audio id="post-audio"></audio>
                 <div class="caption-container"><p id="post-caption" class="text-xs font-light text-gray-300 leading-relaxed"></p></div>
-                <div id="comment-sidebar" class="glass-panel backdrop-blur-3xl" style="position:absolute;left:0;right:0;bottom:-75%;width:100%;height:75%;z-index:120;transition:bottom 0.5s cubic-bezier(0.19,1,0.22,1);display:flex;flex-direction:column;border-top:1px solid var(--border);border-radius:32px 32px 0 0;">
-                    <div class="p-6 flex flex-col h-full">
-                        <div class="flex justify-between items-center mb-6">
-                            <h3 class="font-brand text-[9px] text-blue-500 tracking-widest">comments</h3>
-                            <button onclick="toggleComments()" class="text-white/40"><i class="fas fa-chevron-down"></i></button>
-                        </div>
-                        <div id="comment-list" class="flex-1 overflow-y-auto space-y-4 custom-scrollbar pr-2"></div>
-                        <div class="mt-4 flex gap-2">
-                            <input type="text" id="comment-input" class="flex-1 bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-xs text-white outline-none font-light" placeholder="Type a comment...">
-                            <button onclick="addComment()" class="w-11 h-11 glass-panel rounded-xl flex items-center justify-center text-blue-500 active:scale-90 transition-transform"><i class="fas fa-paper-plane text-xs"></i></button>
-                        </div>
+                <div id="comment-sidebar" class="glass-panel">
+                    <div style="padding:16px 20px;border-bottom:1px solid rgba(255,255,255,0.06);flex-shrink:0;">
+                        <div class="w-10 h-1 bg-white/20 rounded-full mx-auto mb-3"></div>
+                        <span class="font-brand text-[9px] text-blue-500 tracking-[0.3em]">COMMENTS</span>
+                    </div>
+                    <div id="comment-list" class="flex-1 overflow-y-auto p-4 space-y-3 custom-scrollbar"></div>
+                    <div style="padding:12px 16px;border-top:1px solid rgba(255,255,255,0.06);flex-shrink:0;display:flex;gap:10px;">
+                        <input type="text" id="comment-input" class="flex-1 bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-xs text-white outline-none font-light" placeholder="Type a comment...">
+                        <button onclick="addComment()" class="w-11 h-11 glass-panel rounded-xl flex items-center justify-center text-blue-500 active:scale-90 transition-transform"><i class="fas fa-paper-plane text-xs"></i></button>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
+    <!-- PROFILE PHOTO ZOOM -->
     <div id="profile-modal" class="floating-modal" onclick="handleExit()">
         <div class="modal-box square-modal glass-panel" onclick="event.stopPropagation()">
             <div class="close-btn-circle" onclick="handleExit()"><i class="fas fa-times"></i></div>
-            <div class="h-full w-full relative">
-                <img src="${photo}" class="w-full h-full object-cover">
+            <div class="h-full w-full relative" style="overflow:hidden;">
+                <div id="zoom-avatar" style="position:relative;width:100%;height:100%;">
+                    <img id="zoom-ph1" src="${photo}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:opacity 0.6s;">
+                    <img id="zoom-ph2" src="${photo2}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:opacity 0.6s;opacity:0;${!photo2?'display:none;':''}">
+                </div>
                 <div class="caption-container">
                     <p class="font-brand text-[10px] text-blue-500 tracking-widest">SYSTEM MEMBER</p>
                     <p class="text-[8px] text-gray-400">DATA SECURED</p>
@@ -282,6 +377,7 @@ function buildProfile(p) {
         </div>
     </div>
 
+    <!-- MAIN PAGE -->
     <div class="main-container">
         <div class="flex justify-between items-center px-6 py-8">
             <button onclick="history.back()" class="glass-panel w-10 h-10 rounded-full flex items-center justify-center text-gray-400 active:scale-90 transition-transform"><i class="fas fa-chevron-left"></i></button>
@@ -292,8 +388,9 @@ function buildProfile(p) {
         <div class="px-6 mb-8">
             <div class="glass-panel p-6 rounded-[32px] relative">
                 <div class="flex items-center gap-6">
-                    <div onclick="openProfile()" class="relative w-20 h-20 rounded-2xl overflow-hidden border border-white/10 cursor-pointer active:scale-95 transition-transform">
-                        <img src="${photo}" class="w-full h-full object-cover">
+                    <!-- Avatar with toggle -->
+                    <div onclick="openProfile()" class="relative w-20 h-20 rounded-2xl overflow-hidden border border-white/10 cursor-pointer active:scale-95 transition-transform flex-shrink-0">
+                        ${avatarHtml}
                     </div>
                     <div class="flex-1">
                         <div class="flex items-center gap-2">
@@ -313,6 +410,7 @@ function buildProfile(p) {
         <div class="px-6">
             <div class="flex justify-between items-center mb-6 px-2">
                 <span class="font-brand text-[9px] text-gray-500 uppercase tracking-[0.3em]">Posts</span>
+                <button onclick="goToAdmin()" class="w-8 h-8 glass-panel rounded-lg flex items-center justify-center text-xs text-white active:scale-90 transition-transform"><i class="fas fa-plus"></i></button>
             </div>
             <div id="posts-grid" class="grid grid-cols-2 gap-3">
                 <div style="grid-column:span 2;text-align:center;padding:40px 0;color:rgba(255,255,255,0.15);font-size:10px;text-transform:uppercase;letter-spacing:2px;">No posts yet</div>
@@ -324,12 +422,86 @@ function buildProfile(p) {
     document.getElementById('loading-screen').classList.add('hidden');
     document.getElementById('profile-root').style.display = 'block';
 
-    setupProfileJS(nameLow, name, audio);
+    // Start avatar toggle in header card
+    if (photo2) startAvatarToggle(photo, photo2);
+
+    // Start zoomed photo toggle
+    if (photo2) startZoomToggle();
+
+    setupJS(nameLow, name, audioSrc, photo, photo2);
 }
 
-function setupProfileJS(nameLow, name, audioSrc) {
+// ── AVATAR TOGGLE in small card ───────────────────────────────────────────────
+let _avatarInterval = null;
+function startAvatarToggle(p1, p2) {
+    if (_avatarInterval) clearInterval(_avatarInterval);
+    let show1 = true;
+    _avatarInterval = setInterval(() => {
+        show1 = !show1;
+        const av1 = document.querySelector('.main-container .av1');
+        const av2 = document.querySelector('.main-container .av2');
+        if (!av1 || !av2) return;
+        av1.style.opacity = show1 ? '1' : '0';
+        av2.style.opacity = show1 ? '0' : '1';
+    }, 3000);
+}
+
+// ── ZOOM TOGGLE ───────────────────────────────────────────────────────────────
+let _zoomInterval = null;
+function startZoomToggle() {
+    if (_zoomInterval) clearInterval(_zoomInterval);
+    let show1 = true;
+    _zoomInterval = setInterval(() => {
+        show1 = !show1;
+        const z1 = document.getElementById('zoom-ph1');
+        const z2 = document.getElementById('zoom-ph2');
+        if (!z1 || !z2) return;
+        z1.style.opacity = show1 ? '1' : '0';
+        z2.style.opacity = show1 ? '0' : '1';
+    }, 3000);
+}
+
+// ── EDIT PHOTO UPLOAD HELPERS ─────────────────────────────────────────────────
+let _epFile1 = null, _epFile2 = null;
+
+window.onEpPhoto = function(e, slot) {
+    const file = e.target.files[0];
+    if (!file) return;
+    const url = URL.createObjectURL(file);
+    if (slot === 1) {
+        _epFile1 = file;
+        document.getElementById('ep-ph-1').style.display = 'none';
+        document.getElementById('ep-pv-1').style.display = 'block';
+        document.getElementById('ep-img-1').src = url;
+    } else {
+        _epFile2 = file;
+        document.getElementById('ep-ph-2').style.display = 'none';
+        document.getElementById('ep-pv-2').style.display = 'block';
+        document.getElementById('ep-img-2').src = url;
+    }
+};
+
+function uploadToCloudinary(file, folder, onProg) {
+    return new Promise((res, rej) => {
+        const fd = new FormData();
+        fd.append('file', file);
+        fd.append('upload_preset', PRESET);
+        fd.append('folder', 'xos/profiles/' + folder);
+        const xhr = new XMLHttpRequest();
+        xhr.open('POST', `https://api.cloudinary.com/v1_1/${CLOUD}/image/upload`);
+        xhr.upload.onprogress = e => { if (e.lengthComputable) onProg(Math.round(e.loaded/e.total*100)); };
+        xhr.onload = () => xhr.status===200 ? res(JSON.parse(xhr.responseText).secure_url) : rej(new Error('Upload failed'));
+        xhr.onerror = () => rej(new Error('Network error'));
+        xhr.send(fd);
+    });
+}
+
+// ── MAIN JS SETUP ─────────────────────────────────────────────────────────────
+function setupJS(nameLow, name, audioSrc, photo, photo2) {
     let POSTS_DATA = [];
     let activePostIndex = null;
+
+    window.goToAdmin = () => window.location.href = 'general_admin.html?u=' + encodeURIComponent(nameLow);
 
     window.toggleBioMusic = function() {
         const audio = document.getElementById('bio-audio');
@@ -339,14 +511,106 @@ function setupProfileJS(nameLow, name, audioSrc) {
         else { audio.pause(); icon.className = 'fas fa-play'; }
     };
 
+    window.openFollowers = () => { history.pushState({modal:'followers-modal'},''); const m=document.getElementById('followers-modal'); m.style.display='flex'; setTimeout(()=>m.classList.add('active'),10); };
+    window.openMenu      = () => { history.pushState({modal:'menu-modal'},''); const m=document.getElementById('menu-modal'); m.style.display='flex'; setTimeout(()=>m.classList.add('active'),10); };
+    window.openProfile   = () => { history.pushState({modal:'profile-modal'},''); const m=document.getElementById('profile-modal'); m.style.display='flex'; setTimeout(()=>m.classList.add('active'),10); };
+    window.openLicense   = () => {
+        history.pushState({modal:'license-modal'},'');
+        const menu=document.getElementById('menu-modal');
+        menu.classList.remove('active');
+        setTimeout(()=>{ menu.style.display='none'; const m=document.getElementById('license-modal'); m.style.display='flex'; setTimeout(()=>m.classList.add('active'),10); }, 300);
+    };
+    window.openEditAuth = () => {
+        history.pushState({modal:'edit-auth-modal'},'');
+        document.getElementById('menu-modal').classList.remove('active');
+        setTimeout(()=>{
+            document.getElementById('menu-modal').style.display='none';
+            const m=document.getElementById('edit-auth-modal');
+            m.style.display='flex'; setTimeout(()=>m.classList.add('active'),10);
+        }, 300);
+    };
+
+    window.checkEditAuth = (id) => {
+        const code = document.getElementById('edit-auth-input').value.trim();
+        if (code === id + EDIT_AUTH_SUFFIX) {
+            document.getElementById('edit-auth-modal').classList.remove('active');
+            setTimeout(()=>{
+                document.getElementById('edit-auth-modal').style.display='none';
+                history.replaceState({modal:'edit-profile-modal'},'','');
+                const m=document.getElementById('edit-profile-modal');
+                m.style.display='flex'; setTimeout(()=>m.classList.add('active'),10);
+            }, 300);
+        } else {
+            document.getElementById('edit-auth-input').style.borderColor='#ef4444';
+            setTimeout(()=>document.getElementById('edit-auth-input').style.borderColor='',1000);
+        }
+    };
+
+    window.saveProfileChanges = async (id) => {
+        const btn = document.getElementById('ep-save-btn');
+        const lbl = document.getElementById('ep-save-label');
+        btn.disabled = true;
+        btn.textContent = 'SAVING...';
+
+        try {
+            let p1url = photo, p2url = photo2;
+
+            if (_epFile1) {
+                lbl.textContent = 'UPLOADING PHOTO 1...';
+                document.getElementById('ep-prog-1').style.display = 'block';
+                p1url = await uploadToCloudinary(_epFile1, id+'/photo1', pct => {
+                    document.getElementById('ep-prog-fill-1').style.width = pct+'%';
+                });
+            }
+            if (_epFile2) {
+                lbl.textContent = 'UPLOADING PHOTO 2...';
+                document.getElementById('ep-prog-2').style.display = 'block';
+                p2url = await uploadToCloudinary(_epFile2, id+'/photo2', pct => {
+                    document.getElementById('ep-prog-fill-2').style.width = pct+'%';
+                });
+            }
+
+            const updates = {
+                name:     document.getElementById('edit-name').value.trim() || name,
+                photo:    p1url,
+                photo2:   p2url,
+                audio:    document.getElementById('edit-audio').value.trim(),
+                songName: document.getElementById('edit-songName').value.trim(),
+                songLink: document.getElementById('edit-songLink').value.trim(),
+                social: {
+                    twitter:   document.getElementById('edit-twitter').value.trim(),
+                    linkedin:  document.getElementById('edit-linkedin').value.trim(),
+                    instagram: document.getElementById('edit-instagram').value.trim(),
+                    snapchat:  document.getElementById('edit-snapchat').value.trim()
+                }
+            };
+            lbl.textContent = 'COMMITTING...';
+            await db.ref('profiles/' + userId).update(updates);
+            lbl.textContent = '✓ SAVED';
+            _epFile1 = null; _epFile2 = null;
+            setTimeout(() => handleExit(), 900);
+        } catch(err) {
+            lbl.textContent = 'ERROR: ' + err.message;
+            btn.disabled = false;
+            btn.textContent = 'COMMIT CHANGES';
+        }
+    };
+
+    window.shareProfile = () => {
+        const url = window.location.href;
+        if (navigator.share) navigator.share({ title: name + ' / XOS', url }).catch(()=>{});
+        else { navigator.clipboard.writeText(url).then(()=>alert('Link copied!')).catch(()=>{}); }
+    };
+
+    // Posts
     if (db) {
         db.ref(nameLow + '/posts').on('value', snap => {
             POSTS_DATA = [];
             const data = snap.val();
             if (data) {
                 Object.entries(data)
-                    .sort((a,b) => (b[1].timestamp||0)-(a[1].timestamp||0))
-                    .forEach(([id,v]) => POSTS_DATA.push({id,...v}));
+                    .sort((a,b)=>(b[1].timestamp||0)-(a[1].timestamp||0))
+                    .forEach(([id,v])=>POSTS_DATA.push({id,...v}));
             }
             renderGrid();
         });
@@ -355,15 +619,14 @@ function setupProfileJS(nameLow, name, audioSrc) {
     function renderGrid() {
         const grid = document.getElementById('posts-grid');
         if (!grid) return;
-        grid.innerHTML = '';
         if (!POSTS_DATA.length) {
             grid.innerHTML = '<div style="grid-column:span 2;text-align:center;padding:40px 0;color:rgba(255,255,255,0.15);font-size:10px;text-transform:uppercase;letter-spacing:2px;">No posts yet</div>';
             return;
         }
+        grid.innerHTML = '';
         POSTS_DATA.forEach((post, index) => {
             const item = document.createElement('div');
-            item.className = 'glass-panel aspect-square rounded-2xl overflow-hidden active:scale-95 transition-transform relative';
-            item.style.cursor = 'pointer';
+            item.className = 'glass-panel aspect-square rounded-2xl overflow-hidden active:scale-95 transition-transform relative cursor-pointer';
             item.onclick = () => openPost(index);
             item.innerHTML = post.type === 'video'
                 ? `<video src="${post.src}" class="w-full h-full object-cover opacity-50" muted></video>`
@@ -375,11 +638,11 @@ function setupProfileJS(nameLow, name, audioSrc) {
     window.openPost = function(index) {
         activePostIndex = index;
         history.pushState({ modal: 'floating-post' }, '', '');
-        const post = POSTS_DATA[index];
+        const post     = POSTS_DATA[index];
         const container = document.getElementById('media-container');
-        const audio     = document.getElementById('post-audio');
-        const caption   = document.getElementById('post-caption');
-        const loader    = document.getElementById('media-loader');
+        const audio    = document.getElementById('post-audio');
+        const caption  = document.getElementById('post-caption');
+        const loader   = document.getElementById('media-loader');
         loader.style.opacity = '1';
         caption.innerText = post.caption || '';
         container.innerHTML = '';
@@ -392,65 +655,41 @@ function setupProfileJS(nameLow, name, audioSrc) {
         renderComments();
         const modal = document.getElementById('floating-post');
         modal.style.display = 'flex';
-        setTimeout(() => { modal.classList.add('active'); loader.style.opacity = '0'; }, 10);
+        setTimeout(()=>{ modal.classList.add('active'); loader.style.opacity='0'; }, 10);
     };
 
-    window.openFollowers = () => { history.pushState({modal:'followers-modal'},''); const m=document.getElementById('followers-modal'); m.style.display='flex'; setTimeout(()=>m.classList.add('active'),10); };
-    window.openMenu      = () => { history.pushState({modal:'menu-modal'},''); const m=document.getElementById('menu-modal'); m.style.display='flex'; setTimeout(()=>m.classList.add('active'),10); };
-    window.openProfile   = () => { history.pushState({modal:'profile-modal'},''); const m=document.getElementById('profile-modal'); m.style.display='flex'; setTimeout(()=>m.classList.add('active'),10); };
-    window.openLicense   = () => {
-        history.pushState({modal:'license-modal'},'');
-        const menu=document.getElementById('menu-modal');
-        menu.classList.remove('active');
-        setTimeout(() => { menu.style.display='none'; const m=document.getElementById('license-modal'); m.style.display='flex'; setTimeout(()=>m.classList.add('active'),10); }, 300);
+    window.toggleComments = () => document.getElementById('comment-sidebar').classList.toggle('open');
+
+    window.addComment = function() {
+        const input = document.getElementById('comment-input');
+        const text  = input.value.trim();
+        if (!text || activePostIndex === null) return;
+        if (db) db.ref(nameLow+'/comments/'+activePostIndex).push({ text, time: new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}), timestamp: Date.now() });
+        input.value = '';
     };
 
-    // --- Edit Auth & Profile Logic ---
-    window.openEditAuth = () => {
-        history.pushState({modal:'edit-auth-modal'},'');
-        document.getElementById('menu-modal').classList.remove('active');
-        setTimeout(() => {
-            document.getElementById('menu-modal').style.display='none';
-            const m = document.getElementById('edit-auth-modal');
-            m.style.display='flex';
-            setTimeout(()=>m.classList.add('active'),10);
-        }, 300);
+    window.deleteComment = function(id) {
+        if (db) db.ref(nameLow+'/comments/'+activePostIndex+'/'+id).remove();
     };
 
-    window.checkEditAuth = (id) => {
-        const code = document.getElementById('edit-auth-input').value;
-        if (code === id + '@432') {
-            document.getElementById('edit-auth-modal').classList.remove('active');
-            setTimeout(() => {
-                document.getElementById('edit-auth-modal').style.display='none';
-                history.replaceState({modal:'edit-profile-modal'},'','');
-                const m = document.getElementById('edit-profile-modal');
-                m.style.display='flex';
-                setTimeout(()=>m.classList.add('active'),10);
-            }, 300);
-        } else {
-            alert('AUTHORIZATION FAILED');
-        }
-    };
-
-    window.saveProfileChanges = (id) => {
-        const updates = {
-            name: document.getElementById('edit-name').value,
-            photo: document.getElementById('edit-photo').value,
-            audio: document.getElementById('edit-audio').value,
-            songName: document.getElementById('edit-songName').value,
-            songLink: document.getElementById('edit-songLink').value,
-            social: {
-                twitter: document.getElementById('edit-twitter').value,
-                linkedin: document.getElementById('edit-linkedin').value,
-                instagram: document.getElementById('edit-instagram').value,
-                snapchat: document.getElementById('edit-snapchat').value
-            }
-        };
-        db.ref('profiles/' + userId).update(updates).then(() => {
-            handleExit();
+    function renderComments() {
+        const list = document.getElementById('comment-list');
+        if (!db) return;
+        db.ref(nameLow+'/comments/'+activePostIndex).on('value', snap => {
+            const data = snap.val();
+            if (!data) { list.innerHTML = '<div class="text-white/20 text-center text-[10px] mt-10 uppercase tracking-widest">No conversation yet</div>'; return; }
+            const comments = Object.entries(data).map(([id,v])=>({id,...v}));
+            list.innerHTML = comments.map(c=>`
+                <div class="comment-item glass-panel p-3 rounded-2xl border border-white/5">
+                    <div class="flex justify-between items-start mb-1">
+                        <span class="text-[9px] text-blue-500/60 font-mono">${c.time}</span>
+                        <button onclick="window.deleteComment('${c.id}')" class="text-white/20"><i class="fas fa-trash text-[9px]"></i></button>
+                    </div>
+                    <p class="text-xs text-white/80 font-light leading-relaxed">${c.text}</p>
+                </div>`).join('');
+            list.scrollTop = list.scrollHeight;
         });
-    };
+    }
 
     window.handleExit = function() { history.back(); };
 
@@ -460,55 +699,16 @@ function setupProfileJS(nameLow, name, audioSrc) {
         const audio = document.getElementById('post-audio');
         if (audio) { audio.pause(); audio.currentTime=0; audio.src=''; }
         document.getElementById('comment-sidebar').classList.remove('open');
-        ['floating-post','profile-modal','menu-modal','license-modal','followers-modal','edit-auth-modal','edit-profile-modal'].forEach(id => {
+        ['floating-post','profile-modal','menu-modal','license-modal','followers-modal','edit-auth-modal','edit-profile-modal'].forEach(id=>{
             const el=document.getElementById(id);
             if(el){el.classList.remove('active');setTimeout(()=>el.style.display='none',300);}
         });
     };
 
     window.onpopstate = (e) => {
-        if (e.state && (e.state.modal || e.state.screen)) { killAndHide(); } 
-        else { window.location.href = 'index.html'; }
+        if (e.state && (e.state.modal || e.state.screen)) killAndHide();
+        else window.location.replace('profiles.html');
     };
-
-    window.addComment = function() {
-        const input = document.getElementById('comment-input');
-        const text = input.value.trim();
-        if (!text || activePostIndex === null) return;
-        if (db) db.ref(nameLow + '/comments/' + activePostIndex).push({ text, time: new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}), timestamp: Date.now() });
-        input.value = '';
-    };
-
-    window.deleteComment = function(id) {
-        if (db) db.ref(nameLow + '/comments/' + activePostIndex + '/' + id).remove();
-    };
-
-    function renderComments() {
-        const list = document.getElementById('comment-list');
-        if (!db) return;
-        db.ref(nameLow + '/comments/' + activePostIndex).on('value', snap => {
-            const data = snap.val();
-            if (!data) { list.innerHTML = '<div class="text-white/20 text-center text-[10px] mt-10 uppercase tracking-widest">No conversation yet</div>'; return; }
-            const comments = Object.entries(data).map(([id,v]) => ({id,...v}));
-            list.innerHTML = comments.map(c => `
-                <div class="comment-item glass-panel p-3 rounded-2xl border border-white/5">
-                    <div class="flex justify-between items-start mb-1">
-                        <span class="text-[9px] text-blue-500/60 font-mono">${c.time}</span>
-                        <button onclick="window.deleteComment('${c.id}')" class="text-white/20"><i class="fas fa-trash text-[9px]"></i></button>
-                    </div>
-                    <p class="text-xs text-white/80 font-light leading-relaxed">${c.text}</p>
-                </div>
-            `).join('');
-            list.scrollTop = list.scrollHeight;
-        });
-    }
-
-    window.shareProfile = () => {
-        const url = window.location.href;
-        if (navigator.share) navigator.share({ title: name + ' / XOS', url }).catch(()=>{});
-        else { navigator.clipboard.writeText(url).then(()=>alert('Link copied!')).catch(()=>{}); }
-    };
-    window.toggleComments = () => document.getElementById('comment-sidebar').classList.toggle('open');
 }
 </script>
 </body>
