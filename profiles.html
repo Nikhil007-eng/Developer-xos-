@@ -209,6 +209,19 @@
             transition: opacity 0.6s ease;
         }
         #zoomed-img2 { opacity: 0; }
+
+        /* Small avatar toggle in card */
+        .avatar-wrap {
+            position: relative; width: 100%; height: 100%;
+            border-radius: 50%; overflow: hidden;
+        }
+        .avatar-wrap img {
+            position: absolute; inset: 0;
+            width: 100%; height: 100%;
+            object-fit: cover;
+            transition: opacity 0.7s ease;
+        }
+        .avatar-wrap .av2 { opacity: 0; }
     </style>
 </head>
 <body>
@@ -284,8 +297,11 @@
                 <div class="profile-item glass-panel rounded-2xl p-4 flex items-center gap-4 cursor-pointer"
                      onclick="trackAndGo('Nikhil\'s profile','Nikhilprof.html')">
                     <div onclick="event.stopPropagation(); zoomPhoto('file_00000000f4f47208a731ff7b47a3b568.png', '')"
-                         class="w-10 h-10 rounded-full bg-gradient-to-tr from-white-600 to-black p-[1px] cursor-pointer z-10">
-                        <img src="file_00000000f4f47208a731ff7b47a3b568.png" class="w-full h-full rounded-full object-cover bg-black">
+                         class="w-10 h-10 rounded-full bg-gradient-to-tr from-white-600 to-black p-[1px] cursor-pointer z-10 flex-shrink-0">
+                        <div class="avatar-wrap bg-black">
+                            <img class="av1" src="file_00000000f4f47208a731ff7b47a3b568.png" onerror="this.style.background='#222'">
+                            <img class="av2" src="" style="display:none;">
+                        </div>
                     </div>
                     <div class="flex-1">
                         <div class="flex items-center gap-2">
@@ -301,8 +317,11 @@
                 <div class="profile-item glass-panel rounded-2xl p-4 flex items-center gap-4 cursor-pointer"
                      onclick="trackAndGo('Anush\'s profile','https://nikhil007-eng.github.io/xosintanush/')">
                     <div onclick="event.stopPropagation(); zoomPhoto('anushp2.jpg', '')"
-                         class="w-10 h-10 rounded-full bg-gradient-to-tr from-white-600 to-black p-[1px] cursor-pointer z-10">
-                        <img src="anushp2.jpg" class="w-full h-full rounded-full object-cover bg-black">
+                         class="w-10 h-10 rounded-full bg-gradient-to-tr from-white-600 to-black p-[1px] cursor-pointer z-10 flex-shrink-0">
+                        <div class="avatar-wrap bg-black">
+                            <img class="av1" src="anushp2.jpg" onerror="this.style.background='#222'">
+                            <img class="av2" src="" style="display:none;">
+                        </div>
                     </div>
                     <div class="flex-1">
                         <div class="flex items-center gap-2">
@@ -318,8 +337,11 @@
                 <div class="profile-item glass-panel rounded-2xl p-4 flex items-center gap-4 cursor-pointer"
                      onclick="trackAndGo('Niranjan\'s profile','https://nikhil007-eng.github.io/xosint/')">
                     <div onclick="event.stopPropagation(); zoomPhoto('IMG-20260222-WA0034 (1).jpg', '')"
-                         class="w-10 h-10 rounded-full bg-gradient-to-tr from-white-600 to-black p-[1px] cursor-pointer z-10">
-                        <img src="IMG-20260222-WA0034 (1).jpg" class="w-full h-full rounded-full object-cover bg-black">
+                         class="w-10 h-10 rounded-full bg-gradient-to-tr from-white-600 to-black p-[1px] cursor-pointer z-10 flex-shrink-0">
+                        <div class="avatar-wrap bg-black">
+                            <img class="av1" src="IMG-20260222-WA0034 (1).jpg" onerror="this.style.background='#222'">
+                            <img class="av2" src="" style="display:none;">
+                        </div>
                     </div>
                     <div class="flex-1">
                         <div class="flex items-center gap-2">
@@ -777,8 +799,10 @@
             card.innerHTML = `
                 <div onclick="event.stopPropagation(); zoomPhoto('${p.photo}', ${photo2arg})"
                      class="w-10 h-10 rounded-full bg-gradient-to-tr from-white-600 to-black p-[1px] cursor-pointer z-10 flex-shrink-0">
-                    <img src="${p.photo}" class="w-full h-full rounded-full object-cover bg-black"
-                         onerror="this.style.background='#222'">
+                    <div class="avatar-wrap bg-black">
+                        <img class="av1" src="${p.photo}" onerror="this.style.background='#222'">
+                        <img class="av2" src="${p.photo2 || ''}" style="${p.photo2 ? '' : 'display:none;'}">
+                    </div>
                 </div>
                 <div class="flex-1">
                     <div class="flex items-center gap-2">
@@ -809,6 +833,31 @@
                 Object.values(data)
                     .sort((a,b) => (a.createdAt||0)-(b.createdAt||0))
                     .forEach(p => injectProfileCard(p));
+                startCardToggles();
+            });
+        }
+
+        /* ── SMALL AVATAR TOGGLE for all cards with 2 photos ── */
+        const cardToggleIntervals = [];
+
+        function startCardToggles() {
+            // Clear old intervals
+            cardToggleIntervals.forEach(id => clearInterval(id));
+            cardToggleIntervals.length = 0;
+
+            document.querySelectorAll('.avatar-wrap').forEach(wrap => {
+                const av1 = wrap.querySelector('.av1');
+                const av2 = wrap.querySelector('.av2');
+                // Only toggle if av2 has a real src and is not hidden
+                if (!av2 || !av2.src || av2.style.display === 'none' || av2.src === window.location.href) return;
+
+                let showing1 = true;
+                const id = setInterval(() => {
+                    showing1 = !showing1;
+                    av1.style.opacity = showing1 ? '1' : '0';
+                    av2.style.opacity = showing1 ? '0' : '1';
+                }, 3000);
+                cardToggleIntervals.push(id);
             });
         }
     </script>
