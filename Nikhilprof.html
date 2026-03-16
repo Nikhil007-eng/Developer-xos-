@@ -637,7 +637,7 @@
             window.renderGrid();
         }
 
-        // ---------- MUSIC PLAYER (YouTube) ----------
+        // ---------- MUSIC PLAYER (YouTube) with auto-play on click ----------
         const YT_VIDEO_ID = 'h4OAXvDRZTY'; // from the link
         let youtubePlayer = null;
         let playerReady = false;
@@ -668,6 +668,7 @@
 
             await loadYouTubeAPI();
             if (!youtubePlayer) {
+                // Create new player
                 youtubePlayer = new YT.Player('youtube-player-container', {
                     height: '0',
                     width: '0',
@@ -679,7 +680,8 @@
                         'enablejsapi': 1,
                         'fs': 0,
                         'modestbranding': 1,
-                        'rel': 0
+                        'rel': 0,
+                        'autoplay': 1  // request autoplay
                     },
                     events: {
                         'onReady': onPlayerReady,
@@ -687,10 +689,10 @@
                     }
                 });
             } else {
-                // already exists, just load video
+                // Player already exists, load and play
                 youtubePlayer.loadVideoById(YT_VIDEO_ID);
-                youtubePlayer.pauseVideo(); // don't autoplay
-                // duration will update via ready/state change
+                // Play after load (should be immediate)
+                youtubePlayer.playVideo();
             }
         };
 
@@ -700,6 +702,9 @@
             document.getElementById('music-duration').innerText = formatTime(duration);
             if (progressInterval) clearInterval(progressInterval);
             progressInterval = setInterval(updateProgress, 500);
+            // Auto-play is already triggered by loadVideoById or autoplay param, but ensure it plays
+            // Sometimes onReady is called after load, so we call play again just in case
+            youtubePlayer.playVideo();
         }
 
         function onPlayerStateChange(event) {
@@ -709,7 +714,6 @@
             } else {
                 icon.className = 'fas fa-play';
             }
-            // when ended, stop progress? no, keep showing end
         }
 
         function updateProgress() {
@@ -731,7 +735,7 @@
             return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
         }
 
-        // Control event listeners (will be set after DOM)
+        // Control event listeners
         document.addEventListener('DOMContentLoaded', function() {
             const playBtn = document.getElementById('music-play-pause');
             if (playBtn) {
@@ -757,7 +761,6 @@
                 });
             }
 
-            // prev/next optional: just restart / next same song? we can ignore or make them restart
             document.getElementById('music-prev')?.addEventListener('click', function() {
                 if (youtubePlayer) youtubePlayer.seekTo(0, true);
             });
