@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>XOS | TERMINAL</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #000000;
+            --accent: #007aff;
+            --card: rgba(10, 10, 10, 0.9);
+            --border: #1a1a1a;
+            --font: 'Space Grotesk', sans-serif;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            background-color: var(--bg);
+            color: #fff;
+            font-family: var(--font);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            overflow: hidden;
+            background-image: radial-gradient(circle at 50% 50%, #0a0a0a 0%, #000 100%);
+        }
+
+        .auth-card {
+            background: var(--card);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--border);
+            padding: 50px 40px;
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+            animation: slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .badge {
+            font-size: 8px;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            color: var(--accent);
+            margin-bottom: 25px;
+            display: block;
+        }
+
+        h1 { font-weight: 300; margin-bottom: 35px; letter-spacing: 1px; }
+
+        input {
+            width: 100%;
+            padding: 16px;
+            background: #050505;
+            border: 1px solid var(--border);
+            color: var(--accent);
+            font-family: var(--font);
+            font-size: 18px;
+            text-align: center;
+            outline: none;
+            margin-bottom: 20px;
+            transition: border 0.3s ease;
+        }
+
+        input:focus { border-color: var(--accent); }
+
+        button {
+            width: 100%;
+            padding: 16px;
+            background: var(--accent);
+            color: #fff;
+            border: none;
+            font-family: var(--font);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            cursor: pointer;
+            transition: transform 0.1s ease;
+        }
+
+        button:active { transform: scale(0.95); }
+
+        #status {
+            color: #ff3b30;
+            font-size: 10px;
+            margin-top: 20px;
+            display: none;
+            text-transform: uppercase;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="auth-card">
+        <span class="badge">Authorization Required</span>
+        <h1>XOS-INT</h1>
+        
+        <input type="password" id="accessKey" placeholder="PASSWORD" autocomplete="off">
+        <button onclick="unlock()">Authenticate</button>
+        
+        <p id="status">Invalid Access Key</p>
+    </div>
+
+    <script>
+        function unlock() {
+            const val = document.getElementById('accessKey').value;
+            const status = document.getElementById('status');
+
+            if (val === 'nynikhil') {
+                // Pointing directly to idex.html as requested
+                window.location.href = 'idex.html';
+            } else {
+                status.style.display = 'block';
+                document.getElementById('accessKey').value = '';
+            }
+        }
+
+        document.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') unlock();
+        });
+    </script>
+</body>
+</html>
