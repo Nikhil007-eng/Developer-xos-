@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>XOS — Post Manager</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;700&display=swap" rel="stylesheet">
+    <style>
+        :root { --accent:#007aff; --red:#ff3131; --border:#1a1a1a; --card:#0a0a0a; }
+        * { box-sizing:border-box; -webkit-tap-highlight-color:transparent; user-select:none; }
+        html,body { height:100%;width:100%;overflow:hidden;position:fixed;background:#000;color:#fff;font-family:'Space Grotesk',sans-serif; }
+        .brand { font-family:'Space Grotesk',sans-serif;letter-spacing:2px;text-transform:uppercase; }
+        .glass { background:rgba(10,10,10,0.85);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border:1px solid var(--border); }
+
+        /* SCREENS */
+        .screen { position:fixed;inset:0;display:flex;flex-direction:column;background:#000;transition:transform 0.4s cubic-bezier(.77,0,.18,1);overflow:hidden; }
+        .screen.off { transform:translateX(100%);pointer-events:none; }
+
+        /* SCROLL */
+        .scroll { flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding-bottom:80px; }
+        .scroll::-webkit-scrollbar { width:0; }
+
+        /* INPUTS */
+        .inp { background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:14px;padding:14px 16px;color:#fff;font-size:13px;width:100%;outline:none;font-family:'Space Grotesk';transition:border-color 0.2s; }
+        .inp:focus { border-color:var(--accent); }
+        .inp::placeholder { color:rgba(255,255,255,0.2); }
+
+        /* BUTTONS */
+        .btn-primary { width:100%;background:rgba(0,122,255,0.12);border:1px solid var(--accent);border-radius:14px;padding:15px;font-size:10px;font-family:'Space Grotesk';letter-spacing:2px;text-transform:uppercase;color:var(--accent);cursor:pointer;transition:transform 0.1s; }
+        .btn-primary:active { transform:scale(0.98);background:rgba(0,122,255,0.25); }
+        .btn-primary:disabled { opacity:0.4; }
+        .btn-icon { width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.1);color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:13px;flex-shrink:0; }
+        .btn-icon:active { background:rgba(255,255,255,0.15); }
+
+        /* UPLOAD ZONE */
+        .drop-zone { border:2px dashed rgba(0,122,255,0.2);border-radius:18px;padding:28px 16px;text-align:center;position:relative;transition:all 0.25s; }
+        .drop-zone.over { border-color:var(--accent);background:rgba(0,122,255,0.06); }
+        .drop-zone input[type=file] { position:absolute;inset:0;opacity:0;width:100%;height:100%;cursor:pointer; }
+
+        /* TABS */
+        .tab { flex:1;padding:10px;font-size:9px;font-family:'Space Grotesk';letter-spacing:1.5px;text-transform:uppercase;border-radius:10px;background:transparent;border:1px solid transparent;color:rgba(255,255,255,0.25);cursor:pointer;transition:all 0.2s; }
+        .tab.on { background:rgba(0,122,255,0.12);border-color:var(--accent);color:var(--accent); }
+
+        /* POST CARDS */
+        .post-card { position:relative;aspect-ratio:1;border-radius:16px;overflow:hidden;cursor:pointer;border:1px solid var(--border);background:var(--card); }
+        .post-card img,.post-card video { width:100%;height:100%;object-fit:cover;opacity:0.85; }
+        .del-btn { position:absolute;top:7px;right:7px;width:28px;height:28px;background:rgba(255,49,49,0.9);border-radius:50%;border:none;color:#fff;font-size:9px;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:5; }
+        .audio-tag { position:absolute;bottom:7px;left:7px;background:rgba(0,122,255,0.85);border-radius:6px;padding:2px 7px;font-size:8px;text-transform:uppercase;letter-spacing:1px; }
+
+        /* TRIMMER */
+        #waveform-box { position:relative;height:90px;background:rgba(255,255,255,0.02);border:1px solid var(--border);border-radius:16px;overflow:hidden;touch-action:none; }
+        #wv-canvas { position:absolute;inset:0;width:100%;height:100%; }
+        #wv-mask-l, #wv-mask-r { position:absolute;top:0;bottom:0;background:rgba(0,0,0,0.7);z-index:2;pointer-events:none; }
+        #wv-mask-l { left:0; } #wv-mask-r { right:0; }
+        #wv-window { position:absolute;top:0;bottom:0;border:2px solid var(--accent);z-index:3;cursor:grab;box-shadow:0 0 20px rgba(0,122,255,0.15); }
+        #wv-window:active { cursor:grabbing; }
+        .trim-h { position:absolute;top:0;bottom:0;width:24px;background:var(--accent);z-index:5;display:flex;align-items:center;justify-content:center;cursor:ew-resize; }
+        .trim-h::after { content:'';width:2px;height:20px;background:#fff;border-radius:2px;opacity:0.8; }
+        #h-start { left:-12px;border-radius:4px 0 0 4px; }
+        #h-end { right:-12px;border-radius:0 4px 4px 0; }
+        #wv-head { position:absolute;top:0;bottom:0;width:2px;background:#fff;z-index:6;pointer-events:none;box-shadow:0 0 10px #fff; }
+
+        /* UTILS */
+        .prog { height:3px;background:rgba(255,255,255,0.06);border-radius:10px;overflow:hidden; }
+        .prog-fill { height:100%;background:var(--accent);width:0%;transition:width 0.2s;border-radius:10px; }
+        .spin { width:22px;height:22px;border:2px solid rgba(255,255,255,0.1);border-top-color:var(--accent);border-radius:50%;animation:rot 0.7s linear infinite;margin:0 auto; }
+        @keyframes rot { to{transform:rotate(360deg)} }
+    </style>
+</head>
+<body>
+
+<!-- AUTH SCREEN -->
+<div class="screen" id="s-auth" style="align-items:center;justify-content:center;">
+    <div style="width:85vw;max-width:300px;text-align:center;">
+        <div style="width:60px;height:60px;background:rgba(0,122,255,0.1);border:1px solid rgba(0,122,255,0.3);border-radius:18px;display:flex;align-items:center;justify-content:center;margin:0 auto 20px;">
+            <i class="fas fa-lock" style="color:var(--accent);font-size:20px;"></i>
+        </div>
+        <p class="brand" id="auth-title" style="font-size:10px;color:var(--accent);letter-spacing:0.35em;margin-bottom:6px;">SECURE UPLINK</p>
+        <p style="font-size:9px;color:rgba(255,255,255,0.25);margin-bottom:24px;text-transform:uppercase;letter-spacing:1px;">Enter access key</p>
+        <input type="password" id="pwd" class="inp" style="text-align:center;letter-spacing:8px;font-size:20px;" placeholder="••••">
+        <p style="font-size:8px;color:rgba(255,255,255,0.2);margin-top:8px;letter-spacing:1px;text-transform:uppercase;">code = <span id="code-hint" style="color:rgba(0,122,255,0.5);">username@432</span></p>
+        <p id="pwd-err" style="font-size:9px;color:var(--red);margin-top:10px;display:none;letter-spacing:1px;text-transform:uppercase;">ACCESS DENIED</p>
+        <button id="auth-btn" class="btn-primary" style="margin-top:18px;" onclick="doAuth()">
+            <i class="fas fa-arrow-right" style="margin-right:6px;"></i>AUTHENTICATE
+        </button>
+    </div>
+</div>
+
+<!-- POSTS GRID SCREEN -->
+<div class="screen off" id="s-posts">
+    <div style="padding:20px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);">
+        <button class="btn-icon" onclick="goBack()"><i class="fas fa-chevron-left"></i></button>
+        <span class="brand" id="posts-title" style="font-size:9px;color:rgba(255,255,255,0.35);letter-spacing:0.4em;">PROFILE FEED</span>
+        <button class="btn-icon" style="background:rgba(0,122,255,0.12);border-color:rgba(0,122,255,0.4);color:var(--accent);" onclick="goUpload()"><i class="fas fa-plus"></i></button>
+    </div>
+    <div class="scroll" style="padding:16px;">
+        <div id="grid" style="display:grid;grid-template-columns:1fr 1fr;gap:10px;"></div>
+    </div>
+</div>
+
+<!-- UPLOAD / CREATE SCREEN -->
+<div class="screen off" id="s-upload">
+    <div style="padding:20px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);">
+        <button class="btn-icon" onclick="goPosts()"><i class="fas fa-chevron-left"></i></button>
+        <span class="brand" style="font-size:9px;color:rgba(255,255,255,0.35);letter-spacing:0.4em;">CREATE POST</span>
+        <div style="width:36px;"></div>
+    </div>
+    <div class="scroll" style="padding:20px;">
+
+        <!-- Media type tabs -->
+        <div style="display:flex;gap:8px;margin-bottom:16px;">
+            <button class="tab on" id="t-img" onclick="setTab('image')"><i class="fas fa-image" style="margin-right:4px;"></i>Image</button>
+            <button class="tab" id="t-vid" onclick="setTab('video')"><i class="fas fa-video" style="margin-right:4px;"></i>Video</button>
+        </div>
+
+        <!-- Media drop zone -->
+        <div class="drop-zone" id="media-drop">
+            <input type="file" id="media-file" accept="image/*" onchange="onMediaPick(event)">
+            <div id="media-ph">
+                <i class="fas fa-photo-film" style="font-size:28px;color:rgba(0,122,255,0.4);display:block;margin-bottom:10px;"></i>
+                <p class="brand" style="font-size:9px;color:rgba(255,255,255,0.2);letter-spacing:2px;">SELECT ASSET</p>
+            </div>
+            <div id="media-pv" style="display:none;">
+                <img id="pv-img" style="width:100%;height:150px;object-fit:cover;border-radius:12px;display:none;">
+                <video id="pv-vid" style="width:100%;height:150px;object-fit:cover;border-radius:12px;display:none;" muted playsinline></video>
+                <p id="pv-name" style="font-size:9px;color:rgba(255,255,255,0.3);margin-top:6px;word-break:break-all;"></p>
+            </div>
+        </div>
+        <div id="media-prog" class="prog" style="margin-top:6px;display:none;"><div id="media-prog-fill" class="prog-fill"></div></div>
+
+        <!-- Caption -->
+        <div style="margin-top:16px;">
+            <p class="brand" style="font-size:8px;color:rgba(255,255,255,0.25);letter-spacing:2px;margin-bottom:8px;">Caption</p>
+            <textarea id="caption" class="inp" rows="2" style="resize:none;" placeholder="Write a caption..."></textarea>
+        </div>
+
+        <!-- Audio drop zone -->
+        <div style="margin-top:16px;">
+            <p class="brand" style="font-size:8px;color:rgba(255,255,255,0.25);letter-spacing:2px;margin-bottom:8px;">Background Audio</p>
+            <div class="drop-zone" id="audio-drop" style="padding:16px;">
+                <input type="file" id="audio-file" accept="audio/*" onchange="onAudioPick(event)">
+                <div id="audio-ph">
+                    <i class="fas fa-music" style="font-size:22px;color:rgba(0,122,255,0.3);display:block;margin-bottom:8px;"></i>
+                    <p class="brand" style="font-size:9px;color:rgba(255,255,255,0.18);letter-spacing:2px;">ADD AUDIO</p>
+                </div>
+                <div id="audio-info" style="display:none;">
+                    <div style="display:flex;align-items:center;gap:10px;">
+                        <div style="width:34px;height:34px;background:rgba(0,122,255,0.12);border-radius:10px;display:flex;align-items:center;justify-content:center;"><i class="fas fa-music" style="color:var(--accent);"></i></div>
+                        <div style="flex:1;overflow:hidden;text-align:left;">
+                            <p id="audio-name" style="font-size:11px;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;"></p>
+                            <p id="audio-dur" style="font-size:9px;color:rgba(255,255,255,0.3);margin-top:2px;"></p>
+                        </div>
+                        <button onclick="clearAudio()" style="background:rgba(255,49,49,0.1);color:#ff6b6b;font-size:9px;padding:6px 12px;border-radius:8px;cursor:pointer;">CLEAR</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Trimmer -->
+        <div id="trimmer" style="display:none;margin-top:16px;">
+            <p class="brand" style="font-size:8px;color:rgba(255,255,255,0.25);letter-spacing:2px;margin-bottom:10px;">TRIM AUDIO</p>
+            <div id="waveform-box">
+                <canvas id="wv-canvas"></canvas>
+                <div id="wv-mask-l"></div>
+                <div id="wv-mask-r"></div>
+                <div id="wv-window">
+                    <div class="trim-h" id="h-start"></div>
+                    <div class="trim-h" id="h-end"></div>
+                </div>
+                <div id="wv-head"></div>
+            </div>
+            <div style="display:flex;justify-content:space-between;margin-top:8px;padding:0 2px;">
+                <span id="lbl-start" style="font-size:10px;color:rgba(255,255,255,0.4);font-family:monospace;">0:00</span>
+                <span id="lbl-dur" style="font-size:10px;color:var(--accent);font-family:monospace;font-weight:bold;">0:00</span>
+                <span id="lbl-end" style="font-size:10px;color:rgba(255,255,255,0.4);font-family:monospace;">0:00</span>
+            </div>
+            <div style="display:flex;gap:10px;margin-top:12px;align-items:center;">
+                <button onclick="togglePlay()" class="btn-icon" style="width:46px;height:46px;border-radius:14px;"><i class="fas fa-play" id="play-icon"></i></button>
+                <button onclick="previewTrim()" class="btn-icon" style="width:46px;height:46px;border-radius:14px;"><i class="fas fa-rotate-left"></i></button>
+            </div>
+            <div id="audio-prog" class="prog" style="margin-top:12px;display:none;"><div id="audio-prog-fill" class="prog-fill"></div></div>
+        </div>
+
+        <button id="pub-btn" class="btn-primary" style="margin-top:24px;" onclick="doPublish()">
+            <i class="fas fa-upload" style="margin-right:6px;"></i>PUBLISH POST
+        </button>
+        <p id="status" style="font-size:9px;text-align:center;margin-top:10px;min-height:14px;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,0.3);"></p>
+        <div style="height:60px;"></div>
+    </div>
+</div>
+
+<audio id="trim-audio" style="display:none;"></audio>
+
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
+<script>
+
+// ── URL PARAM ─────────────────────────────────────────────────────────────────
+const urlParams = new URLSearchParams(window.location.search);
+const userId    = (urlParams.get('u') || '').toLowerCase();
+if (!userId) window.location.replace('profiles.html');
+
+// Update UI titles with username
+document.getElementById('auth-title').textContent = userId.toUpperCase() + ' — SECURE UPLINK';
+document.getElementById('code-hint').textContent   = userId + '@432';
+document.getElementById('posts-title').textContent = userId.toUpperCase() + ' // FEED';
+
+// ── HISTORY (back → profile) ──────────────────────────────────────────────────
+history.replaceState({ page: 'admin' }, '', window.location.href);
+
+function goBack() {
+    window.location.href = 'profile.html?u=' + encodeURIComponent(userId);
+}
+window.addEventListener('popstate', () => {
+    window.location.href = 'profile.html?u=' + encodeURIComponent(userId);
+});
+
+// ── CONSTANTS ─────────────────────────────────────────────────────────────────
+const CLOUD  = "dptphdatf";
+const PRESET = "vagprxhr";
+// Auth code = userId + '@432'
+const AUTH_SUFFIX = '@432';
+
+// ── FIREBASE ──────────────────────────────────────────────────────────────────
+let db = null;
+try {
+    firebase.initializeApp({
+        apiKey:"AIzaSyAUk6bBCFPoq-Tu-AiX1nD3LFvhc6g7B7g",
+        authDomain:"steel-melody-464711-d6.firebaseapp.com",
+        databaseURL:"https://steel-melody-464711-d6-default-rtdb.firebaseio.com",
+        projectId:"steel-melody-464711-d6",
+        storageBucket:"steel-melody-464711-d6.firebasestorage.app",
+        messagingSenderId:"288849938458",
+        appId:"1:288849938458:web:d615242bb9f1e1ee0fe9a3"
+    });
+    db = firebase.database();
+} catch(e) {}
+
+// ── AUTH ──────────────────────────────────────────────────────────────────────
+const SESSION_KEY = 'xos_admin_' + userId;
+
+window.addEventListener('DOMContentLoaded', () => {
+    if (localStorage.getItem(SESSION_KEY) === 'active') {
+        show('s-posts');
+        loadPosts();
+    }
+});
+
+function doAuth() {
+    const val = document.getElementById('pwd').value.trim();
+    if (val === userId + AUTH_SUFFIX) {
+        localStorage.setItem(SESSION_KEY, 'active');
+        show('s-posts');
+        loadPosts();
+    } else {
+        const err = document.getElementById('pwd-err');
+        err.style.display = 'block';
+        document.getElementById('pwd').value = '';
+        setTimeout(() => err.style.display = 'none', 2000);
+    }
+}
+
+// ── SCREENS ───────────────────────────────────────────────────────────────────
+function show(id) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.add('off'));
+    document.getElementById(id).classList.remove('off');
+}
+function goUpload() { resetForm(); show('s-upload'); }
+function goPosts()  { show('s-posts'); }
+
+// ── POSTS ─────────────────────────────────────────────────────────────────────
+let posts = [];
+
+function loadPosts() {
+    if (!db) return;
+    // Uses userId/posts path — fully general per-user
+    db.ref(userId + '/posts').on('value', snap => {
+        posts = [];
+        const d = snap.val();
+        if (d) {
+            Object.entries(d)
+                .sort((a,b) => (b[1].timestamp||0) - (a[1].timestamp||0))
+                .forEach(([id,v]) => posts.push({ id, ...v }));
+        }
+        renderGrid();
+    });
+}
+
+function renderGrid() {
+    const g = document.getElementById('grid');
+    if (!posts.length) {
+        g.innerHTML = '<div style="grid-column:span 2;text-align:center;padding:50px 20px;color:rgba(255,255,255,0.1);font-size:10px;">NO_DATA_FOUND</div>';
+        return;
+    }
+    g.innerHTML = posts.map(p => `
+        <div class="post-card">
+            ${p.type==='video' ? `<video src="${p.src}" muted playsinline></video>` : `<img src="${p.src}" loading="lazy">`}
+            ${p.audio ? '<div class="audio-tag"><i class="fas fa-music"></i></div>' : ''}
+            <button class="del-btn" onclick="delPost('${p.id}')"><i class="fas fa-trash"></i></button>
+            ${p.caption ? `<div style="position:absolute;bottom:0;left:0;right:0;padding:8px;background:linear-gradient(transparent,rgba(0,0,0,0.8));font-size:9px;color:rgba(255,255,255,0.6);">${p.caption}</div>` : ''}
+        </div>
+    `).join('');
+}
+
+function delPost(id) {
+    if (confirm('Erase this post?')) db.ref(userId + '/posts/' + id).remove();
+}
+
+// ── UPLOAD ENGINE ─────────────────────────────────────────────────────────────
+async function compressImage(file) {
+    return new Promise(resolve => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = e => {
+            const img = new Image();
+            img.src = e.target.result;
+            img.onload = () => {
+                const canvas = document.createElement('canvas');
+                const MAX = 1280;
+                let w = img.width, h = img.height;
+                if (w > h && w > MAX) { h *= MAX/w; w = MAX; }
+                else if (h > MAX) { w *= MAX/h; h = MAX; }
+                canvas.width = w; canvas.height = h;
+                canvas.getContext('2d').drawImage(img,0,0,w,h);
+                canvas.toBlob(resolve,'image/jpeg',0.85);
+            };
+        };
+    });
+}
+
+async function upload(file, type, folder, onProg) {
+    let uploadFile = file;
+    if (type === 'image') uploadFile = await compressImage(file);
+    return new Promise((res,rej) => {
+        const fd = new FormData();
+        fd.append('file', uploadFile);
+        fd.append('upload_preset', PRESET);
+        // Path: userId/posts or userId/audio — fully scoped per user
+        fd.append('folder', userId + '/' + folder);
+        const xhr = new XMLHttpRequest();
+        xhr.open('POST', `https://api.cloudinary.com/v1_1/${CLOUD}/${type==='audio'?'video':type}/upload`);
+        xhr.upload.onprogress = e => { if(e.lengthComputable) onProg(Math.round(e.loaded/e.total*100)); };
+        xhr.onload = () => xhr.status===200 ? res(JSON.parse(xhr.responseText).secure_url) : rej(new Error('Upload failed'));
+        xhr.onerror = () => rej(new Error('Network error'));
+        xhr.send(fd);
+    });
+}
+
+// ── MEDIA PICKER ──────────────────────────────────────────────────────────────
+let mediaFile = null;
+
+function setTab(t) {
+    document.getElementById('t-img').classList.toggle('on', t==='image');
+    document.getElementById('t-vid').classList.toggle('on', t==='video');
+    document.getElementById('media-file').accept = t==='image' ? 'image/*' : 'video/*';
+    clearMedia();
+}
+
+function onMediaPick(e) { if (e.target.files[0]) setMedia(e.target.files[0]); }
+function setMedia(f) {
+    mediaFile = f;
+    const url = URL.createObjectURL(f);
+    document.getElementById('media-ph').style.display = 'none';
+    document.getElementById('media-pv').style.display = 'block';
+    const img = document.getElementById('pv-img'), vid = document.getElementById('pv-vid');
+    if (f.type.startsWith('image/')) { img.src=url; img.style.display='block'; vid.style.display='none'; }
+    else { vid.src=url; vid.style.display='block'; img.style.display='none'; }
+    document.getElementById('pv-name').textContent = f.name;
+}
+function clearMedia() {
+    mediaFile = null;
+    document.getElementById('media-ph').style.display = 'block';
+    document.getElementById('media-pv').style.display = 'none';
+    document.getElementById('media-file').value = '';
+}
+
+// ── AUDIO PICKER + TRIMMER ────────────────────────────────────────────────────
+let audioFile=null, audioBuffer=null, audioDur=0, trimS=0, trimE=0;
+let dragType=null, startX=0, startS=0, startE=0;
+
+function onAudioPick(e) { if (e.target.files[0]) setAudio(e.target.files[0]); }
+function setAudio(f) {
+    audioFile = f;
+    document.getElementById('audio-ph').style.display   = 'none';
+    document.getElementById('audio-info').style.display = 'block';
+    document.getElementById('audio-name').textContent   = f.name;
+    const el = document.getElementById('trim-audio');
+    el.src = URL.createObjectURL(f);
+    el.onloadedmetadata = () => {
+        audioDur = el.duration;
+        trimS = 0; trimE = Math.min(audioDur, 30);
+        document.getElementById('trimmer').style.display = 'block';
+        updateTrimUI();
+        drawWave(f);
+    };
+}
+function clearAudio() {
+    audioFile = null; audioBuffer = null;
+    document.getElementById('audio-ph').style.display   = 'block';
+    document.getElementById('audio-info').style.display = 'none';
+    document.getElementById('trimmer').style.display    = 'none';
+}
+
+async function drawWave(f) {
+    const canvas = document.getElementById('wv-canvas');
+    const ctx = canvas.getContext('2d');
+    const W = canvas.offsetWidth, H = 90;
+    canvas.width = W*2; canvas.height = H*2; ctx.scale(2,2);
+    const ab = await f.arrayBuffer();
+    const ac = new AudioContext();
+    audioBuffer = await ac.decodeAudioData(ab);
+    const data = audioBuffer.getChannelData(0);
+    const step = Math.floor(data.length/W);
+    ctx.fillStyle = 'rgba(255,255,255,0.15)';
+    for(let i=0; i<W; i++) {
+        let max=0;
+        for(let j=0; j<step; j++) { const v=Math.abs(data[i*step+j]); if(v>max) max=v; }
+        const bh=Math.max(2,max*H*0.8);
+        ctx.fillRect(i,(H-bh)/2,1,bh);
+    }
+}
+function updateTrimUI() {
+    const W = document.getElementById('waveform-box').offsetWidth;
+    const l=(trimS/audioDur)*100, r=(trimE/audioDur)*100;
+    document.getElementById('wv-mask-l').style.width   = l+'%';
+    document.getElementById('wv-mask-r').style.width   = (100-r)+'%';
+    document.getElementById('wv-window').style.left    = l+'%';
+    document.getElementById('wv-window').style.width   = (r-l)+'%';
+    document.getElementById('lbl-start').textContent   = fmt(trimS);
+    document.getElementById('lbl-end').textContent     = fmt(trimE);
+    document.getElementById('lbl-dur').textContent     = fmt(trimE-trimS);
+}
+function fmt(s) { return Math.floor(s/60)+':'+Math.floor(s%60).toString().padStart(2,'0'); }
+
+const box = document.getElementById('waveform-box');
+function handleStart(e) {
+    const x = e.touches ? e.touches[0].clientX : e.clientX;
+    const rect = box.getBoundingClientRect();
+    const rx = x - rect.left;
+    const W = rect.width;
+    const hitS=(trimS/audioDur)*W, hitE=(trimE/audioDur)*W;
+    if (Math.abs(rx-hitS)<25)      dragType='start';
+    else if (Math.abs(rx-hitE)<25) dragType='end';
+    else if (rx>hitS && rx<hitE)   dragType='move';
+    else return;
+    startX=x; startS=trimS; startE=trimE;
+    e.preventDefault();
+}
+function handleMove(e) {
+    if (!dragType) return;
+    const x = e.touches ? e.touches[0].clientX : e.clientX;
+    const W = box.offsetWidth;
+    const dt = ((x-startX)/W)*audioDur;
+    if (dragType==='start')      trimS = Math.max(0, Math.min(startS+dt, trimE-0.5));
+    else if (dragType==='end')   trimE = Math.min(audioDur, Math.max(startE+dt, trimS+0.5));
+    else {
+        let ns=startS+dt, ne=startE+dt;
+        if (ns<0)          { ne-=ns; ns=0; }
+        if (ne>audioDur)   { ns-=(ne-audioDur); ne=audioDur; }
+        trimS=ns; trimE=ne;
+    }
+    updateTrimUI();
+}
+box.addEventListener('mousedown', handleStart);
+box.addEventListener('touchstart', handleStart, { passive: false });
+window.addEventListener('mousemove', handleMove);
+window.addEventListener('touchmove', handleMove, { passive: false });
+window.addEventListener('mouseup',  ()=>dragType=null);
+window.addEventListener('touchend', ()=>dragType=null);
+
+let playing=false, playT=null;
+function togglePlay() {
+    const el = document.getElementById('trim-audio');
+    if (!playing) {
+        el.currentTime=trimS; el.play(); playing=true;
+        document.getElementById('play-icon').className='fas fa-pause';
+        playT = setInterval(()=>{
+            document.getElementById('wv-head').style.left=(el.currentTime/audioDur)*100+'%';
+            if (el.currentTime>=trimE) stopPlay();
+        }, 30);
+    } else stopPlay();
+}
+function stopPlay() {
+    const el = document.getElementById('trim-audio');
+    el.pause(); playing=false; clearInterval(playT);
+    document.getElementById('play-icon').className='fas fa-play';
+}
+function previewTrim() { stopPlay(); togglePlay(); }
+
+async function renderTrim() {
+    const sr=audioBuffer.sampleRate;
+    const s=Math.floor(trimS*sr), e=Math.floor(trimE*sr);
+    const oc=new OfflineAudioContext(audioBuffer.numberOfChannels,e-s,sr);
+    const buf=oc.createBuffer(audioBuffer.numberOfChannels,e-s,sr);
+    for(let i=0;i<audioBuffer.numberOfChannels;i++) buf.copyToChannel(audioBuffer.getChannelData(i).slice(s,e),i);
+    const src=oc.createBufferSource(); src.buffer=buf; src.connect(oc.destination); src.start();
+    const out=await oc.startRendering();
+    const nc=out.numberOfChannels, len=out.length*nc*2+44;
+    const buffer=new ArrayBuffer(len), view=new DataView(buffer);
+    const set=(o,s)=>{ for(let i=0;i<s.length;i++) view.setUint8(o+i,s.charCodeAt(i)); };
+    set(0,'RIFF'); view.setUint32(4,len-8,true); set(8,'WAVEfmt ');
+    view.setUint32(16,16,true); view.setUint16(20,1,true); view.setUint16(22,nc,true);
+    view.setUint32(24,sr,true); view.setUint32(28,sr*nc*2,true); view.setUint16(32,nc*2,true);
+    view.setUint16(34,16,true); set(36,'data'); view.setUint32(40,out.length*nc*2,true);
+    let offset=44;
+    for(let i=0;i<out.length;i++) {
+        for(let c=0;c<nc;c++) {
+            let s=Math.max(-1,Math.min(1,out.getChannelData(c)[i]));
+            view.setInt16(offset,s<0?s*0x8000:s*0x7FFF,true); offset+=2;
+        }
+    }
+    return new Blob([buffer],{type:'audio/wav'});
+}
+
+// ── PUBLISH ───────────────────────────────────────────────────────────────────
+async function doPublish() {
+    if (!mediaFile) return;
+    const btn = document.getElementById('pub-btn');
+    btn.disabled=true; btn.innerHTML='<div class="spin"></div>';
+    try {
+        const mType = mediaFile.type.startsWith('video') ? 'video' : 'image';
+        document.getElementById('media-prog').style.display='block';
+        const mUrl = await upload(mediaFile, mType, 'posts', p => {
+            document.getElementById('media-prog-fill').style.width=p+'%';
+            document.getElementById('status').textContent='UPLOADING: '+p+'%';
+        });
+        let aUrl = '';
+        if (audioFile) {
+            document.getElementById('audio-prog').style.display='block';
+            const blob = await renderTrim();
+            aUrl = await upload(blob, 'audio', 'audio', p => {
+                document.getElementById('audio-prog-fill').style.width=p+'%';
+            });
+        }
+        // Save to userId/posts in Firebase
+        await db.ref(userId + '/posts').push({
+            type:    mType,
+            src:     mUrl,
+            audio:   aUrl,
+            caption: document.getElementById('caption').value.trim(),
+            timestamp: Date.now()
+        });
+        document.getElementById('status').textContent='✓ UPLINK COMPLETE';
+        setTimeout(()=>{ goPosts(); resetForm(); }, 1000);
+    } catch(e) {
+        document.getElementById('status').textContent='ERROR: '+e.message;
+        btn.disabled=false; btn.innerHTML='<i class="fas fa-upload" style="margin-right:6px;"></i>PUBLISH POST';
+    }
+}
+
+function resetForm() {
+    clearMedia(); clearAudio();
+    document.getElementById('caption').value='';
+    document.getElementById('status').textContent='';
+    document.getElementById('media-prog').style.display='none';
+    document.getElementById('media-prog-fill').style.width='0%';
+    document.getElementById('audio-prog').style.display='none';
+    document.getElementById('audio-prog-fill').style.width='0%';
+    const btn=document.getElementById('pub-btn');
+    btn.disabled=false;
+    btn.innerHTML='<i class="fas fa-upload" style="margin-right:6px;"></i>PUBLISH POST';
+}
+
+</script>
+</body>
+</html>
