@@ -160,10 +160,57 @@
             font-family: 'Space Grotesk', sans-serif;
         }
         .message-textarea:focus { border-color: var(--accent); }
+
+        /* music player custom */
+        #music-progress {
+            height: 4px;
+            border-radius: 2px;
+        }
+        #music-progress::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: var(--accent);
+            cursor: pointer;
+            border: 2px solid white;
+        }
     </style>
 </head>
 <body>
     <audio id="bio-audio" src="2FilesMerged_14032026.mp3" loop preload="auto"></audio>
+
+    <!-- new music player modal (instagram style) -->
+    <div id="music-player-modal" class="floating-modal" onclick="handleExit()">
+        <div class="modal-box glass-panel" onclick="event.stopPropagation()" style="aspect-ratio: 1/1; max-width: 380px;">
+            <div class="close-btn-circle" onclick="handleExit()"><i class="fas fa-times"></i></div>
+            <div class="p-4 flex flex-col h-full">
+                <div class="relative w-full aspect-square rounded-2xl overflow-hidden bg-black/50 mb-4" id="music-thumbnail-container">
+                    <img id="music-thumbnail" src="" class="w-full h-full object-cover">
+                    <button id="music-play-pause" class="absolute inset-0 m-auto w-16 h-16 rounded-full bg-blue-500/80 flex items-center justify-center text-white text-xl backdrop-blur border border-white/20">
+                        <i class="fas fa-play" id="music-play-icon"></i>
+                    </button>
+                </div>
+                <div class="text-center">
+                    <p class="font-brand text-sm" id="music-title">Wait a Minute!</p>
+                    <p class="text-[10px] text-gray-400" id="music-artist">Willow</p>
+                </div>
+                <div class="mt-4 w-full">
+                    <input type="range" id="music-progress" value="0" min="0" max="100" step="0.1" class="w-full accent-blue-500">
+                    <div class="flex justify-between text-[8px] text-gray-500 mt-1">
+                        <span id="music-current">0:00</span>
+                        <span id="music-duration">0:00</span>
+                    </div>
+                </div>
+                <div class="flex justify-center gap-6 mt-4">
+                    <button id="music-prev" class="text-white/50"><i class="fas fa-backward"></i></button>
+                    <button id="music-next" class="text-white/50"><i class="fas fa-forward"></i></button>
+                </div>
+            </div>
+            <!-- hidden container for youtube iframe -->
+            <div id="youtube-player-container" style="display: none;"></div>
+        </div>
+    </div>
 
     <div id="followers-modal" class="floating-modal" onclick="handleExit()">
         <div class="modal-box menu-window" onclick="event.stopPropagation()">
@@ -350,9 +397,10 @@
                                 <div onclick="toggleBioMusic()" class="text-blue-500 text-[9px] cursor-pointer transition-transform active:scale-90" id="bio-play-container">
                                     <i class="fas fa-play" id="bio-play-icon"></i>
                                 </div>
-                                <a href="https://music.youtube.com/watch?v=h4OAXvDRZTY" target="_blank" class="text-[9px] font-brand tracking-[1.5px] text-gray-500 hover:text-blue-400 transition-colors uppercase">
+                                <!-- REPLACED YT LINK with music player trigger -->
+                                <span onclick="openMusicPlayer()" class="text-[9px] font-brand tracking-[1.5px] text-gray-500 hover:text-blue-400 transition-colors uppercase cursor-pointer">
                                     Wait a Minute!
-                                </a>
+                                </span>
                             </div>
                         </div>
                     </div>
@@ -372,6 +420,7 @@
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
     <script>
+        // Firebase init
         let db = null;
         try {
             firebase.initializeApp({
@@ -386,7 +435,6 @@
             db = firebase.database();
         } catch(e) {}
 
-        // Keep original hardcoded post + merge with Firebase posts
         const STATIC_POSTS = [{ type: 'image', src: 'Picsart_26-02-28_14-41-10-477.jpg', audio: 'From_The_Start(256k).mp3', caption: 'image/audio test' }];
         let POSTS_DATA = [...STATIC_POSTS];
         let activePostIndex = null;
@@ -550,12 +598,16 @@
         window.handleExit = function() { if (window.history.state && window.history.state.modal === 'active') { window.history.back(); } else { window.killAndHide(); } }
 
         window.killAndHide = function() {
+            // pause youtube player if active
+            if (window.youtubePlayer && window.youtubePlayer.pauseVideo) {
+                window.youtubePlayer.pauseVideo();
+            }
             const video = document.getElementById('active-video');
             if (video) { video.pause(); video.src = ""; }
             const audio = document.getElementById('post-audio');
             if (audio) { audio.pause(); audio.currentTime = 0; audio.src = ""; }
             document.getElementById('comment-sidebar').classList.remove('open');
-            const modals = ['floating-post', 'profile-modal', 'menu-modal', 'license-modal', 'followers-modal', 'auth-portal', 'message-modal'];
+            const modals = ['floating-post', 'profile-modal', 'menu-modal', 'license-modal', 'followers-modal', 'auth-portal', 'message-modal', 'music-player-modal'];
             modals.forEach(id => { const el = document.getElementById(id); if(el) { el.classList.remove('active'); setTimeout(() => el.style.display = 'none', 300); } });
         }
 
@@ -568,7 +620,7 @@
 
         window.addEventListener('popstate', window.killAndHide);
 
-        // Load posts from Firebase (nikhil/posts) and merge with static post
+        // Load posts from Firebase
         if (db) {
             db.ref('nikhil/posts').on('value', (snapshot) => {
                 const data = snapshot.val();
@@ -578,13 +630,141 @@
                         .sort((a, b) => (b[1].timestamp || 0) - (a[1].timestamp || 0))
                         .forEach(([id, val]) => firebasePosts.push({ id, ...val }));
                 }
-                // Static post first, then Firebase posts newest first
                 POSTS_DATA = [...STATIC_POSTS, ...firebasePosts];
                 window.renderGrid();
             });
         } else {
             window.renderGrid();
         }
+
+        // ---------- MUSIC PLAYER (YouTube) ----------
+        const YT_VIDEO_ID = 'h4OAXvDRZTY'; // from the link
+        let youtubePlayer = null;
+        let playerReady = false;
+        let progressInterval = null;
+
+        function loadYouTubeAPI() {
+            return new Promise((resolve) => {
+                if (window.YT && window.YT.Player) {
+                    resolve();
+                    return;
+                }
+                const tag = document.createElement('script');
+                tag.src = 'https://www.youtube.com/iframe_api';
+                const firstScriptTag = document.getElementsByTagName('script')[0];
+                firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+                window.onYouTubeIframeAPIReady = resolve;
+            });
+        }
+
+        window.openMusicPlayer = async function() {
+            window.history.pushState({ modal: 'active' }, "");
+            const modal = document.getElementById('music-player-modal');
+            modal.style.display = 'flex';
+            setTimeout(() => modal.classList.add('active'), 10);
+
+            // Set thumbnail
+            document.getElementById('music-thumbnail').src = `https://img.youtube.com/vi/${YT_VIDEO_ID}/maxresdefault.jpg`;
+
+            await loadYouTubeAPI();
+            if (!youtubePlayer) {
+                youtubePlayer = new YT.Player('youtube-player-container', {
+                    height: '0',
+                    width: '0',
+                    videoId: YT_VIDEO_ID,
+                    playerVars: {
+                        'playsinline': 1,
+                        'controls': 0,
+                        'disablekb': 1,
+                        'enablejsapi': 1,
+                        'fs': 0,
+                        'modestbranding': 1,
+                        'rel': 0
+                    },
+                    events: {
+                        'onReady': onPlayerReady,
+                        'onStateChange': onPlayerStateChange
+                    }
+                });
+            } else {
+                // already exists, just load video
+                youtubePlayer.loadVideoById(YT_VIDEO_ID);
+                youtubePlayer.pauseVideo(); // don't autoplay
+                // duration will update via ready/state change
+            }
+        };
+
+        function onPlayerReady(event) {
+            playerReady = true;
+            const duration = youtubePlayer.getDuration();
+            document.getElementById('music-duration').innerText = formatTime(duration);
+            if (progressInterval) clearInterval(progressInterval);
+            progressInterval = setInterval(updateProgress, 500);
+        }
+
+        function onPlayerStateChange(event) {
+            const icon = document.getElementById('music-play-icon');
+            if (event.data === YT.PlayerState.PLAYING) {
+                icon.className = 'fas fa-pause';
+            } else {
+                icon.className = 'fas fa-play';
+            }
+            // when ended, stop progress? no, keep showing end
+        }
+
+        function updateProgress() {
+            if (!youtubePlayer || !playerReady) return;
+            const currentTime = youtubePlayer.getCurrentTime();
+            const duration = youtubePlayer.getDuration();
+            if (duration > 0) {
+                const progress = (currentTime / duration) * 100;
+                document.getElementById('music-progress').value = progress;
+                document.getElementById('music-current').innerText = formatTime(currentTime);
+                document.getElementById('music-duration').innerText = formatTime(duration);
+            }
+        }
+
+        function formatTime(seconds) {
+            if (!seconds || isNaN(seconds)) return '0:00';
+            const mins = Math.floor(seconds / 60);
+            const secs = Math.floor(seconds % 60);
+            return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+        }
+
+        // Control event listeners (will be set after DOM)
+        document.addEventListener('DOMContentLoaded', function() {
+            const playBtn = document.getElementById('music-play-pause');
+            if (playBtn) {
+                playBtn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    if (!youtubePlayer) return;
+                    const state = youtubePlayer.getPlayerState();
+                    if (state === YT.PlayerState.PLAYING) {
+                        youtubePlayer.pauseVideo();
+                    } else {
+                        youtubePlayer.playVideo();
+                    }
+                });
+            }
+
+            const progressBar = document.getElementById('music-progress');
+            if (progressBar) {
+                progressBar.addEventListener('input', function(e) {
+                    if (!youtubePlayer || !playerReady) return;
+                    const duration = youtubePlayer.getDuration();
+                    const seekTo = (e.target.value / 100) * duration;
+                    youtubePlayer.seekTo(seekTo, true);
+                });
+            }
+
+            // prev/next optional: just restart / next same song? we can ignore or make them restart
+            document.getElementById('music-prev')?.addEventListener('click', function() {
+                if (youtubePlayer) youtubePlayer.seekTo(0, true);
+            });
+            document.getElementById('music-next')?.addEventListener('click', function() {
+                if (youtubePlayer) youtubePlayer.seekTo(0, true); // restart, no next track
+            });
+        });
     </script>
 </body>
 </html>
