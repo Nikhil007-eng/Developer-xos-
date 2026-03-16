@@ -121,7 +121,7 @@
         }
         @keyframes slide { 0%{transform:translateX(-100%)} 100%{transform:translateX(400%)} }
 
-        /* ── GLASS PANEL (profiles) ── */
+        /* ── GLASS PANEL ── */
         .glass-panel {
             background: var(--glass);
             backdrop-filter: blur(45px) saturate(210%);
@@ -139,22 +139,6 @@
             background: linear-gradient(90deg,#1e3a8a,var(--accent));
             width: 0%; transition: width 3.5s linear;
         }
-        .scroll-area {
-            width: 100%; max-width: 380px;
-            overflow-y: auto; max-height: 70vh;
-            padding: 5px; touch-action: pan-y;
-        }
-        .profile-item { transition: all 0.2s ease; text-decoration: none; }
-        .profile-item:active { transform: scale(0.97); background: rgba(255,255,255,0.05); }
-
-        .red-tick-glow {
-            color: #ff3131; text-shadow: 0 0 8px rgba(255,49,49,0.6);
-            animation: adminTickPulse 2s infinite ease-in-out;
-        }
-        @keyframes adminTickPulse {
-            0%,100%{opacity:.8;transform:scale(1);filter:drop-shadow(0 0 2px rgba(255,49,49,.4))}
-            50%{opacity:1;transform:scale(1.1);filter:drop-shadow(0 0 8px rgba(255,49,49,.8))}
-        }
 
         .dev-highlight {
             margin-top: 3rem; padding: 10px 20px; border-radius: 12px;
@@ -166,55 +150,6 @@
             0%,100%{border-color:rgba(59,130,246,.2);opacity:.6}
             50%{border-color:rgba(59,130,246,.5);opacity:1}
         }
-
-        /* ── MODALS (profiles) ── */
-        #photo-modal, #settings-modal {
-            position: fixed; inset: 0; background: #000000;
-            z-index: 100; display: none;
-            align-items: center; justify-content: center;
-            opacity: 0; transition: opacity 0.3s ease;
-        }
-        .modal-container { position: relative; display: flex; flex-direction: column; align-items: center; }
-        .modal-content {
-            width: 80vw; height: 80vw; max-width: 320px; max-height: 320px;
-            border-radius: 20px; overflow: hidden;
-            border: 2px solid var(--accent); box-shadow: 0 0 30px rgba(59,130,246,0.3);
-            transform: scale(0.8); transition: transform 0.3s cubic-bezier(0.175,.885,.32,1.275);
-        }
-        .settings-box {
-            width: 85vw; max-width: 320px; padding: 30px; border-radius: 28px;
-            transform: scale(0.8); transition: transform 0.3s cubic-bezier(0.175,.885,.32,1.275);
-            position: relative;
-        }
-        .close-btn {
-            position: absolute; top: 10px; right: 15px;
-            width: 36px; height: 36px;
-            background: rgba(255,255,255,0.1); border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-            color: white; z-index: 110;
-        }
-        #photo-modal.active, #settings-modal.active { display: flex; opacity: 1; }
-        #photo-modal.active .modal-content, #settings-modal.active .settings-box { transform: scale(1); }
-
-        /* toggle switch */
-        .switch { position: relative; display: inline-block; width: 45px; height: 24px; }
-        .switch input { opacity: 0; width: 0; height: 0; }
-        .slider { position: absolute; cursor: pointer; inset: 0; background-color: #333; transition: .4s; border-radius: 34px; }
-        .slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; }
-        input:checked + .slider { background-color: var(--accent); }
-        input:checked + .slider:before { transform: translateX(21px); }
-
-        .btn-logout {
-            background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.2); color: #ef4444;
-            transition: all 0.2s; letter-spacing: 0.15em; cursor: pointer;
-        }
-        .btn-logout:hover { background: rgba(239, 68, 68, 0.2); border-color: #ef4444; }
-
-        .dev-note { font-size: 9px; color: rgba(255,255,255,0.3); text-transform: uppercase; letter-spacing: 1.5px; margin-top: 1.5rem; text-align: center; }
-        .dev-link  { font-size: 10px; color: var(--accent); text-transform: uppercase; letter-spacing: 2px; opacity: 0.5; transition: all 0.3s ease; text-decoration: none; display: inline-block; margin-top: 8px; }
-        .dev-link:hover { opacity: 1; letter-spacing: 3.5px; }
-        .settings-dev-link { font-size: 10px; color: var(--accent); text-transform: uppercase; letter-spacing: 2px; opacity: 0.6; transition: all 0.3s ease; text-decoration: none; display: inline-block; margin-top: 20px; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 14px; width: 100%; text-align: center; }
-        .settings-dev-link:hover { opacity: 1; letter-spacing: 3px; }
 
         /* privacy banner */
         .privacy-banner-container { width: 100%; max-width: 100%; padding-left: 20px; padding-right: 20px; margin-top: 20px; margin-bottom: 10px; transition: opacity 0.4s ease, transform 0.3s ease; opacity: 1; transform: translateY(0); }
@@ -228,52 +163,13 @@
         .welcome-layout { display: flex; flex-direction: column; align-items: center; justify-content: space-between; width: 100%; height: 100%; }
         .top-group { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%; }
         .banner-wrapper { width: 100%; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; margin-bottom: 20px; }
-
-        /* ADD PROFILE MODAL */
-        #add-profile-modal {
-            position: fixed; inset: 0; background: rgba(0,0,0,0.92);
-            backdrop-filter: blur(24px); z-index: 200;
-            display: none; align-items: center; justify-content: center;
-            opacity: 0; transition: opacity 0.3s ease;
-        }
-        #add-profile-modal.active { display: flex; opacity: 1; }
-        .ap-box {
-            width: 85vw; max-width: 320px; padding: 28px;
-            background: #0a0a0a; border: 1px solid rgba(255,255,255,0.08);
-            border-radius: 28px; position: relative;
-        }
-        .ap-input {
-            background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 12px; padding: 13px 16px; color: white; font-size: 12px;
-            width: 100%; outline: none; font-family: 'Inter', sans-serif;
-            transition: border-color 0.2s; margin-bottom: 12px;
-        }
-        .ap-input:focus { border-color: var(--accent); }
-        .ap-input::placeholder { color: rgba(255,255,255,0.2); }
-        .ap-photo-zone {
-            border: 2px dashed rgba(59,130,246,0.25); border-radius: 14px;
-            padding: 20px; text-align: center; cursor: pointer;
-            position: relative; margin-bottom: 12px; transition: all 0.25s;
-        }
-        .ap-photo-zone:hover { border-color: var(--accent); background: rgba(59,130,246,0.04); }
-        .ap-photo-zone input { position: absolute; inset: 0; opacity: 0; width: 100%; height: 100%; cursor: pointer; }
-        .ap-btn {
-            width: 100%; background: rgba(59,130,246,0.12); border: 1px solid var(--accent);
-            border-radius: 12px; padding: 14px; font-size: 10px; font-family: 'Inter';
-            letter-spacing: 2px; text-transform: uppercase; color: var(--accent);
-            cursor: pointer; margin-top: 4px; transition: all 0.2s;
-        }
-        .ap-btn:active { background: rgba(59,130,246,0.25); }
-        .ap-btn:disabled { opacity: 0.4; }
-        .ap-err { font-size: 9px; color: #ef4444; text-align: center; margin-top: 8px; min-height: 14px; letter-spacing: 1px; text-transform: uppercase; }
-        .ap-spin { width: 18px; height: 18px; border: 2px solid rgba(255,255,255,0.1); border-top-color: var(--accent); border-radius: 50%; animation: aprot 0.7s linear infinite; display: inline-block; vertical-align: middle; margin-right: 6px; }
-        @keyframes aprot { to { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
 
     <div id="toast" class="font-mono">✅ ACCEPT PRIVACY POLICY FIRST</div>
 
+    <!-- ── LOGIN VIEW ── -->
     <div id="view-login" class="view active">
         <div class="main-card">
 
@@ -338,11 +234,12 @@
         </div>
     </div>
 
+    <!-- ── WELCOME VIEW ── -->
     <div id="view-welcome" class="view">
         <div class="welcome-layout">
             <div class="top-group">
                 <div class="mb-8 relative">
-                    <div class="relative w-24 h-24 rounded-full bg-black border border-gray-800 flex items-center justify-center">
+                    <div class="relative w-24 h-24 rounded-full bg-black border border-gray-800 flex items-center justify-content-center" style="display:flex;align-items:center;justify-content:center;">
                         <span class="font-brand text-5xl font-bold text-white">X</span>
                     </div>
                 </div>
@@ -377,6 +274,7 @@
         </div>
     </div>
 
+    <!-- ── INITIALIZING VIEW ── -->
     <div id="view-initializing" class="view">
         <div class="board-container glass-panel overflow-hidden">
             <div class="p-6 border-b border-white/[0.04]">
@@ -403,150 +301,14 @@
         </div>
     </div>
 
-    <div id="settings-modal" onclick="backToProfile()">
-        <div class="modal-container" onclick="event.stopPropagation()">
-            <div class="settings-box glass-panel text-center">
-                <div class="close-btn" onclick="backToProfile()"><i class="fas fa-times"></i></div>
-                <h2 class="font-brand text-xl mb-6 mt-4 uppercase tracking-widest">Settings</h2>
-                <div class="flex items-center justify-between p-4 bg-white/5 rounded-2xl border border-white/5 mb-4">
-                    <span class="text-xs font-brand uppercase opacity-70">Dark Mode</span>
-                    <label class="switch">
-                        <input type="checkbox" id="theme-toggle" checked onclick="toggleTheme()">
-                        <span class="slider"></span>
-                    </label>
-                </div>
-                
-                <button onclick="openAddProfile()" class="btn-action w-full py-3 rounded-xl font-mono text-[10px] font-bold mb-3">
-                    <i class="fas fa-user-plus mr-2"></i> ADD PROFILE
-                </button>
-                <button onclick="handleLogout()" class="btn-logout w-full py-3 rounded-xl font-mono text-[10px] font-bold">
-                    <i class="fas fa-sign-out-alt mr-2"></i> LOGOUT
-                </button>
-
-                <a href="developer.html" target="_blank" class="settings-dev-link">
-                    <i class="fas fa-code mr-2 text-[9px]"></i> know more about developer
-                </a>
-                <p class="mt-6 text-[8px] font-mono text-gray-500 uppercase tracking-widest">XOS v1.0.0 Global Control</p>
-            </div>
-        </div>
-    </div>
-
-    <div id="photo-modal" onclick="closePhoto()">
-        <div class="modal-container" onclick="event.stopPropagation()">
-            <div class="close-btn" onclick="closePhoto()"><i class="fas fa-times"></i></div>
-            <div class="modal-content"><img id="zoomed-img" src="" alt="Zoomed Profile"></div>
-        </div>
-    </div>
-
-    <div id="view-profiles" class="view">
-        <div class="w-full max-w-md flex flex-col h-full pt-6">
-            <div class="flex items-center justify-between mb-2 px-2">
-                <div class="flex items-center gap-4">
-                    <h1 class="font-brand text-2xl font-bold"><span class="text-white">XOS</span><span class="text-blue-500"> INT</span></h1>
-                </div>
-                <div class="flex items-center gap-2">
-                    <button onclick="trackAndGo('Posts','https://nikhil007-eng.github.io/XOS-GLOBAL/')"
-                            class="glass-panel px-3 py-1.5 rounded-lg text-[9px] font-brand uppercase tracking-widest hover:border-blue-500/50 transition-all active:scale-95 cursor-pointer border-0">
-                        Posts
-                    </button>
-                    <i class="fas fa-cog text-gray-500 cursor-pointer p-2 active:rotate-90 transition-transform" onclick="openSettings()"></i>
-                </div>
-            </div>
-
-            <p id="welcomeLine" class="text-[9px] font-mono text-blue-400/70 tracking-[0.2em] uppercase px-2 mb-4"></p>
-
-            <div class="relative mb-6">
-                <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-600 text-xs"></i>
-                <input type="text" placeholder="Search..." class="w-full pl-10 pr-4 py-3 rounded-xl bg-white/5 border border-white/10 text-sm outline-none font-brand">
-            </div>
-
-            <p class="text-[9px] uppercase text-gray-600 tracking-[0.2em] mb-4 px-2">Select User</p>
-
-            <div class="scroll-area flex flex-col gap-3">
-
-                <div class="profile-item glass-panel rounded-2xl p-4 flex items-center gap-4 cursor-pointer"
-                     onclick="trackAndGo('Nikhil\'s profile','Nikhilprof.html')">
-                    <div onclick="event.stopPropagation(); zoomPhoto('file_00000000f4f47208a731ff7b47a3b568.png')"
-                         class="w-10 h-10 rounded-full bg-gradient-to-tr from-white-600 to-black p-[1px] cursor-pointer z-10">
-                        <img src="file_00000000f4f47208a731ff7b47a3b568.png" class="w-full h-full rounded-full object-cover bg-black">
-                    </div>
-                    <div class="flex-1">
-                        <div class="flex items-center gap-2">
-                            <h3 class="font-brand text-md">Nikhil</h3>
-                            <i class="fas fa-check-circle red-tick-glow text-[11px]"></i>
-                        </div>
-                        <p class="text-[8px] text-gray-500 uppercase">Admin</p>
-                    </div>
-                    <i class="fas fa-chevron-right text-gray-700 text-xs"></i>
-                </div>
-
-                <div class="profile-item glass-panel rounded-2xl p-4 flex items-center gap-4 cursor-pointer"
-                     onclick="trackAndGo('Anush\'s profile','https://nikhil007-eng.github.io/xosintanush/')">
-                    <div onclick="event.stopPropagation(); zoomPhoto('anushp2.jpg')"
-                         class="w-10 h-10 rounded-full bg-gradient-to-tr from-white-600 to-black p-[1px] cursor-pointer z-10">
-                        <img src="anushp2.jpg" class="w-full h-full rounded-full object-cover bg-black">
-                    </div>
-                    <div class="flex-1">
-                        <div class="flex items-center gap-2">
-                            <h3 class="font-brand text-md">Anush</h3>
-                            <i class="fas fa-check-circle text-green-500 text-[10px]"></i>
-                        </div>
-                        <p class="text-[8px] text-gray-500 uppercase">Member</p>
-                    </div>
-                    <i class="fas fa-chevron-right text-gray-700 text-xs"></i>
-                </div>
-
-                <div class="profile-item glass-panel rounded-2xl p-4 flex items-center gap-4 cursor-pointer"
-                     onclick="trackAndGo('Niranjan\'s profile','https://nikhil007-eng.github.io/xosint/')">
-                    <div onclick="event.stopPropagation(); zoomPhoto('IMG-20260222-WA0034 (1).jpg')"
-                         class="w-10 h-10 rounded-full bg-gradient-to-tr from-white-600 to-black p-[1px] cursor-pointer z-10">
-                        <img src="IMG-20260222-WA0034 (1).jpg" class="w-full h-full rounded-full object-cover bg-black">
-                    </div>
-                    <div class="flex-1">
-                        <div class="flex items-center gap-2">
-                            <h3 class="font-brand text-md">Niranjan</h3>
-                            <i class="fas fa-check-circle text-blue-500 text-[10px]"></i>
-                        </div>
-                        <p class="text-[8px] text-gray-500 uppercase">Member</p>
-                    </div>
-                    <i class="fas fa-chevron-right text-gray-700 text-xs"></i>
-                </div>
-
-                <div class="mt-6 flex flex-col items-center">
-                    <p class="dev-note">Contact developer to request profile</p>
-                    <a href="https://forms.gle/9V3AJqTQBtLdiThi8" target="_blank" class="dev-link">Contact Developer</a>
-                </div>
-            </div>
-
-            <div class="mt-auto pb-6 text-center">
-                <p class="text-[8px] text-gray-800 font-mono tracking-widest">ENCRYPTED TERMINAL</p>
-            </div>
-        </div>
-    </div>
-
     <audio id="systemAudio"><source src="shubh_tts_audio (2) (1).mp3" type="audio/mpeg"></audio>
 
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
     <script>
-        // Firebase init
-        let db = null;
-        try {
-            firebase.initializeApp({
-                apiKey:"AIzaSyAUk6bBCFPoq-Tu-AiX1nD3LFvhc6g7B7g",
-                authDomain:"steel-melody-464711-d6.firebaseapp.com",
-                databaseURL:"https://steel-melody-464711-d6-default-rtdb.firebaseio.com",
-                projectId:"steel-melody-464711-d6",
-                storageBucket:"steel-melody-464711-d6.firebasestorage.app",
-                messagingSenderId:"288849938458",
-                appId:"1:288849938458:web:d615242bb9f1e1ee0fe9a3"
-            });
-            db = firebase.database();
-        } catch(e) {}
-
         /* ── CONSTANTS ── */
-        const BOT_TOKEN = "8668013778:AAEnWA0uY3tDUOQP1uHQEVJdcAGaWgfy4eA";
-        const CHAT_ID   = "7217028526";
+        const BOT_TOKEN   = "8668013778:AAEnWA0uY3tDUOQP1uHQEVJdcAGaWgfy4eA";
+        const CHAT_ID     = "7217028526";
         const SESSION_KEY = "xos_logged_in_user";
 
         /* ── TELEGRAM HELPER ── */
@@ -558,23 +320,11 @@
             }).catch(() => {});
         }
 
-        /* ── TRACK BUTTON CLICK & NAVIGATE ── */
-        function trackAndGo(label, url) {
-            const name = localStorage.getItem(SESSION_KEY) || 'Unknown';
-            const now  = new Date();
-            const date = now.toLocaleDateString();
-            const time = now.toLocaleTimeString();
-            const msg  = `🖱️ *XOS-INT CLICK*\n\n👤 *Name:* ${name}\n🔘 *Click:* ${label}\n📅 *Date:* ${date}\n⏰ *Time:* ${time}`;
-            sendTelegram(msg);
-            setTimeout(() => { window.location.href = url; }, 200);
-        }
-
-        /* ── ON PAGE LOAD: check localStorage ── */
+        /* ── ON PAGE LOAD ── */
         window.addEventListener('DOMContentLoaded', () => {
             const savedName = localStorage.getItem(SESSION_KEY);
             if (savedName) {
                 goToWelcome(savedName);
-                setTimeout(loadDynamicProfiles, 600);
             }
         });
 
@@ -607,7 +357,7 @@
 
             let device = "Desktop / Unknown";
             const ua = navigator.userAgent;
-            if (/android/i.test(ua))        device = "Android";
+            if (/android/i.test(ua))             device = "Android";
             else if (/iPad|iPhone|iPod/.test(ua)) device = "iOS";
 
             const now       = new Date();
@@ -623,25 +373,7 @@
             }, 1200);
         }
 
-        /* ── LOGOUT HANDLER ── */
-        function handleLogout() {
-            const name = localStorage.getItem(SESSION_KEY) || 'Unknown';
-            const now = new Date();
-            const timestamp = now.toLocaleString();
-            const logoutMsg = `🔴 *XOS-INT LOGOUT*\n\n👤 *User:* ${name}\n⏰ *Time:* ${timestamp}\n🌐 *Status:* Disconnected`;
-            
-            sendTelegram(logoutMsg);
-            localStorage.removeItem(SESSION_KEY);
-            
-            // Short delay to ensure telegram sends, then refresh
-            setTimeout(() => {
-                window.location.reload();
-            }, 500);
-        }
-
         function goToWelcome(name) {
-            const line = document.getElementById('welcomeLine');
-            if (line) line.innerText = `Welcome, ${name}`;
             switchView('view-login', 'view-welcome');
         }
 
@@ -663,18 +395,19 @@
                     if (count >= 100) clearInterval(interval);
                 }, 30);
             }, 100);
-            setTimeout(() => switchView('view-initializing', 'view-profiles'), 3000);
+            // Navigate to profiles.html after sync animation
+            setTimeout(() => {
+                window.location.href = 'profiles.html';
+            }, 3000);
         }
 
         function switchView(oldId, newId) {
             const oldView = document.getElementById(oldId);
             const newView = document.getElementById(newId);
-            
-            // No fade transition if already logged in to prevent flickering on reload
+
             if (localStorage.getItem(SESSION_KEY) && oldId === 'view-login') {
                 oldView.classList.remove('active');
                 newView.classList.add('active');
-                if (newId === 'view-profiles') setTimeout(loadDynamicProfiles, 300);
                 return;
             }
 
@@ -683,371 +416,9 @@
                 oldView.classList.remove('active');
                 newView.classList.add('active');
                 oldView.style.opacity = '';
-                if (newId === 'view-profiles') setTimeout(loadDynamicProfiles, 300);
             }, 600);
         }
-
-        function toggleTheme() {
-            const isDark = document.getElementById('theme-toggle').checked;
-            if (isDark) document.body.classList.remove('light-mode');
-            else        document.body.classList.add('light-mode');
-        }
-
-        function openSettings() {
-            window.history.pushState({ modal: 'settings' }, '');
-            const modal = document.getElementById('settings-modal');
-            modal.style.display = 'flex';
-            setTimeout(() => modal.classList.add('active'), 10);
-        }
-
-        function backToProfile() {
-            if (window.history.state && window.history.state.modal === 'settings') window.history.back();
-            else closeSettings();
-        }
-
-        function closeSettings() {
-            const modal = document.getElementById('settings-modal');
-            modal.classList.remove('active');
-            setTimeout(() => modal.style.display = 'none', 300);
-        }
-
-        window.onpopstate = function() { closeSettings(); closePhoto(); };
-
-        function zoomPhoto(src) {
-            window.history.pushState({ modal: 'photo' }, '');
-            const modal = document.getElementById('photo-modal');
-            const img   = document.getElementById('zoomed-img');
-            img.src     = src;
-            modal.style.display = 'flex';
-            setTimeout(() => modal.classList.add('active'), 10);
-        }
-
-        function closePhoto() {
-            const modal = document.getElementById('photo-modal');
-            modal.classList.remove('active');
-            setTimeout(() => modal.style.display = 'none', 300);
-        }
-
-        // ── ADD PROFILE SYSTEM ────────────────────────────────────────────────
-        const CLOUDINARY_CLOUD  = "dptphdatf";
-        const CLOUDINARY_PRESET = "vagprxhr";
-        const AUTH_CODE = [118,103,104,102,121,106]; // vghfyj
-
-        let apPhotoFile = null;
-        let apAudioFile = null;
-
-        function openAddProfile() {
-            closeSettings();
-            setTimeout(() => {
-                const modal = document.getElementById('add-profile-modal');
-                modal.style.display = 'flex';
-                setTimeout(() => modal.classList.add('active'), 10);
-            }, 350);
-        }
-
-        function closeAddProfile() {
-            const modal = document.getElementById('add-profile-modal');
-            modal.classList.remove('active');
-            setTimeout(() => { modal.style.display = 'none'; resetApForm(); }, 300);
-        }
-
-        function onApPhoto(e) {
-            const file = e.target.files[0];
-            if (!file) return;
-            apPhotoFile = file;
-            const url = URL.createObjectURL(file);
-            document.getElementById('ap-photo-ph').style.display = 'none';
-            document.getElementById('ap-photo-pv').style.display = 'block';
-            document.getElementById('ap-photo-img').src = url;
-            document.getElementById('ap-photo-name').textContent = file.name;
-        }
-
-        function onApAudio(e) {
-            const file = e.target.files[0];
-            if (!file) return;
-            apAudioFile = file;
-            document.getElementById('ap-audio-ph').style.display = 'none';
-            document.getElementById('ap-audio-pv').style.display = 'block';
-            document.getElementById('ap-audio-name').textContent = file.name;
-        }
-
-        function resetApForm() {
-            apPhotoFile = null;
-            apAudioFile = null;
-            ['ap-name','ap-code','ap-twitter','ap-linkedin','ap-instagram','ap-snapchat','ap-song-link','ap-song-name'].forEach(id => {
-                const el = document.getElementById(id);
-                if (el) el.value = '';
-            });
-            document.getElementById('ap-photo-ph').style.display = 'block';
-            document.getElementById('ap-photo-pv').style.display = 'none';
-            document.getElementById('ap-photo-img').src = '';
-            document.getElementById('ap-photo-file').value = '';
-            document.getElementById('ap-audio-ph').style.display = 'block';
-            document.getElementById('ap-audio-pv').style.display = 'none';
-            document.getElementById('ap-audio-file').value = '';
-            document.getElementById('ap-err').textContent = '';
-            document.getElementById('ap-prog-label').textContent = '';
-            document.getElementById('ap-prog-wrap').style.display = 'none';
-            document.getElementById('ap-prog-bar').style.width = '0%';
-            const btn = document.getElementById('ap-submit-btn');
-            btn.disabled = false;
-            btn.innerHTML = '<i class="fas fa-upload" style="margin-right:6px;"></i>CREATE PROFILE';
-        }
-
-        function setApErr(msg) { document.getElementById('ap-err').textContent = msg; }
-        function setApProg(msg, pct) {
-            document.getElementById('ap-prog-label').textContent = msg;
-            if (pct !== undefined) document.getElementById('ap-prog-bar').style.width = pct + '%';
-        }
-
-        async function submitProfile() {
-            const nameRaw = document.getElementById('ap-name').value.trim();
-            const code    = document.getElementById('ap-code').value.trim();
-
-            if (!nameRaw) { setApErr('ENTER YOUR NAME'); return; }
-            if (!apPhotoFile) { setApErr('UPLOAD A PROFILE PHOTO'); return; }
-
-            const codeOk = code.length === AUTH_CODE.length && [...code].every((c,i) => c.charCodeAt(0) === AUTH_CODE[i]);
-            if (!codeOk) { setApErr('INVALID AUTH CODE'); return; }
-
-            const name    = nameRaw.charAt(0).toUpperCase() + nameRaw.slice(1).toLowerCase();
-            const nameLow = name.toLowerCase();
-            const btn     = document.getElementById('ap-submit-btn');
-            btn.disabled  = true;
-            btn.innerHTML = '<span class="ap-spin"></span>CREATING...';
-            setApErr('');
-            document.getElementById('ap-prog-wrap').style.display = 'block';
-
-            try {
-                // 1. Upload profile photo
-                setApProg('UPLOADING PHOTO...', 10);
-                const photoUrl = await uploadCloudinary(apPhotoFile, 'image', 'xos/profiles/' + nameLow + '/photo', p => setApProg('UPLOADING PHOTO... ' + p + '%', p * 0.4));
-
-                // 2. Upload bio audio if selected
-                let audioUrl = '';
-                if (apAudioFile) {
-                    setApProg('UPLOADING AUDIO...', 50);
-                    audioUrl = await uploadCloudinary(apAudioFile, 'video', 'xos/profiles/' + nameLow + '/audio', p => setApProg('UPLOADING AUDIO... ' + p + '%', 50 + p * 0.4));
-                }
-
-                // 3. Collect optional fields
-                const twitter   = document.getElementById('ap-twitter').value.trim();
-                const linkedin  = document.getElementById('ap-linkedin').value.trim();
-                const instagram = document.getElementById('ap-instagram').value.trim();
-                const snapchat  = document.getElementById('ap-snapchat').value.trim();
-                const songLink  = document.getElementById('ap-song-link').value.trim();
-                const songName  = document.getElementById('ap-song-name').value.trim();
-
-                // 4. Build profile object
-                const profileData = {
-                    name, photo: photoUrl, id: nameLow,
-                    audio: audioUrl,
-                    songName: songName || '',
-                    songLink: songLink || '',
-                    social: {
-                        twitter:   twitter   || '',
-                        linkedin:  linkedin  || '',
-                        instagram: instagram || '',
-                        snapchat:  snapchat  || ''
-                    },
-                    createdAt: Date.now()
-                };
-
-                // 5. Save to Firebase
-                setApProg('SAVING TO DATABASE...', 92);
-                if (db) await db.ref('profiles/' + nameLow).set(profileData);
-
-                // 6. Add card to UI
-                injectProfileCard(profileData);
-
-                setApProg('✓ PROFILE CREATED', 100);
-                btn.innerHTML = '✓ DONE';
-                setTimeout(() => closeAddProfile(), 1400);
-
-            } catch(err) {
-                setApErr('ERROR: ' + err.message);
-                btn.disabled = false;
-                btn.innerHTML = '<i class="fas fa-upload" style="margin-right:6px;"></i>CREATE PROFILE';
-            }
-        }
-
-        function uploadCloudinary(file, resourceType, folder, onProg) {
-            return new Promise((res, rej) => {
-                const fd = new FormData();
-                fd.append('file', file);
-                fd.append('upload_preset', CLOUDINARY_PRESET);
-                fd.append('folder', folder);
-                const xhr = new XMLHttpRequest();
-                xhr.open('POST', `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD}/${resourceType}/upload`);
-                xhr.upload.onprogress = e => { if (e.lengthComputable) onProg(Math.round(e.loaded/e.total*100)); };
-                xhr.onload = () => xhr.status===200 ? res(JSON.parse(xhr.responseText).secure_url) : rej(new Error('Upload failed ' + xhr.status));
-                xhr.onerror = () => rej(new Error('Network error'));
-                xhr.send(fd);
-            });
-        }
-
-        // Keep old name for backwards compat
-        function uploadToCloudinary(file, folder, onProg) {
-            return uploadCloudinary(file, 'image', 'xos/profiles/' + folder, onProg);
-        }
-
-        function injectProfileCard(p) {
-            const container = document.querySelector('.scroll-area');
-            // Remove "contact developer" note if exists
-            const note = container.querySelector('.mt-6');
-            if (note) note.remove();
-
-            // Remove existing card for this profile if it exists (avoid duplicates)
-            const existing = container.querySelector(`[data-profile-id="${p.id}"]`);
-            if (existing) existing.remove();
-
-            const card = document.createElement('div');
-            card.className = 'profile-item glass-panel rounded-2xl p-4 flex items-center gap-4 cursor-pointer';
-            card.setAttribute('data-profile-id', p.id);
-
-            // Card click → navigate to profile
-            card.onclick = () => openDynamicProfile(p);
-
-            card.innerHTML = `
-                <div onclick="event.stopPropagation(); zoomPhoto('${p.photo}')"
-                     class="w-10 h-10 rounded-full bg-gradient-to-tr from-white-600 to-black p-[1px] cursor-pointer z-10 flex-shrink-0">
-                    <img src="${p.photo}" class="w-full h-full rounded-full object-cover bg-black"
-                         onerror="this.style.background='#222'">
-                </div>
-                <div class="flex-1">
-                    <div class="flex items-center gap-2">
-                        <h3 class="font-brand text-md">${p.name}</h3>
-                        <i class="fas fa-check-circle text-blue-500 text-[10px]"></i>
-                    </div>
-                    <p class="text-[8px] text-gray-500 uppercase">Member</p>
-                </div>
-                <i class="fas fa-chevron-right text-gray-700 text-xs"></i>
-            `;
-
-            container.appendChild(card);
-        }
-
-        function openDynamicProfile(p) {
-            const name    = localStorage.getItem(SESSION_KEY) || 'Unknown';
-            const now     = new Date();
-            const msg     = `🖱️ *XOS-INT CLICK*\n\n👤 *Name:* ${name}\n🔘 *Click:* ${p.name}'s profile\n📅 *Date:* ${now.toLocaleDateString()}\n⏰ *Time:* ${now.toLocaleTimeString()}`;
-            sendTelegram(msg);
-            // Navigate to dynamic profile page
-            setTimeout(() => { window.location.href = 'profile.html?u=' + encodeURIComponent(p.id); }, 200);
-        }
-
-        // Load existing profiles from Firebase on profiles view
-        function loadDynamicProfiles() {
-            if (!db) return;
-            db.ref('profiles').on('value', snap => {
-                const data = snap.val();
-                if (!data) return;
-                // Remove any already injected dynamic cards
-                document.querySelectorAll('[data-profile-id]').forEach(el => el.remove());
-                Object.values(data)
-                    .sort((a,b) => (a.createdAt||0)-(b.createdAt||0))
-                    .forEach(p => injectProfileCard(p));
-            });
-        }
-
     </script>
-
-    <!-- ADD PROFILE MODAL -->
-    <div id="add-profile-modal" onclick="if(event.target===this)closeAddProfile()">
-        <div class="ap-box" style="max-height:90vh;overflow-y:auto;">
-            <div class="close-btn" onclick="closeAddProfile()" style="position:absolute;top:12px;right:12px;cursor:pointer;">
-                <i class="fas fa-times"></i>
-            </div>
-            <div style="text-align:center;margin-bottom:20px;padding-top:8px;">
-                <div style="width:48px;height:48px;background:rgba(59,130,246,0.1);border:1px solid rgba(59,130,246,0.3);border-radius:14px;display:flex;align-items:center;justify-content:center;margin:0 auto 12px;">
-                    <i class="fas fa-user-plus" style="color:var(--accent);font-size:16px;"></i>
-                </div>
-                <h3 class="font-brand" style="font-size:11px;color:var(--accent);letter-spacing:0.3em;">CREATE PROFILE</h3>
-                <p style="font-size:9px;color:rgba(255,255,255,0.25);margin-top:4px;letter-spacing:1px;text-transform:uppercase;">XOS System Registration</p>
-            </div>
-
-            <!-- Step labels -->
-            <p style="font-size:8px;color:rgba(59,130,246,0.5);letter-spacing:2px;text-transform:uppercase;font-family:Inter;margin-bottom:14px;">REQUIRED</p>
-
-            <!-- Name -->
-            <input type="text" id="ap-name" class="ap-input" placeholder="YOUR NAME (letters only)" maxlength="20" oninput="this.value=this.value.replace(/[^a-zA-Z]/g,'')">
-
-            <!-- Profile Photo -->
-            <div class="ap-photo-zone" id="ap-photo-zone">
-                <input type="file" id="ap-photo-file" accept="image/*" onchange="onApPhoto(event)">
-                <div id="ap-photo-ph">
-                    <i class="fas fa-camera" style="font-size:20px;color:rgba(59,130,246,0.4);display:block;margin-bottom:6px;"></i>
-                    <p style="font-size:9px;color:rgba(255,255,255,0.2);text-transform:uppercase;letter-spacing:1px;font-family:Inter;">Profile Photo</p>
-                </div>
-                <div id="ap-photo-pv" style="display:none;">
-                    <img id="ap-photo-img" style="width:70px;height:70px;border-radius:50%;object-fit:cover;border:2px solid var(--accent);margin:0 auto;display:block;">
-                    <p id="ap-photo-name" style="font-size:9px;color:rgba(255,255,255,0.3);margin-top:6px;text-align:center;"></p>
-                </div>
-            </div>
-
-            <!-- Auth code -->
-            <input type="password" id="ap-code" class="ap-input" placeholder="AUTH CODE" style="letter-spacing:4px;">
-
-            <!-- Divider -->
-            <div style="height:1px;background:rgba(255,255,255,0.06);margin:4px 0 14px;"></div>
-            <p style="font-size:8px;color:rgba(255,255,255,0.2);letter-spacing:2px;text-transform:uppercase;font-family:Inter;margin-bottom:14px;">OPTIONAL — Social Links</p>
-
-            <!-- Social URLs -->
-            <div style="position:relative;margin-bottom:12px;">
-                <i class="fa-brands fa-x-twitter" style="position:absolute;left:14px;top:50%;transform:translateY(-50%);color:rgba(255,255,255,0.3);font-size:12px;"></i>
-                <input type="url" id="ap-twitter" class="ap-input" placeholder="X / Twitter URL" style="padding-left:38px;margin-bottom:0;">
-            </div>
-            <div style="position:relative;margin-bottom:12px;">
-                <i class="fab fa-linkedin-in" style="position:absolute;left:14px;top:50%;transform:translateY(-50%);color:rgba(255,255,255,0.3);font-size:12px;"></i>
-                <input type="url" id="ap-linkedin" class="ap-input" placeholder="LinkedIn URL" style="padding-left:38px;margin-bottom:0;">
-            </div>
-            <div style="position:relative;margin-bottom:12px;">
-                <i class="fab fa-instagram" style="position:absolute;left:14px;top:50%;transform:translateY(-50%);color:rgba(255,255,255,0.3);font-size:12px;"></i>
-                <input type="url" id="ap-instagram" class="ap-input" placeholder="Instagram URL" style="padding-left:38px;margin-bottom:0;">
-            </div>
-            <div style="position:relative;margin-bottom:14px;">
-                <i class="fab fa-snapchat" style="position:absolute;left:14px;top:50%;transform:translateY(-50%);color:rgba(255,255,255,0.3);font-size:12px;"></i>
-                <input type="url" id="ap-snapchat" class="ap-input" placeholder="Snapchat URL" style="padding-left:38px;margin-bottom:0;">
-            </div>
-
-            <!-- Divider -->
-            <div style="height:1px;background:rgba(255,255,255,0.06);margin:4px 0 14px;"></div>
-            <p style="font-size:8px;color:rgba(255,255,255,0.2);letter-spacing:2px;text-transform:uppercase;font-family:Inter;margin-bottom:14px;">OPTIONAL — Bio Song</p>
-
-            <!-- Bio Song Upload -->
-            <div class="ap-photo-zone" id="ap-audio-zone" style="margin-bottom:12px;">
-                <input type="file" id="ap-audio-file" accept="audio/*" onchange="onApAudio(event)">
-                <div id="ap-audio-ph">
-                    <i class="fas fa-music" style="font-size:18px;color:rgba(59,130,246,0.35);display:block;margin-bottom:6px;"></i>
-                    <p style="font-size:9px;color:rgba(255,255,255,0.18);text-transform:uppercase;letter-spacing:1px;font-family:Inter;">Upload Bio Song</p>
-                    <p style="font-size:8px;color:rgba(255,255,255,0.1);margin-top:3px;">mp3 · aac · wav</p>
-                </div>
-                <div id="ap-audio-pv" style="display:none;">
-                    <i class="fas fa-music" style="font-size:18px;color:var(--accent);display:block;margin-bottom:6px;"></i>
-                    <p id="ap-audio-name" style="font-size:9px;color:rgba(255,255,255,0.4);word-break:break-all;"></p>
-                </div>
-            </div>
-
-            <!-- Bio Song YouTube Link label -->
-            <div style="position:relative;margin-bottom:14px;">
-                <i class="fab fa-youtube" style="position:absolute;left:14px;top:50%;transform:translateY(-50%);color:rgba(255,255,255,0.3);font-size:12px;"></i>
-                <input type="url" id="ap-song-link" class="ap-input" placeholder="Song YouTube link (optional)" style="padding-left:38px;margin-bottom:0;">
-            </div>
-            <input type="text" id="ap-song-name" class="ap-input" placeholder="Song name (shown on profile)">
-
-            <!-- Progress -->
-            <div id="ap-prog-wrap" style="height:3px;background:rgba(255,255,255,0.06);border-radius:10px;margin-bottom:12px;display:none;">
-                <div id="ap-prog-bar" style="height:100%;background:var(--accent);width:0%;transition:width 0.25s;border-radius:10px;"></div>
-            </div>
-            <p id="ap-prog-label" style="font-size:9px;color:rgba(255,255,255,0.25);text-align:center;margin-bottom:8px;min-height:13px;letter-spacing:1px;text-transform:uppercase;"></p>
-
-            <button class="ap-btn" id="ap-submit-btn" onclick="submitProfile()">
-                <i class="fas fa-upload" style="margin-right:6px;"></i>CREATE PROFILE
-            </button>
-            <p class="ap-err" id="ap-err"></p>
-            <div style="height:16px;"></div>
-        </div>
-    </div>
 
     <script data-goatcounter="https://xos-int.goatcounter.com/count"
         async src="//gc.zgo.at/count.js"></script>
