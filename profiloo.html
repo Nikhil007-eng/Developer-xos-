@@ -293,26 +293,6 @@
 
             <div class="scroll-area flex flex-col gap-3">
 
-                <!-- Static: Nikhil -->
-                <div class="profile-item glass-panel rounded-2xl p-4 flex items-center gap-4 cursor-pointer"
-                     onclick="trackAndGo('Nikhil\'s profile','Nikhilprof.html')">
-                    <div onclick="event.stopPropagation(); zoomPhoto('file_00000000f4f47208a731ff7b47a3b568.png', '')"
-                         class="w-10 h-10 rounded-full bg-gradient-to-tr from-white-600 to-black p-[1px] cursor-pointer z-10 flex-shrink-0">
-                        <div class="avatar-wrap bg-black">
-                            <img class="av1" src="file_00000000f4f47208a731ff7b47a3b568.png" onerror="this.style.background='#222'">
-                            <img class="av2" src="" style="display:none;">
-                        </div>
-                    </div>
-                    <div class="flex-1">
-                        <div class="flex items-center gap-2">
-                            <h3 class="font-brand text-md">Nikhil</h3>
-                            <i class="fas fa-check-circle red-tick-glow text-[11px]"></i>
-                        </div>
-                        <p class="text-[8px] text-gray-500 uppercase">Admin</p>
-                    </div>
-                    <i class="fas fa-chevron-right text-gray-700 text-xs"></i>
-                </div>
-
                 <!-- Static: Anush -->
                 <div class="profile-item glass-panel rounded-2xl p-4 flex items-center gap-4 cursor-pointer"
                      onclick="trackAndGo('Anush\'s profile','https://nikhil007-eng.github.io/xosintanush/')">
@@ -364,7 +344,26 @@
             </div>
         </div>
     </div>
-
+    
+<!-- Static: Nikhil -->
+                <div class="profile-item glass-panel rounded-2xl p-4 flex items-center gap-4 cursor-pointer"
+                     onclick="trackAndGo('Nikhil\'s profile','Nikhilprof.html')">
+                    <div onclick="event.stopPropagation(); zoomPhoto('file_00000000f4f47208a731ff7b47a3b568.png', '')"
+                         class="w-10 h-10 rounded-full bg-gradient-to-tr from-white-600 to-black p-[1px] cursor-pointer z-10 flex-shrink-0">
+                        <div class="avatar-wrap bg-black">
+                            <img class="av1" src="file_00000000f4f47208a731ff7b47a3b568.png" onerror="this.style.background='#222'">
+                            <img class="av2" src="" style="display:none;">
+                        </div>
+                    </div>
+                    <div class="flex-1">
+                        <div class="flex items-center gap-2">
+                            <h3 class="font-brand text-md">Nikhil</h3>
+                            <i class="fas fa-check-circle red-tick-glow text-[11px]"></i>
+                        </div>
+                        <p class="text-[8px] text-gray-500 uppercase">Admin</p>
+                    </div>
+                    <i class="fas fa-chevron-right text-gray-700 text-xs"></i>
+                </div>
     <!-- ── ADD PROFILE MODAL ── -->
     <div id="add-profile-modal" onclick="if(event.target===this)closeAddProfile()">
         <div class="ap-box" style="max-height:90vh;overflow-y:auto;">
