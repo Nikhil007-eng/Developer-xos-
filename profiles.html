@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>XOS | SYSTEM ERROR</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #000000;
+            --accent: #007aff;
+            --card: rgba(10, 10, 10, 0.9);
+            --border: #1a1a1a;
+            --font: 'Space Grotesk', sans-serif;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            background-color: var(--bg);
+            color: #fff;
+            font-family: var(--font);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            overflow: hidden;
+            text-align: center;
+        }
+
+        .container {
+            animation: slideUp 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+            max-width: 600px;
+            padding: 20px;
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(30px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .badge {
+            font-size: 8px;
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            color: var(--accent);
+            margin-bottom: 20px;
+            display: block;
+        }
+
+        .emoji {
+            font-size: 80px;
+            margin-bottom: 20px;
+            display: block;
+            animation: bounce 0.5s infinite alternate;
+        }
+
+        @keyframes bounce {
+            from { transform: translateY(0); }
+            to { transform: translateY(-20px); }
+        }
+
+        h1 {
+            font-size: 32px;
+            font-weight: 700;
+            letter-spacing: -1px;
+            margin-bottom: 15px;
+            color: #fff;
+        }
+
+        p {
+            font-size: 18px;
+            color: #888;
+            line-height: 1.6;
+        }
+
+        .technical-stats {
+            margin-top: 40px;
+            font-family: monospace;
+            font-size: 12px;
+            color: #333;
+            border-top: 1px solid var(--border);
+            padding-top: 20px;
+        }
+
+        .btn-return {
+            margin-top: 30px;
+            display: inline-block;
+            padding: 12px 24px;
+            border: 1px solid var(--accent);
+            color: var(--accent);
+            text-decoration: none;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-return:hover {
+            background: var(--accent);
+            color: #fff;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <span class="badge">Security Protocol: Bypassed</span>
+        <span class="emoji">😂</span>
+        <h1>Gotcha!</h1>
+        <p>Laughing! Your friend fooled you. <br> Did you really think it would be that easy to see the source?</p>
+        
+        <a href="index.html" class="btn-return">Try again, Genius</a>
+
+        <div class="technical-stats">
+            ID: 0xFOOL_USER // LATENCY: 0ms // STATUS: TROLLED
+        </div>
+    </div>
+
+</body>
+</html>
