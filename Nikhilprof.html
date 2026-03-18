@@ -175,6 +175,23 @@
             cursor: pointer;
             border: 2px solid white;
         }
+        /* open on yt button */
+        .yt-icon-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 28px;
+            height: 28px;
+            border-radius: 8px;
+            background: rgba(255,255,255,0.1);
+            color: #ff0000;
+            margin-left: 8px;
+            transition: 0.2s;
+        }
+        .yt-icon-btn:hover {
+            background: #ff0000;
+            color: white;
+        }
     </style>
 </head>
 <body>
@@ -192,7 +209,12 @@
                     </button>
                 </div>
                 <div class="text-center">
-                    <p class="font-brand text-sm" id="music-title">Wait a Minute!</p>
+                    <div class="flex items-center justify-center gap-2">
+                        <p class="font-brand text-sm" id="music-title">Wait a Minute!</p>
+                        <a id="open-yt-link" href="#" target="_blank" class="yt-icon-btn" title="Open on YouTube">
+                            <i class="fab fa-youtube"></i>
+                        </a>
+                    </div>
                     <p class="text-[10px] text-gray-400" id="music-artist">Willow</p>
                 </div>
                 <div class="mt-4 w-full">
@@ -212,6 +234,7 @@
         </div>
     </div>
 
+    <!-- FOLLOWERS MODAL (DYNAMIC) -->
     <div id="followers-modal" class="floating-modal" onclick="handleExit()">
         <div class="modal-box menu-window" onclick="event.stopPropagation()">
             <div class="flex justify-between items-center mb-8">
@@ -220,22 +243,8 @@
                     <i class="fas fa-times text-xs"></i>
                 </div>
             </div>
-            <div class="flex flex-col gap-4">
-                <a href="index (6) (27).html" class="block group">
-                    <div class="relative p-4 rounded-xl border border-white/10 bg-white/5 backdrop-blur-md transition-all duration-300 group-active:scale-95 group-active:bg-white/10">
-                        <div class="flex items-center gap-4">
-                            <div class="w-12 h-12 rounded-lg overflow-hidden border border-white/20 shadow-lg">
-                                <img src="Screenshot_20260221-160725.png" class="w-full h-full object-cover" alt="Anush">
-                            </div>
-                            <div>
-                                <p class="text-xs font-semibold tracking-wide text-white">Anush</p>
-                                <p class="text-[9px] text-blue-400 uppercase tracking-widest mt-1 opacity-80">System Member</p>
-                            </div>
-                            <i class="fas fa-chevron-right ml-auto text-[10px] text-gray-600 group-hover:text-blue-500 transition-colors"></i>
-                        </div>
-                    </div>
-                </a>
-                <p class="text-[9px] text-center text-gray-700 font-brand mt-6 uppercase tracking-[0.2em]">End of Directory</p>
+            <div id="followers-container" class="flex flex-col gap-4">
+                <!-- Static entries will be added via JS, then dynamic ones appended -->
             </div>
         </div>
     </div>
@@ -443,17 +452,97 @@
         const TELEGRAM_CHAT_ID = "7217028526";
         const SESSION_KEY = "xos_logged_in_user";
 
-        window.toggleDarkMode = () => document.body.classList.toggle('light-mode');
-        window.openAuth = () => window.location.href = 'nikhil_admin.html';
-        window.closeAuth = () => document.getElementById('auth-portal').style.display = 'none';
-        window.verifyAccess = () => { window.location.href = 'nikhil_admin.html'; }
+        // ---------- FOLLOWERS LOGIC ----------
+        // Static profiles (always shown)
+        const staticFollowers = [
+            { name: 'Anush', link: 'https://nikhil007-eng.github.io/xosintanush/', img: 'anushp2.jpg', role: 'System Member' },
+            { name: 'Niranjan', link: 'https://nikhil007-eng.github.io/xosint/', img: 'IMG-20260222-WA0034 (1).jpg', role: 'System Member' }
+        ];
 
+        function loadFollowers() {
+            const container = document.getElementById('followers-container');
+            if (!container) return;
+            
+            // Clear container
+            container.innerHTML = '';
+
+            // Add static followers
+            staticFollowers.forEach(f => {
+                const entry = createFollowerEntry(f.name, f.link, f.img, f.role);
+                container.appendChild(entry);
+            });
+
+            // Fetch dynamic profiles from Firebase (excluding Nikhil and static names)
+            if (db) {
+                db.ref('profiles').once('value', (snapshot) => {
+                    const profiles = snapshot.val();
+                    if (!profiles) return;
+
+                    const staticNames = staticFollowers.map(s => s.name.toLowerCase());
+
+                    Object.entries(profiles).forEach(([id, profile]) => {
+                        const name = profile.name || id;
+                        // Skip if name is Nikhil (case-insensitive) or matches a static name
+                        if (name.toLowerCase() === 'nikhil' || staticNames.includes(name.toLowerCase())) return;
+
+                        // Use profile photo or fallback
+                        const imgSrc = profile.photo || 'default-avatar.png';
+                        const link = `profile.html?u=${encodeURIComponent(id)}`;
+                        const role = profile.role || 'Member';
+                        const entry = createFollowerEntry(name, link, imgSrc, role);
+                        container.appendChild(entry);
+                    });
+
+                    // Add "End of Directory" if no dynamic entries were added
+                    if (container.children.length === 0) {
+                        const emptyMsg = document.createElement('p');
+                        emptyMsg.className = 'text-[9px] text-center text-gray-700 font-brand mt-6 uppercase tracking-[0.2em]';
+                        emptyMsg.innerText = 'No other profiles';
+                        container.appendChild(emptyMsg);
+                    }
+                });
+            }
+        }
+
+        function createFollowerEntry(name, link, imgSrc, role) {
+            const wrapper = document.createElement('a');
+            wrapper.href = link;
+            wrapper.className = 'block group';
+
+            const div = document.createElement('div');
+            div.className = 'relative p-4 rounded-xl border border-white/10 bg-white/5 backdrop-blur-md transition-all duration-300 group-active:scale-95 group-active:bg-white/10';
+
+            div.innerHTML = `
+                <div class="flex items-center gap-4">
+                    <div class="w-12 h-12 rounded-lg overflow-hidden border border-white/20 shadow-lg">
+                        <img src="${imgSrc}" class="w-full h-full object-cover" alt="${name}" onerror="this.src='default-avatar.png'">
+                    </div>
+                    <div>
+                        <p class="text-xs font-semibold tracking-wide text-white">${name}</p>
+                        <p class="text-[9px] text-blue-400 uppercase tracking-widest mt-1 opacity-80">${role}</p>
+                    </div>
+                    <i class="fas fa-chevron-right ml-auto text-[10px] text-gray-600 group-hover:text-blue-500 transition-colors"></i>
+                </div>
+            `;
+            wrapper.appendChild(div);
+            return wrapper;
+        }
+
+        // Call loadFollowers when modal is opened
         window.openFollowers = () => {
+            loadFollowers(); // refresh list
             window.history.pushState({ modal: 'active' }, "");
             const modal = document.getElementById('followers-modal');
             modal.style.display = 'flex';
             setTimeout(() => modal.classList.add('active'), 10);
         }
+
+        // ---------- END FOLLOWERS ----------
+
+        window.toggleDarkMode = () => document.body.classList.toggle('light-mode');
+        window.openAuth = () => window.location.href = 'nikhil_admin.html';
+        window.closeAuth = () => document.getElementById('auth-portal').style.display = 'none';
+        window.verifyAccess = () => { window.location.href = 'nikhil_admin.html'; }
 
         window.openMenu = () => {
             window.history.pushState({ modal: 'active' }, "");
@@ -658,13 +747,21 @@
         }
 
         window.openMusicPlayer = async function() {
+            // Pause background audio if playing
+            const bioAudio = document.getElementById('bio-audio');
+            if (bioAudio && !bioAudio.paused) {
+                bioAudio.pause();
+                document.getElementById('bio-play-icon').className = "fas fa-play";
+            }
+
             window.history.pushState({ modal: 'active' }, "");
             const modal = document.getElementById('music-player-modal');
             modal.style.display = 'flex';
             setTimeout(() => modal.classList.add('active'), 10);
 
-            // Set thumbnail
+            // Set thumbnail and YouTube link
             document.getElementById('music-thumbnail').src = `https://img.youtube.com/vi/${YT_VIDEO_ID}/maxresdefault.jpg`;
+            document.getElementById('open-yt-link').href = `https://youtu.be/${YT_VIDEO_ID}`;
 
             await loadYouTubeAPI();
             if (!youtubePlayer) {
@@ -769,5 +866,8 @@
             });
         });
     </script>
+
+    <!-- GoatCounter analytics (optional) -->
+    <script data-goatcounter="https://xos-int.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
 </body>
 </html>
