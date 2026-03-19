@@ -186,23 +186,24 @@
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
 <script>
+// ─────────────────────────────────────────────────────────────────────────────
+// OPTIMISED AUDIO UPLOAD (no more freezing)
+// ─────────────────────────────────────────────────────────────────────────────
 
-// ── HISTORY API ───────────────────────────────────────────────────────────────
-// Push a state on load so phone back button returns to profile
+// History and navigation
 history.replaceState({ page: 'admin' }, '', window.location.href);
 
 function goBack() {
     window.location.href = 'Nikhilprof.html';
 }
-
-// Phone back button / swipe back → go to profile
 window.addEventListener('popstate', function(e) {
     window.location.href = 'Nikhilprof.html';
 });
 
+// Cloudinary + Firebase config
 const CLOUD  = "dptphdatf";
 const PRESET = "vagprxhr";
-// PASSWORD: nynikhil
+// password: nynikhil
 const _P     = [110, 121, 110, 105, 107, 104, 105, 108]; 
 
 let db = null;
@@ -219,7 +220,7 @@ try {
     db = firebase.database();
 } catch(e) {}
 
-// AUTH LOGIC
+// Auth
 window.addEventListener('DOMContentLoaded', () => {
     if (localStorage.getItem('xos_session') === 'active') {
         show('s-posts');
@@ -250,7 +251,7 @@ function show(id) {
 function goUpload() { resetForm(); show('s-upload'); }
 function goPosts()  { show('s-posts'); }
 
-// NIKHIL DATA HANDLERS
+// Firebase posts
 let posts = [];
 function loadPosts() {
     if (!db) return;
@@ -286,7 +287,7 @@ function delPost(id) {
     if (confirm('Erase this post?')) db.ref('nikhil/posts/'+id).remove(); 
 }
 
-// OPTIMIZED UPLOAD ENGINE
+// Upload helpers
 async function compressImage(file) {
     return new Promise((resolve) => {
         const reader = new FileReader();
@@ -326,9 +327,63 @@ async function upload(file, type, folder, onProg) {
     });
 }
 
-// TRIMMER DRAG SYSTEM
+// ---------- AUDIO TRIMMER & WORKER (fast, non‑blocking) ----------
 let audioFile=null, audioBuffer=null, audioDur=0, trimS=0, trimE=0;
 let dragType=null, startX=0, startS=0, startE=0;
+
+// Inline Web Worker for WAV encoding (keeps UI smooth)
+const encoderWorker = new Worker(URL.createObjectURL(new Blob([`
+    self.onmessage = function(e) {
+        const { audioData, sampleRate, numChannels, startSample, endSample } = e.data;
+        const length = endSample - startSample;
+        const samples = new Float32Array(length * numChannels);
+        // interleave channels
+        for (let ch = 0; ch < numChannels; ch++) {
+            const channelData = audioData[ch];
+            for (let i = 0; i < length; i++) {
+                samples[i * numChannels + ch] = channelData[startSample + i];
+            }
+        }
+        // create WAV blob
+        const wavBytes = encodeWAV(samples, sampleRate, numChannels);
+        self.postMessage(wavBytes);
+    };
+
+    function encodeWAV(samples, sampleRate, numChannels) {
+        const buffer = new ArrayBuffer(44 + samples.length * 2);
+        const view = new DataView(buffer);
+        // RIFF chunk
+        writeString(view, 0, 'RIFF');
+        view.setUint32(4, 36 + samples.length * 2, true);
+        writeString(view, 8, 'WAVE');
+        // fmt subchunk
+        writeString(view, 12, 'fmt ');
+        view.setUint32(16, 16, true);
+        view.setUint16(20, 1, true);          // PCM
+        view.setUint16(22, numChannels, true);
+        view.setUint32(24, sampleRate, true);
+        view.setUint32(28, sampleRate * numChannels * 2, true); // byte rate
+        view.setUint16(32, numChannels * 2, true); // block align
+        view.setUint16(34, 16, true);          // bits per sample
+        // data subchunk
+        writeString(view, 36, 'data');
+        view.setUint32(40, samples.length * 2, true);
+        // write samples
+        let offset = 44;
+        for (let i = 0; i < samples.length; i++) {
+            let s = Math.max(-1, Math.min(1, samples[i]));
+            view.setInt16(offset, s < 0 ? s * 0x8000 : s * 0x7FFF, true);
+            offset += 2;
+        }
+        return new Uint8Array(buffer);
+    }
+
+    function writeString(view, offset, str) {
+        for (let i = 0; i < str.length; i++) {
+            view.setUint8(offset + i, str.charCodeAt(i));
+        }
+    }
+`], { type: 'application/javascript' })));
 
 function setTab(t) {
     document.getElementById('t-img').classList.toggle('on', t==='image');
@@ -338,6 +393,7 @@ function setTab(t) {
 }
 
 function onMediaPick(e) { if (e.target.files[0]) setMedia(e.target.files[0]); }
+let mediaFile = null;
 function setMedia(f) {
     mediaFile = f;
     const url = URL.createObjectURL(f);
@@ -363,6 +419,7 @@ function setAudio(f) {
         document.getElementById('trimmer').style.display = 'block';
         updateTrimUI();
         drawWave(f);
+        document.getElementById('audio-dur').textContent = fmt(audioDur);
     };
 }
 
@@ -398,8 +455,12 @@ function updateTrimUI() {
     document.getElementById('lbl-dur').textContent = fmt(trimE-trimS);
 }
 
-function fmt(s) { return Math.floor(s/60)+':'+Math.floor(s%60).toString().padStart(2,'0'); }
+function fmt(s) { 
+    s = Math.max(0, s);
+    return Math.floor(s/60)+':'+Math.floor(s%60).toString().padStart(2,'0'); 
+}
 
+// Drag handlers
 const box = document.getElementById('waveform-box');
 function handleStart(e) {
     const x = e.touches ? e.touches[0].clientX : e.clientX;
@@ -456,29 +517,49 @@ function stopPlay() {
 }
 function previewTrim() { stopPlay(); togglePlay(); }
 
-async function renderTrim() {
-    const sr = audioBuffer.sampleRate;
-    const s = Math.floor(trimS*sr), e = Math.floor(trimE*sr);
-    const oc = new OfflineAudioContext(audioBuffer.numberOfChannels, e-s, sr);
-    const buf = oc.createBuffer(audioBuffer.numberOfChannels, e-s, sr);
-    for(let i=0; i<audioBuffer.numberOfChannels; i++) buf.copyToChannel(audioBuffer.getChannelData(i).slice(s,e), i);
-    const src = oc.createBufferSource(); src.buffer = buf; src.connect(oc.destination); src.start();
-    const out = await oc.startRendering();
-    const nc = out.numberOfChannels, len = out.length * nc * 2 + 44;
-    const buffer = new ArrayBuffer(len), view = new DataView(buffer);
-    const set = (o, s) => { for(let i=0; i<s.length; i++) view.setUint8(o+i, s.charCodeAt(i)); };
-    set(0, 'RIFF'); view.setUint32(4, len-8, true); set(8, 'WAVEfmt ');
-    view.setUint32(16, 16, true); view.setUint16(20, 1, true); view.setUint16(22, nc, true);
-    view.setUint32(24, sr, true); view.setUint32(28, sr*nc*2, true); view.setUint16(32, nc*2, true);
-    view.setUint16(34, 16, true); set(36, 'data'); view.setUint32(40, out.length*nc*2, true);
-    let offset = 44;
-    for(let i=0; i<out.length; i++) {
-        for(let c=0; c<nc; c++) {
-            let s = Math.max(-1, Math.min(1, out.getChannelData(c)[i]));
-            view.setInt16(offset, s < 0 ? s * 0x8000 : s * 0x7FFF, true); offset += 2;
-        }
+// ✨ FAST AUDIO TRIMMING: use Worker, skip if no trim
+async function prepareAudioForUpload() {
+    if (!audioFile) return '';
+    // If no trim needed, upload original file directly (instant)
+    if (trimS === 0 && trimE >= audioDur) {
+        return audioFile;  // return original file blob
     }
-    return new Blob([buffer], {type:'audio/wav'});
+    // Otherwise encode trimmed part using worker
+    document.getElementById('status').textContent = 'PROCESSING AUDIO...';
+    document.getElementById('audio-prog').style.display = 'block';
+    document.getElementById('audio-prog-fill').style.width = '30%'; // indicate activity
+
+    const ac = new AudioContext();
+    const buffer = await ac.decodeAudioData(await audioFile.arrayBuffer());
+    const sr = buffer.sampleRate;
+    const startSample = Math.floor(trimS * sr);
+    const endSample = Math.floor(trimE * sr);
+    const numChannels = buffer.numberOfChannels;
+    // Extract channel data
+    const channelData = [];
+    for (let ch = 0; ch < numChannels; ch++) {
+        channelData.push(buffer.getChannelData(ch));
+    }
+
+    return new Promise((resolve) => {
+        encoderWorker.onmessage = (e) => {
+            const wavBytes = e.data;
+            const blob = new Blob([wavBytes], { type: 'audio/wav' });
+            document.getElementById('audio-prog-fill').style.width = '100%';
+            setTimeout(() => {
+                document.getElementById('audio-prog').style.display = 'none';
+                document.getElementById('status').textContent = '';
+            }, 300);
+            resolve(blob);
+        };
+        encoderWorker.postMessage({
+            audioData: channelData,
+            sampleRate: sr,
+            numChannels: numChannels,
+            startSample: startSample,
+            endSample: endSample
+        });
+    });
 }
 
 async function doPublish() {
@@ -490,18 +571,22 @@ async function doPublish() {
         document.getElementById('media-prog').style.display='block';
         const mUrl = await upload(mediaFile, mType, 'posts', p => {
             document.getElementById('media-prog-fill').style.width = p+'%';
-            document.getElementById('status').textContent = `UPLOADING: ${p}%`;
+            document.getElementById('status').textContent = `UPLOADING MEDIA: ${p}%`;
         });
-        let aUrl = '';
+
+        let audioUrl = '';
         if (audioFile) {
-            document.getElementById('audio-prog').style.display='block';
-            const blob = await renderTrim();
-            aUrl = await upload(blob, 'audio', 'audio', p => {
-                document.getElementById('audio-prog-fill').style.width = p+'%';
-            });
+            const audioBlob = await prepareAudioForUpload(); // fast & non‑blocking
+            if (audioBlob) {
+                audioUrl = await upload(audioBlob, 'audio', 'audio', p => {
+                    document.getElementById('audio-prog-fill').style.width = p+'%';
+                    document.getElementById('status').textContent = `UPLOADING AUDIO: ${p}%`;
+                });
+            }
         }
+
         await db.ref('nikhil/posts').push({
-            type: mType, src: mUrl, audio: aUrl,
+            type: mType, src: mUrl, audio: audioUrl,
             caption: document.getElementById('caption').value.trim(),
             timestamp: Date.now()
         });
@@ -509,7 +594,7 @@ async function doPublish() {
         setTimeout(() => { goPosts(); resetForm(); }, 1000);
     } catch(e) {
         document.getElementById('status').textContent = 'ERROR';
-        btn.disabled = false; btn.innerHTML = 'PUBLISH POST';
+        btn.disabled = false; btn.innerHTML = '<i class="fas fa-upload" style="margin-right:6px;"></i>PUBLISH POST';
     }
 }
 
@@ -525,6 +610,7 @@ function clearAudio() {
     document.getElementById('audio-ph').style.display = 'block';
     document.getElementById('audio-info').style.display = 'none';
     document.getElementById('trimmer').style.display = 'none';
+    stopPlay();
 }
 
 function resetForm() {
@@ -532,9 +618,10 @@ function resetForm() {
     document.getElementById('caption').value = '';
     document.getElementById('status').textContent = '';
     document.getElementById('pub-btn').disabled = false;
-    document.getElementById('pub-btn').innerHTML = 'PUBLISH POST';
+    document.getElementById('pub-btn').innerHTML = '<i class="fas fa-upload" style="margin-right:6px;"></i>PUBLISH POST';
+    document.getElementById('media-prog').style.display = 'none';
+    document.getElementById('audio-prog').style.display = 'none';
 }
-
 </script>
 </body>
 </html>
