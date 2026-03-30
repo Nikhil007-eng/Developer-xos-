@@ -28,17 +28,24 @@
     .top-header {
       position: sticky; top: 0; z-index: 100;
       padding: env(safe-area-inset-top, 14px) 20px 12px;
-      background: var(--bg);
+      background: rgba(0,0,0,0.55);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-bottom: 1px solid rgba(255,255,255,0.06);
       display: flex; align-items: center; justify-content: space-between;
     }
     .brand { font-family: 'Space Grotesk', sans-serif; font-size: 22px; font-weight: 700; letter-spacing: 1px; }
-    .brand span { font-weight: 300; opacity: 0.7; }
-    .msg-icon { width: 40px; height: 40px; border-radius: 50%; background: var(--pill-bg); display: flex; align-items: center; justify-content: center; cursor: pointer; border: 1px solid var(--border); }
-    .msg-icon i { font-size: 16px; color: var(--accent); }
+    .brand span { font-weight: 300; opacity: 0.55; }
+    .msg-icon { width: 38px; height: 38px; border-radius: 50%; background: rgba(255,255,255,0.08); display: flex; align-items: center; justify-content: center; cursor: pointer; border: 1px solid var(--border); backdrop-filter: blur(8px); }
+    .msg-icon i { font-size: 15px; color: var(--accent); }
 
-    /* Main Content Area */
-    .main-content { flex: 1; overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch; scrollbar-width: none; padding-bottom: calc(var(--nav-h) + 20px); }
+    /* Main Content Area - can be feed or iframe */
+    .main-content { flex: 1; overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch; scrollbar-width: none; padding-bottom: calc(var(--nav-h) + 20px); position: relative; }
     .main-content::-webkit-scrollbar { display: none; }
+    
+    /* Feed specific */
+    .feed-view { display: block; }
+    .iframe-view { width: 100%; height: 100%; border: none; background: #000; display: block; position: absolute; top: 0; left: 0; right: 0; bottom: 0; }
 
     /* Horizontal Carousel Feed - centered with peek */
     .carousel-container {
@@ -120,7 +127,6 @@
       color: var(--text-secondary);
       line-height: 1.4;
     }
-    /* Mention styling: no underline, just colored text with pointer */
     .mention-link {
       color: var(--mention-color);
       text-decoration: none;
@@ -193,13 +199,13 @@
     /* Bottom Navigation */
     .bottom-nav {
       position: fixed;
-      bottom: 0;
-      left: 0;
-      right: 0;
+      bottom: 0; left: 0; right: 0;
       z-index: 100;
       height: var(--nav-h);
-      background: var(--bg);
-      border-top: 1px solid var(--border);
+      background: rgba(0,0,0,0.6);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border-top: 1px solid rgba(255,255,255,0.07);
       display: flex;
       align-items: center;
       justify-content: space-around;
@@ -210,40 +216,89 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      gap: 4px;
-      width: 60px;
-      height: 50px;
+      gap: 3px;
+      width: 64px;
+      height: 52px;
       cursor: pointer;
       position: relative;
+      transition: transform 0.15s ease;
     }
+    .nav-item:active { transform: scale(0.88); }
     .nav-item i {
-      font-size: 22px;
-      color: var(--muted);
+      font-size: 21px;
+      color: rgba(255,255,255,0.35);
+      transition: color 0.2s, transform 0.2s;
+    }
+    .nav-item.active i { color: #fff; transform: scale(1.08); }
+    .nav-label {
+      font-size: 9px;
+      font-weight: 500;
+      color: rgba(255,255,255,0.3);
+      letter-spacing: 0.3px;
       transition: color 0.2s;
     }
-    .nav-item.active i { color: var(--accent); }
-    .nav-item.create i {
-      width: 48px;
-      height: 32px;
-      background: var(--accent);
-      color: #000;
-      border-radius: 8px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 16px;
-    }
-    .nav-dot {
+    .nav-item.active .nav-label { color: rgba(255,255,255,0.85); }
+    .nav-pill {
       position: absolute;
-      bottom: 4px;
-      width: 4px;
-      height: 4px;
-      border-radius: 50%;
-      background: var(--accent);
+      top: 4px;
+      width: 28px; height: 3px;
+      border-radius: 2px;
+      background: #fff;
       opacity: 0;
       transition: opacity 0.2s;
     }
-    .nav-item.active .nav-dot { opacity: 1; }
+    .nav-item.active .nav-pill { opacity: 1; }
+
+    /* Side-slide menu drawer */
+    #menuDrawer {
+      position: fixed;
+      top: 0; right: -300px;
+      width: 280px; height: 100%;
+      background: rgba(10,10,10,0.97);
+      backdrop-filter: blur(30px);
+      -webkit-backdrop-filter: blur(30px);
+      border-left: 1px solid rgba(255,255,255,0.08);
+      z-index: 700;
+      display: flex; flex-direction: column;
+      padding: env(safe-area-inset-top, 54px) 0 env(safe-area-inset-bottom, 24px);
+      transition: right 0.32s cubic-bezier(0.22,1,0.36,1);
+    }
+    #menuDrawer.open { right: 0; }
+    #menuScrim {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.5);
+      z-index: 699;
+      opacity: 0; pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+    #menuScrim.open { opacity: 1; pointer-events: auto; }
+    .menu-top {
+      padding: 20px 24px 24px;
+      border-bottom: 1px solid rgba(255,255,255,0.07);
+    }
+    .menu-brand { font-size: 18px; font-weight: 700; letter-spacing: 0.5px; }
+    .menu-brand span { font-weight: 300; opacity: 0.5; }
+    .menu-user { font-size: 12px; color: rgba(255,255,255,0.4); margin-top: 4px; }
+    .menu-list { flex: 1; padding: 16px 12px; overflow-y: auto; }
+    .menu-item {
+      display: flex; align-items: center; gap: 16px;
+      padding: 15px 14px;
+      border-radius: 16px;
+      cursor: pointer;
+      transition: background 0.15s ease;
+      margin-bottom: 4px;
+    }
+    .menu-item:active { background: rgba(255,255,255,0.06); }
+    .menu-item i {
+      width: 22px; text-align: center;
+      font-size: 18px;
+      color: rgba(255,255,255,0.55);
+    }
+    .menu-item span { font-size: 15px; font-weight: 500; color: rgba(255,255,255,0.85); }
+    .menu-item.danger i, .menu-item.danger span { color: #ff453a; }
+    .menu-divider { height: 1px; background: rgba(255,255,255,0.06); margin: 8px 14px; }
+    .menu-bottom { padding: 12px 24px; border-top: 1px solid rgba(255,255,255,0.07); }
+    .menu-version { font-size: 10px; color: rgba(255,255,255,0.2); letter-spacing: 0.5px; }
 
     /* Modal */
     #xmodal {
@@ -356,87 +411,6 @@
       transition: 0.2s;
     }
     .xl-btn.liked { color: #ff3b3b; background: rgba(255,59,59,0.15); border-color: #ff3b3b; }
-
-    /* Additional panels */
-    .panel-overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0,0,0,0.96);
-      backdrop-filter: blur(16px);
-      z-index: 500;
-      display: none;
-      flex-direction: column;
-      overflow-y: auto;
-      padding: 70px 20px 90px;
-    }
-    .panel-overlay.open { display: flex; }
-    .panel-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 24px;
-      font-size: 20px;
-      font-weight: 600;
-    }
-    .panel-close {
-      width: 36px;
-      height: 36px;
-      border-radius: 50%;
-      background: rgba(255,255,255,0.1);
-      border: 1px solid var(--border);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-    }
-    .saved-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 14px;
-    }
-    .saved-item {
-      background: #111;
-      border-radius: 18px;
-      overflow: hidden;
-      border: 1px solid var(--border);
-      cursor: pointer;
-      position: relative;
-      aspect-ratio: 1 / 1;
-    }
-    .saved-thumb { width: 100%; height: 100%; object-fit: cover; }
-    .saved-info { position: absolute; bottom: 0; left: 0; right: 0; background: linear-gradient(to top, #000, transparent); padding: 12px 8px 6px; font-size: 11px; font-weight: 600; }
-    .unsave-icon { position: absolute; top: 8px; right: 8px; background: rgba(0,0,0,0.6); border-radius: 30px; padding: 5px 7px; font-size: 11px; backdrop-filter: blur(8px); z-index: 12; cursor: pointer; }
-    .profile-list-item {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-      padding: 12px 16px;
-      background: rgba(255,255,255,0.03);
-      border: 1px solid var(--border);
-      border-radius: 18px;
-      margin-bottom: 12px;
-      cursor: pointer;
-    }
-    .profile-avatar {
-      width: 52px;
-      height: 52px;
-      border-radius: 16px;
-      overflow: hidden;
-      background: #111;
-    }
-    .profile-avatar img { width: 100%; height: 100%; object-fit: cover; }
-    .profile-info strong { display: block; font-size: 14px; }
-    .profile-info span { font-size: 11px; color: var(--muted); }
-    iframe#zynxFrame {
-      width: 100%;
-      height: 90%;
-      border: none;
-      background: #000;
-      border-radius: 20px;
-    }
   </style>
 </head>
 <body>
@@ -446,23 +420,57 @@
     <div class="msg-icon"><i class="fas fa-comment-dots"></i></div>
   </div>
 
-  <!-- Main Content (no category pills) -->
-  <div class="main-content">
-    <div class="carousel-container" id="carouselContainer">
-      <div class="carousel-track" id="carouselTrack"></div>
-    </div>
-    <div class="creators-section">
-      <h2 class="section-title">Featured Creators</h2>
-      <div class="creators-scroll" id="creatorsRow"></div>
-    </div>
+  <!-- Main Content Area: dynamic feed or iframe -->
+  <div class="main-content" id="mainContent">
+    <!-- Feed view will be injected here -->
   </div>
 
   <div class="bottom-nav">
-    <div class="nav-item active" data-nav="0"><i class="fas fa-home"></i><div class="nav-dot"></div></div>
-    <div class="nav-item" data-nav="1"><i class="fas fa-search"></i></div>
-    <div class="nav-item create" data-nav="2"><i class="fas fa-plus"></i></div>
-    <div class="nav-item" data-nav="3"><i class="fas fa-bell"></i></div>
-    <div class="nav-item" data-nav="4"><i class="fas fa-user"></i></div>
+    <div class="nav-item active" data-nav="0">
+      <div class="nav-pill"></div>
+      <i class="fas fa-house"></i>
+      <span class="nav-label">Home</span>
+    </div>
+    <div class="nav-item" data-nav="1">
+      <div class="nav-pill"></div>
+      <i class="fas fa-film"></i>
+      <span class="nav-label">ZYNX</span>
+    </div>
+    <div class="nav-item" data-nav="2">
+      <div class="nav-pill"></div>
+      <i class="fas fa-users"></i>
+      <span class="nav-label">Profiles</span>
+    </div>
+    <div class="nav-item" data-nav="3" id="menuBtn">
+      <div class="nav-pill"></div>
+      <i class="fas fa-bars"></i>
+      <span class="nav-label">Menu</span>
+    </div>
+  </div>
+
+  <!-- Menu scrim + drawer -->
+  <div id="menuScrim" onclick="closeMenu()"></div>
+  <div id="menuDrawer">
+    <div class="menu-top">
+      <div class="menu-brand">XOS <span>INT</span></div>
+      <div class="menu-user" id="menuUsername"></div>
+    </div>
+    <div class="menu-list">
+      <div class="menu-item" onclick="closeMenu(); showToast('Saved posts coming soon')">
+        <i class="fas fa-bookmark"></i><span>Saved Posts</span>
+      </div>
+      <div class="menu-divider"></div>
+      <div class="menu-item" onclick="window.open('https://nikhil007-eng.github.io/xos-social-Id/', '_blank')">
+        <i class="fas fa-code"></i><span>Developer</span>
+      </div>
+      <div class="menu-divider"></div>
+      <div class="menu-item danger" onclick="logout()">
+        <i class="fas fa-right-from-bracket"></i><span>Sign Out</span>
+      </div>
+    </div>
+    <div class="menu-bottom">
+      <div class="menu-version">XOS INT · ALPHA</div>
+    </div>
   </div>
 </div>
 
@@ -481,12 +489,6 @@
     </div>
   </div>
 </div>
-
-<!-- Panels -->
-<div id="savedPanel" class="panel-overlay"><div class="panel-header"><span>📁 Saved Posts</span><div class="panel-close" onclick="closePanel('savedPanel')"><i class="fas fa-times"></i></div></div><div id="savedGridContainer" class="saved-grid"></div></div>
-<div id="profilesPanel" class="panel-overlay"><div class="panel-header"><span>👥 Members</span><div class="panel-close" onclick="closePanel('profilesPanel')"><i class="fas fa-times"></i></div></div><div id="profilesListContainer"></div></div>
-<div id="settingsPanel" class="panel-overlay"><div class="panel-header"><span>⚙️ Settings</span><div class="panel-close" onclick="closePanel('settingsPanel')"><i class="fas fa-times"></i></div></div><div id="settingsContent"></div></div>
-<div id="zynxPanel" class="panel-overlay"><div class="panel-header"><span>🎬 ZYNX</span><div class="panel-close" onclick="closePanel('zynxPanel')"><i class="fas fa-times"></i></div></div><iframe id="zynxFrame" src="about:blank" allow="autoplay" style="width:100%;height:90%;border:none;background:#000;border-radius:20px;"></iframe></div>
 
 <audio id="ap"></audio>
 
@@ -522,11 +524,10 @@
   let POSTS = [];
   let carouselIndex = 0;
   let activePid = null, mSlide = 0, mTotal = 0;
+  let feedHTML = ''; // store generated feed for restoration
 
-  // Helper: format caption with @xos links (no visible link, just clickable mention)
   function formatCaptionWithLinks(caption) {
     if (!caption) return '';
-    // Match any word@xos (word can contain letters, numbers, underscore)
     const regex = /\b([a-zA-Z0-9_]+)@xos\b/gi;
     return caption.replace(regex, (match, username) => {
       return `<span class="mention-link" data-username="${username}" onclick="event.stopPropagation(); goToProfile('${username}'); return false;">${match}</span>`;
@@ -537,65 +538,29 @@
     window.location.href = `profile.html?u=${encodeURIComponent(username)}`;
   }
 
-  // Saved posts
-  function getSavedKey() { return `xos_saved_${USERNAME}`; }
-  function loadSavedPosts() { const raw = localStorage.getItem(getSavedKey()); return raw ? JSON.parse(raw) : []; }
-  function savePostsToStorage(arr) { localStorage.setItem(getSavedKey(), JSON.stringify(arr)); }
-  function isPostSaved(uniqueId) { return loadSavedPosts().some(p => p.uniqueId === uniqueId); }
-  function toggleSavePost(postObj) {
-    let saved = loadSavedPosts();
-    const exists = saved.find(p => p.uniqueId === postObj.uniqueId);
-    if (exists) saved = saved.filter(p => p.uniqueId !== postObj.uniqueId);
-    else { const toStore = { uniqueId: postObj.uniqueId, name: postObj.name, pfp: postObj.pfp, pfp2: postObj.pfp2, media: postObj.media, cap: postObj.cap, uid: postObj.uid, profileUrl: postObj.profileUrl, audio: postObj.audio }; saved.unshift(toStore); }
-    savePostsToStorage(saved);
-    updateSaveButtonUI(postObj.uniqueId, !exists);
-    renderSavedGrid();
-    return !exists;
+  function showToast(msg) {
+    const toast = document.createElement('div');
+    toast.textContent = msg;
+    toast.style.position = 'fixed';
+    toast.style.bottom = '90px';
+    toast.style.left = '50%';
+    toast.style.transform = 'translateX(-50%)';
+    toast.style.background = 'rgba(0,0,0,0.8)';
+    toast.style.backdropFilter = 'blur(10px)';
+    toast.style.color = 'white';
+    toast.style.padding = '8px 16px';
+    toast.style.borderRadius = '40px';
+    toast.style.fontSize = '13px';
+    toast.style.zIndex = '999';
+    toast.style.pointerEvents = 'none';
+    toast.style.opacity = '0';
+    toast.style.transition = 'opacity 0.2s';
+    document.body.appendChild(toast);
+    setTimeout(() => toast.style.opacity = '1', 10);
+    setTimeout(() => { toast.style.opacity = '0'; setTimeout(() => toast.remove(), 300); }, 2000);
   }
-  function updateSaveButtonUI(uid, isSavedNow) {
-    document.querySelectorAll(`.save-icon[data-uid="${uid}"]`).forEach(btn => {
-      btn.innerHTML = isSavedNow ? '<i class="fas fa-bookmark"></i>' : '<i class="far fa-bookmark"></i>';
-    });
-  }
-  function renderSavedGrid() {
-    const container = document.getElementById('savedGridContainer');
-    const saved = loadSavedPosts();
-    if (!saved.length) { container.innerHTML = '<div style="text-align:center;padding:40px;color:gray;">✨ No saved posts yet. Tap bookmark on any post.</div>'; return; }
-    let html = '';
-    saved.forEach(post => {
-      const thumb = post.media?.[0]?.src || '';
-      html += `<div class="saved-item" onclick="openPostModalFromSaved('${post.uniqueId}')"><img class="saved-thumb" src="${thumb}" onerror="this.src='https://placehold.co/400/111/333?text=📷'"><div class="saved-info">${escapeHtml(post.name || 'User')}</div><div class="unsave-icon" onclick="event.stopPropagation(); unsaveFromSaved('${post.uniqueId}')"><i class="fas fa-trash-alt"></i></div></div>`;
-    });
-    container.innerHTML = html;
-  }
-  function unsaveFromSaved(uid) {
-    const saved = loadSavedPosts().filter(p => p.uniqueId !== uid);
-    savePostsToStorage(saved);
-    renderSavedGrid();
-    const globalPost = POSTS.find(p => p.uniqueId === uid);
-    if (globalPost) updateSaveButtonUI(uid, false);
-  }
-  function openPostModalFromSaved(uniqueId) {
-    const saved = loadSavedPosts();
-    const post = saved.find(p => p.uniqueId === uniqueId);
-    if (post) openModalWithPost(post);
-  }
-  function openModalWithPost(post) {
-    activePid = post.uniqueId; mSlide = 0; mTotal = post.media.length;
-    document.getElementById('xmUser').textContent = post.name;
-    const formattedCap = formatCaptionWithLinks(post.cap || '');
-    document.getElementById('xmCap').innerHTML = formattedCap;
-    const track = document.getElementById('xmTrack');
-    track.innerHTML = post.media.map(m => `<div class="xm-slide">${m.type==='video'?`<video src="${m.src}" autoplay loop playsinline></video>`:`<img src="${m.src}">`}</div>`).join('');
-    track.style.width = (post.media.length * 100) + '%';
-    document.getElementById('xmDots').innerHTML = post.media.length > 1 ? post.media.map((_,i) => `<div class="xmdot${i===0?' on':''}"></div>`).join('') : '';
-    const liked = parseInt(localStorage.getItem('lk_'+post.uniqueId)) > 0;
-    document.getElementById('xlBtn').classList.toggle('liked', liked);
-    document.getElementById('xmodal').classList.add('open');
-    setupModSwipe();
-    const ap = document.getElementById('ap'); ap.pause(); ap.src = '';
-    if (post.audio) { ap.src = post.audio; ap.play().catch(()=>{}); }
-  }
+
+  function toggleSavePostById(uid) { showToast('Saved feature coming soon'); }
 
   async function loadData() {
     try {
@@ -625,11 +590,26 @@
       const srcs = new Set(all.map(p=>p.media[0]?.src));
       POSTS = [...all, ...STATIC_POSTS.filter(p=>!srcs.has(p.media[0]?.src))];
     } catch(e) { POSTS = [...STATIC_POSTS]; }
-    renderCarousel();
-    renderCreators();
+    renderFeed();
+    setupCarouselSwipe();
   }
 
-  function renderCarousel() {
+  function renderFeed() {
+    const container = document.getElementById('mainContent');
+    const feedDiv = document.createElement('div');
+    feedDiv.className = 'feed-view';
+    feedDiv.innerHTML = `
+      <div class="carousel-container" id="carouselContainer">
+        <div class="carousel-track" id="carouselTrack"></div>
+      </div>
+      <div class="creators-section">
+        <h2 class="section-title">Featured Creators</h2>
+        <div class="creators-scroll" id="creatorsRow"></div>
+      </div>
+    `;
+    container.innerHTML = '';
+    container.appendChild(feedDiv);
+    
     const track = document.getElementById('carouselTrack');
     track.innerHTML = '';
     POSTS.forEach((post, idx) => {
@@ -638,17 +618,13 @@
       card.dataset.index = idx;
       const isVideo = post.media[0].type === 'video';
       const mediaHtml = isVideo ? `<video src="${post.media[0].src}" muted autoplay loop playsinline></video>` : `<img src="${post.media[0].src}" loading="lazy">`;
-      const saved = isPostSaved(post.uniqueId);
       const liked = parseInt(localStorage.getItem('lk_'+post.uniqueId)) > 0;
-      
-      // Split caption into first line and rest
       const caption = post.cap || '';
       const lines = caption.split('\n');
       const firstLine = lines[0] || '';
       const restLines = lines.slice(1).join('\n');
       const formattedFirst = formatCaptionWithLinks(firstLine);
       const formattedRest = formatCaptionWithLinks(restLines);
-      
       const profileHtml = `
         <div class="card-profile-row">
           <div class="small-avatar">
@@ -657,7 +633,6 @@
           <span class="profile-name">${escapeHtml(post.name)}</span>
         </div>
       `;
-      
       card.innerHTML = `
         ${mediaHtml}
         <div class="card-overlay">
@@ -671,7 +646,7 @@
               <span class="${liked ? 'liked' : ''}"><i class="fas fa-heart"></i> ${liked ? parseInt(localStorage.getItem('lk_'+post.uniqueId)) : (post.likes || 0)}</span>
               <span><i class="fas fa-comment"></i></span>
               <span>${ago(post.timestamp)}</span>
-              <span class="save-icon" data-uid="${post.uniqueId}" onclick="event.stopPropagation(); toggleSavePostById('${post.uniqueId}')">${saved ? '<i class="fas fa-bookmark"></i>' : '<i class="far fa-bookmark"></i>'}</span>
+              <span class="save-icon" data-uid="${post.uniqueId}" onclick="event.stopPropagation(); toggleSavePostById('${post.uniqueId}')"><i class="far fa-bookmark"></i></span>
             </div>
           </div>
         </div>
@@ -679,10 +654,7 @@
       card.onclick = () => openModFromPost(post);
       track.appendChild(card);
     });
-    updateCarousel(true);
-  }
-
-  function renderCreators() {
+    
     const usersMap = new Map();
     POSTS.forEach(p => { if (!usersMap.has(p.uid)) usersMap.set(p.uid, { name: p.name, pfp: p.pfp, profileUrl: p.profileUrl }); });
     const creators = Array.from(usersMap.values()).slice(0, 8);
@@ -700,8 +672,91 @@
       `;
       row.appendChild(item);
     });
+    
+    updateCarousel(true);
   }
 
+  function loadPageInMain(pageUrl) {
+    const container = document.getElementById('mainContent');
+    container.innerHTML = '';
+    const iframe = document.createElement('iframe');
+    iframe.src = pageUrl;
+    iframe.style.width = '100%';
+    iframe.style.height = '100%';
+    iframe.style.border = 'none';
+    iframe.style.backgroundColor = '#000';
+    container.appendChild(iframe);
+  }
+
+  function ago(ts) { const d = Date.now() - ts, m = Math.floor(d/60000); if(m<1) return 'now'; if(m<60) return m+'m'; const h = Math.floor(m/60); if(h<24) return h+'h'; return Math.floor(h/24)+'d'; }
+  function escapeHtml(str) { if(!str) return ''; return str.replace(/[&<>]/g, function(m){ if(m==='&') return '&amp;'; if(m==='<') return '&lt;'; if(m==='>') return '&gt;'; return m;}); }
+
+  // Carousel logic
+  const CARD_W = 320, CARD_GAP = 2;
+  const LERP_FACTOR = 0.12;
+  let cx_pos = 0, cx_target = 0, cx_drag = false, cx_raf = null;
+  function getSnapX(index) {
+    const cw = document.querySelector('.carousel-container')?.offsetWidth || window.innerWidth;
+    return -(index * (CARD_W + CARD_GAP) - cw / 2 + CARD_W / 2);
+  }
+  function applyCarouselFrame() {
+    const track = document.getElementById('carouselTrack');
+    const cards = document.querySelectorAll('.carousel-card');
+    if (!track) return;
+    if (!cx_drag) cx_pos += (cx_target - cx_pos) * LERP_FACTOR;
+    track.style.transform = `translateX(${cx_pos}px)`;
+    const cw = document.querySelector('.carousel-container')?.offsetWidth || window.innerWidth;
+    const centerX = cw / 2;
+    cards.forEach((card, idx) => {
+      const cardCenter = -cx_pos + idx * (CARD_W + CARD_GAP) + CARD_W / 2;
+      const dist = Math.abs(cardCenter - centerX);
+      const t = Math.min(dist / (CARD_W * 0.85), 1);
+      card.style.transform = `scale(${1 - 0.04 * t})`;
+      card.style.opacity = 1;
+      card.style.boxShadow = t < 0.12 ? '0 20px 40px rgba(0,0,0,0.5)' : 'none';
+      card.style.borderColor = t < 0.12 ? 'rgba(255,255,255,0.2)' : 'rgba(255,255,255,0.08)';
+    });
+    const settled = !cx_drag && Math.abs(cx_target - cx_pos) < 0.1;
+    if (!settled) cx_raf = requestAnimationFrame(applyCarouselFrame);
+    else { cx_pos = cx_target; track.style.transform = `translateX(${cx_pos}px)`; cx_raf = null; }
+  }
+  function startCarouselLoop() { if (!cx_raf) cx_raf = requestAnimationFrame(applyCarouselFrame); }
+  function updateCarousel(instant) { cx_target = getSnapX(carouselIndex); if (instant) cx_pos = cx_target; startCarouselLoop(); }
+  function setupCarouselSwipe() {
+    const container = document.getElementById('carouselContainer');
+    if (!container) return;
+    let startX = 0, lastX = 0, lastT = 0, velocity = 0, isDragging = false, dragBase = 0;
+    container.addEventListener('touchstart', e => {
+      if (cx_raf) { cancelAnimationFrame(cx_raf); cx_raf = null; }
+      startX = e.touches[0].clientX; lastX = startX; lastT = Date.now(); velocity = 0;
+      dragBase = cx_pos; isDragging = true; cx_drag = true; startCarouselLoop();
+    }, { passive: true });
+    container.addEventListener('touchmove', e => {
+      if (!isDragging) return;
+      const dx = e.touches[0].clientX - startX;
+      if (Math.abs(dx) > 6) e.preventDefault();
+      const now = Date.now(), dt = now - lastT;
+      if (dt > 0) velocity = (e.touches[0].clientX - lastX) / dt;
+      lastX = e.touches[0].clientX; lastT = now;
+      let raw = dragBase + dx;
+      const minX = getSnapX(POSTS.length - 1), maxX = getSnapX(0);
+      if (raw > maxX) raw = maxX + (raw - maxX) * 0.18;
+      else if (raw < minX) raw = minX + (raw - minX) * 0.18;
+      cx_pos = raw;
+    }, { passive: false });
+    container.addEventListener('touchend', e => {
+      if (!isDragging) return;
+      isDragging = false; cx_drag = false;
+      const diff = e.changedTouches[0].clientX - startX;
+      const isFlick = Math.abs(velocity) > 0.2, isSwipe = Math.abs(diff) > 22;
+      if (diff < 0 && (isSwipe || isFlick) && carouselIndex < POSTS.length - 1) carouselIndex++;
+      else if (diff > 0 && (isSwipe || isFlick) && carouselIndex > 0) carouselIndex--;
+      updateCarousel();
+    });
+    container.addEventListener('touchcancel', () => { isDragging = false; cx_drag = false; updateCarousel(); });
+  }
+
+  // Modal functions
   function openModFromPost(post) {
     activePid = post.uniqueId; mSlide = 0; mTotal = post.media.length;
     document.getElementById('xmUser').textContent = post.name;
@@ -718,7 +773,6 @@
     const ap = document.getElementById('ap'); ap.pause(); ap.src = '';
     if (post.audio) { ap.src = post.audio; ap.play().catch(()=>{}); }
   }
-
   function setupModSwipe() {
     const box = document.getElementById('xmBox');
     let startX = 0, startY = 0;
@@ -735,7 +789,6 @@
       } else if (dy > 80) closeMod();
     };
   }
-
   function closeMod(e) { if(e && e.target !== document.getElementById('xmodal')) return; document.getElementById('xmodal').classList.remove('open'); document.getElementById('xmTrack').innerHTML = ''; }
   function doLike() {
     if(!activePid) return;
@@ -744,185 +797,59 @@
     btn.classList.add('liked');
     const curr = parseInt(localStorage.getItem('lk_'+activePid)) || 0;
     localStorage.setItem('lk_'+activePid, curr + 1);
-    updateLikeDisplay(activePid, curr+1);
-  }
-  function updateLikeDisplay(uid, count) {
-    const likeSpan = document.querySelector(`.card-stats span[data-uid="${uid}"]`);
-    if(likeSpan) likeSpan.innerHTML = `<i class="fas fa-heart"></i> ${count}`;
-  }
-  function toggleSavePostById(uid) { const post = POSTS.find(p => p.uniqueId === uid); if(post) toggleSavePost(post); }
-  function ago(ts) { const d = Date.now() - ts, m = Math.floor(d/60000); if(m<1) return 'now'; if(m<60) return m+'m'; const h = Math.floor(m/60); if(h<24) return h+'h'; return Math.floor(h/24)+'d'; }
-  function escapeHtml(str) { if(!str) return ''; return str.replace(/[&<>]/g, function(m){ if(m==='&') return '&amp;'; if(m==='<') return '&lt;'; if(m==='>') return '&gt;'; return m;}); }
-
-  // ── Lerp carousel engine — One UI style, zero oscillation ───────────────
-  const CARD_W = 320, CARD_GAP = 2;
-  const LERP_FACTOR = 0.12;   // snap speed: 0.1 = slow/floaty, 0.2 = crisp
-
-  let cx_pos    = 0;
-  let cx_target = 0;
-  let cx_drag   = false;
-  let cx_raf    = null;
-
-  function getSnapX(index) {
-    const cw = document.querySelector('.carousel-container').offsetWidth;
-    return -(index * (CARD_W + CARD_GAP) - cw / 2 + CARD_W / 2);
-  }
-
-  function applyCarouselFrame() {
-    const track = document.getElementById('carouselTrack');
-    const cards = document.querySelectorAll('.carousel-card');
-    if (!track) return;
-
-    // Exponential lerp — always moves toward target, never past it, no bounce
-    if (!cx_drag) {
-      cx_pos += (cx_target - cx_pos) * LERP_FACTOR;
-    }
-
-    track.style.transform = `translateX(${cx_pos}px)`;
-
-    // Per-card scale + opacity — continuous, proportional to distance from center
-    const cw = document.querySelector('.carousel-container').offsetWidth;
-    const centerX = cw / 2;
-    cards.forEach((card, idx) => {
-      const cardCenter = -cx_pos + idx * (CARD_W + CARD_GAP) + CARD_W / 2;
-      const dist = Math.abs(cardCenter - centerX);
-      const t = Math.min(dist / (CARD_W * 0.85), 1);
-      card.style.transform  = `scale(${1 - 0.04 * t})`;
-      card.style.opacity    = 1;
-      card.style.boxShadow  = t < 0.12 ? '0 20px 40px rgba(0,0,0,0.5)' : 'none';
-      card.style.borderColor= t < 0.12 ? 'rgba(255,255,255,0.2)' : 'rgba(255,255,255,0.08)';
-    });
-
-    const settled = !cx_drag && Math.abs(cx_target - cx_pos) < 0.1;
-    if (!settled) {
-      cx_raf = requestAnimationFrame(applyCarouselFrame);
-    } else {
-      cx_pos = cx_target;
-      track.style.transform = `translateX(${cx_pos}px)`;
-      cx_raf = null;
+    // Update in feed if present
+    const card = document.querySelector(`.carousel-card .save-icon[data-uid="${activePid}"]`)?.closest('.carousel-card');
+    if (card) {
+      const likeSpan = card.querySelector('.card-stats span:first-child');
+      if (likeSpan) likeSpan.innerHTML = `<i class="fas fa-heart"></i> ${curr+1}`;
+      likeSpan.classList.add('liked');
     }
   }
 
-  function startCarouselLoop() {
-    if (!cx_raf) cx_raf = requestAnimationFrame(applyCarouselFrame);
+  // Navigation
+  let activeNav = 0;
+  function setActiveNav(idx) {
+    activeNav = idx;
+    document.querySelectorAll('.nav-item').forEach((n, i) => n.classList.toggle('active', i === idx));
   }
-
-  function updateCarousel(instant) {
-    cx_target = getSnapX(carouselIndex);
-    if (instant) cx_pos = cx_target;
-    startCarouselLoop();
-  }
-
-  function setupCarouselSwipe() {
-    const container = document.getElementById('carouselContainer');
-    let startX = 0, lastX = 0, lastT = 0, velocity = 0;
-    let isDragging = false, dragBase = 0;
-
-    container.addEventListener('touchstart', e => {
-      // Kill any running snap immediately — finger takes full control
-      if (cx_raf) { cancelAnimationFrame(cx_raf); cx_raf = null; }
-      startX   = e.touches[0].clientX;
-      lastX    = startX;
-      lastT    = Date.now();
-      velocity = 0;
-      dragBase = cx_pos;
-      isDragging = true;
-      cx_drag    = true;
-      startCarouselLoop();
-    }, { passive: true });
-
-    container.addEventListener('touchmove', e => {
-      if (!isDragging) return;
-      const dx = e.touches[0].clientX - startX;
-      if (Math.abs(dx) > 6) e.preventDefault();
-
-      const now = Date.now(), dt = now - lastT;
-      if (dt > 0) velocity = (e.touches[0].clientX - lastX) / dt;
-      lastX = e.touches[0].clientX;
-      lastT = now;
-
-      // Pure 1:1 finger tracking, rubber-band at edges
-      let raw = dragBase + dx;
-      const minX = getSnapX(POSTS.length - 1);
-      const maxX = getSnapX(0);
-      if      (raw > maxX) raw = maxX + (raw - maxX) * 0.18;
-      else if (raw < minX) raw = minX + (raw - minX) * 0.18;
-
-      cx_pos = raw;
-    }, { passive: false });
-
-    container.addEventListener('touchend', e => {
-      if (!isDragging) return;
-      isDragging = false;
-      cx_drag    = false;
-
-      const diff    = e.changedTouches[0].clientX - startX;
-      const isFlick = Math.abs(velocity) > 0.2;
-      const isSwipe = Math.abs(diff) > 22;
-
-      if      (diff < 0 && (isSwipe || isFlick) && carouselIndex < POSTS.length - 1) carouselIndex++;
-      else if (diff > 0 && (isSwipe || isFlick) && carouselIndex > 0)                carouselIndex--;
-
-      updateCarousel();
-    });
-
-    container.addEventListener('touchcancel', () => {
-      isDragging = false; cx_drag = false;
-      updateCarousel();
-    });
-  }
-
-  // Panels
-  function openPanel(panelId) {
-    document.getElementById(panelId).classList.add('open');
-    if (panelId === 'savedPanel') renderSavedGrid();
-    if (panelId === 'profilesPanel') renderProfilesPanel();
-    if (panelId === 'settingsPanel') renderSettingsPanel();
-    if (panelId === 'zynxPanel') { const frame = document.getElementById('zynxFrame'); if(frame.src === 'about:blank') frame.src = 'ZYNX.html'; }
-  }
-  function closePanel(panelId) { document.getElementById(panelId).classList.remove('open'); }
-  async function renderProfilesPanel() {
-    const container = document.getElementById('profilesListContainer');
-    const psnap = await db.ref('profiles').once('value');
-    const pdata = psnap.val() || {};
-    const entries = Object.values(pdata);
-    if(!entries.length) { container.innerHTML = '<div style="text-align:center;padding:40px;">No profiles yet</div>'; return; }
-    let html = '';
-    entries.forEach(p => {
-      const uid = p.id || (p.name||'').toLowerCase();
-      html += `<div class="profile-list-item" onclick="window.location.href='profile.html?u=${encodeURIComponent(uid)}'">
-        <div class="profile-avatar">${p.photo ? `<img src="${p.photo}" onerror="this.style.display='none'">` : '<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;">👤</div>'}</div>
-        <div class="profile-info"><strong>${escapeHtml(p.name||uid)}</strong><span>@${uid}</span></div>
-      </div>`;
-    });
-    container.innerHTML = html;
-  }
-  function renderSettingsPanel() {
-    const container = document.getElementById('settingsContent');
-    container.innerHTML = `<div style="margin:0 0 20px 0;padding:16px;background:rgba(255,255,255,0.03);border-radius:20px;display:flex;align-items:center;gap:14px;"><div style="width:52px;height:52px;border-radius:14px;background:#111;display:flex;align-items:center;justify-content:center;">${USERNAME.charAt(0).toUpperCase()}</div><div><strong>${escapeHtml(USERNAME)}</strong><div style="font-size:11px;color:var(--muted);">Member</div></div></div>
-    <div><div style="display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid var(--border);cursor:pointer;" onclick="closePanel('settingsPanel');openPanel('savedPanel');"><span>📚 Saved posts</span><i class="fas fa-chevron-right"></i></div>
-    <div style="display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid var(--border);cursor:pointer;" onclick="logout()"><span>🚪 Sign out</span><i class="fas fa-sign-out-alt"></i></div></div>`;
-  }
-  function logout() { localStorage.removeItem('xos_session'); location.reload(); }
-
-  // Bottom navigation
   document.querySelectorAll('.nav-item').forEach((item, idx) => {
     item.addEventListener('click', () => {
-      document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-      item.classList.add('active');
-      if (idx === 0) { closePanel('savedPanel'); closePanel('profilesPanel'); closePanel('settingsPanel'); closePanel('zynxPanel'); }
-      else if (idx === 1) openPanel('profilesPanel');
-      else if (idx === 2) openPanel('zynxPanel');
-      else if (idx === 3) openPanel('settingsPanel');
-      else if (idx === 4) openPanel('savedPanel');
+      if (idx === 3) { openMenu(); setActiveNav(3); return; }
+      if (idx === 0) {
+        // restore feed
+        renderFeed();
+        setActiveNav(0);
+      } else if (idx === 1) {
+        loadPageInMain('ZYNX.html');
+        setActiveNav(1);
+      } else if (idx === 2) {
+        loadPageInMain('profiles.html');
+        setActiveNav(2);
+      }
     });
   });
 
-  window.closeMod = closeMod; window.doLike = doLike; window.toggleSavePostById = toggleSavePostById; window.openPostModalFromSaved = openPostModalFromSaved; window.unsaveFromSaved = unsaveFromSaved; window.openPanel = openPanel; window.closePanel = closePanel; window.logout = logout; window.goToProfile = goToProfile;
+  function openMenu() {
+    document.getElementById('menuDrawer').classList.add('open');
+    document.getElementById('menuScrim').classList.add('open');
+    document.getElementById('menuUsername').textContent = USERNAME || 'Member';
+  }
+  function closeMenu() {
+    document.getElementById('menuDrawer').classList.remove('open');
+    document.getElementById('menuScrim').classList.remove('open');
+  }
+  function logout() { localStorage.removeItem('xos_session'); location.reload(); }
+
+  window.closeMod = closeMod;
+  window.doLike = doLike;
+  window.toggleSavePostById = toggleSavePostById;
+  window.goToProfile = goToProfile;
+  window.showToast = showToast;
+  window.closeMenu = closeMenu;
+  window.openMenu = openMenu;
+  window.logout = logout;
+
   loadData();
-  setTimeout(() => setupCarouselSwipe(), 100);
 </script>
 </body>
 </html>
-
-align post column in centr with peak both sides and also make touch response more smooth and responsive I can shake post containers that much smoother animation.
