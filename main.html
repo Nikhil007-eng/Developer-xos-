@@ -51,28 +51,19 @@
       display: flex;
       height: 100%;
       align-items: center;
-      gap: 16px;
-      transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+      gap: 8px;
       will-change: transform;
     }
     .carousel-card {
       flex-shrink: 0;
-      width: 280px;
-      height: 500px;
-      border-radius: 28px;
+      width: 320px;
+      height: 510px;
+      border-radius: 30px;
       overflow: hidden;
       position: relative;
       background: var(--card-bg);
       border: 1px solid var(--border);
-      transition: all 0.3s ease;
-      transform: scale(0.92);
-      opacity: 0.7;
-    }
-    .carousel-card.active {
-      transform: scale(1);
-      opacity: 1;
-      box-shadow: 0 20px 40px rgba(0,0,0,0.5);
-      border-color: rgba(255,255,255,0.2);
+      will-change: transform, opacity;
     }
     .carousel-card img, .carousel-card video {
       width: 100%;
@@ -91,11 +82,11 @@
     .card-profile-row {
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 2px;
     }
     .small-avatar {
-      width: 32px;
-      height: 32px;
+      width: 28px;
+      height: 28px;
       border-radius: 50%;
       overflow: hidden;
       background: #222;
@@ -643,7 +634,7 @@
     track.innerHTML = '';
     POSTS.forEach((post, idx) => {
       const card = document.createElement('div');
-      card.className = 'carousel-card' + (idx === carouselIndex ? ' active' : '');
+      card.className = 'carousel-card';
       card.dataset.index = idx;
       const isVideo = post.media[0].type === 'video';
       const mediaHtml = isVideo ? `<video src="${post.media[0].src}" muted autoplay loop playsinline></video>` : `<img src="${post.media[0].src}" loading="lazy">`;
@@ -688,7 +679,7 @@
       card.onclick = () => openModFromPost(post);
       track.appendChild(card);
     });
-    updateCarousel();
+    updateCarousel(true);
   }
 
   function renderCreators() {
@@ -763,31 +754,122 @@
   function ago(ts) { const d = Date.now() - ts, m = Math.floor(d/60000); if(m<1) return 'now'; if(m<60) return m+'m'; const h = Math.floor(m/60); if(h<24) return h+'h'; return Math.floor(h/24)+'d'; }
   function escapeHtml(str) { if(!str) return ''; return str.replace(/[&<>]/g, function(m){ if(m==='&') return '&amp;'; if(m==='<') return '&lt;'; if(m==='>') return '&gt;'; return m;}); }
 
-  // Carousel with centering + peek
+  // ── Lerp carousel engine — One UI style, zero oscillation ───────────────
+  const CARD_W = 320, CARD_GAP = 2;
+  const LERP_FACTOR = 0.12;   // snap speed: 0.1 = slow/floaty, 0.2 = crisp
+
+  let cx_pos    = 0;
+  let cx_target = 0;
+  let cx_drag   = false;
+  let cx_raf    = null;
+
+  function getSnapX(index) {
+    const cw = document.querySelector('.carousel-container').offsetWidth;
+    return -(index * (CARD_W + CARD_GAP) - cw / 2 + CARD_W / 2);
+  }
+
+  function applyCarouselFrame() {
+    const track = document.getElementById('carouselTrack');
+    const cards = document.querySelectorAll('.carousel-card');
+    if (!track) return;
+
+    // Exponential lerp — always moves toward target, never past it, no bounce
+    if (!cx_drag) {
+      cx_pos += (cx_target - cx_pos) * LERP_FACTOR;
+    }
+
+    track.style.transform = `translateX(${cx_pos}px)`;
+
+    // Per-card scale + opacity — continuous, proportional to distance from center
+    const cw = document.querySelector('.carousel-container').offsetWidth;
+    const centerX = cw / 2;
+    cards.forEach((card, idx) => {
+      const cardCenter = -cx_pos + idx * (CARD_W + CARD_GAP) + CARD_W / 2;
+      const dist = Math.abs(cardCenter - centerX);
+      const t = Math.min(dist / (CARD_W * 0.85), 1);
+      card.style.transform  = `scale(${1 - 0.04 * t})`;
+      card.style.opacity    = 1;
+      card.style.boxShadow  = t < 0.12 ? '0 20px 40px rgba(0,0,0,0.5)' : 'none';
+      card.style.borderColor= t < 0.12 ? 'rgba(255,255,255,0.2)' : 'rgba(255,255,255,0.08)';
+    });
+
+    const settled = !cx_drag && Math.abs(cx_target - cx_pos) < 0.1;
+    if (!settled) {
+      cx_raf = requestAnimationFrame(applyCarouselFrame);
+    } else {
+      cx_pos = cx_target;
+      track.style.transform = `translateX(${cx_pos}px)`;
+      cx_raf = null;
+    }
+  }
+
+  function startCarouselLoop() {
+    if (!cx_raf) cx_raf = requestAnimationFrame(applyCarouselFrame);
+  }
+
+  function updateCarousel(instant) {
+    cx_target = getSnapX(carouselIndex);
+    if (instant) cx_pos = cx_target;
+    startCarouselLoop();
+  }
+
   function setupCarouselSwipe() {
     const container = document.getElementById('carouselContainer');
-    let startX = 0, isDragging = false;
-    container.addEventListener('touchstart', e => { startX = e.touches[0].clientX; isDragging = true; }, {passive: true});
-    container.addEventListener('touchmove', e => { if (isDragging && Math.abs(e.touches[0].clientX - startX) > 50) e.preventDefault(); }, {passive: false});
+    let startX = 0, lastX = 0, lastT = 0, velocity = 0;
+    let isDragging = false, dragBase = 0;
+
+    container.addEventListener('touchstart', e => {
+      // Kill any running snap immediately — finger takes full control
+      if (cx_raf) { cancelAnimationFrame(cx_raf); cx_raf = null; }
+      startX   = e.touches[0].clientX;
+      lastX    = startX;
+      lastT    = Date.now();
+      velocity = 0;
+      dragBase = cx_pos;
+      isDragging = true;
+      cx_drag    = true;
+      startCarouselLoop();
+    }, { passive: true });
+
+    container.addEventListener('touchmove', e => {
+      if (!isDragging) return;
+      const dx = e.touches[0].clientX - startX;
+      if (Math.abs(dx) > 6) e.preventDefault();
+
+      const now = Date.now(), dt = now - lastT;
+      if (dt > 0) velocity = (e.touches[0].clientX - lastX) / dt;
+      lastX = e.touches[0].clientX;
+      lastT = now;
+
+      // Pure 1:1 finger tracking, rubber-band at edges
+      let raw = dragBase + dx;
+      const minX = getSnapX(POSTS.length - 1);
+      const maxX = getSnapX(0);
+      if      (raw > maxX) raw = maxX + (raw - maxX) * 0.18;
+      else if (raw < minX) raw = minX + (raw - minX) * 0.18;
+
+      cx_pos = raw;
+    }, { passive: false });
+
     container.addEventListener('touchend', e => {
       if (!isDragging) return;
       isDragging = false;
-      const diff = e.changedTouches[0].clientX - startX;
-      if (Math.abs(diff) > 60) {
-        if (diff < 0 && carouselIndex < POSTS.length - 1) carouselIndex++;
-        else if (diff > 0 && carouselIndex > 0) carouselIndex--;
-        updateCarousel();
-      }
+      cx_drag    = false;
+
+      const diff    = e.changedTouches[0].clientX - startX;
+      const isFlick = Math.abs(velocity) > 0.2;
+      const isSwipe = Math.abs(diff) > 22;
+
+      if      (diff < 0 && (isSwipe || isFlick) && carouselIndex < POSTS.length - 1) carouselIndex++;
+      else if (diff > 0 && (isSwipe || isFlick) && carouselIndex > 0)                carouselIndex--;
+
+      updateCarousel();
     });
-  }
-  function updateCarousel() {
-    const cards = document.querySelectorAll('.carousel-card');
-    cards.forEach((card, idx) => card.classList.toggle('active', idx === carouselIndex));
-    const containerWidth = document.querySelector('.carousel-container').offsetWidth;
-    const cardWidth = 280;
-    const gap = 16;
-    const offset = carouselIndex * (cardWidth + gap) - (containerWidth/2) + (cardWidth/2);
-    document.getElementById('carouselTrack').style.transform = `translateX(${-offset}px)`;
+
+    container.addEventListener('touchcancel', () => {
+      isDragging = false; cx_drag = false;
+      updateCarousel();
+    });
   }
 
   // Panels
@@ -842,3 +924,5 @@
 </script>
 </body>
 </html>
+
+align post column in centr with peak both sides and also make touch response more smooth and responsive I can shake post containers that much smoother animation.
