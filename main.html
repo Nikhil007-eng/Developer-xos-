@@ -4,164 +4,410 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>XOS INT — Feed</title>
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&family=Space+Mono:wght@400;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   <style>
     :root {
-      --accent: #007aff;
+      --accent: #fff;
       --bg: #000;
-      --border: rgba(255,255,255,0.07);
-      --muted: rgba(255,255,255,0.38);
-      --nav-h: 76px;
+      --card-bg: #111;
+      --pill-bg: #1a1a1a;
+      --border: rgba(255,255,255,0.08);
+      --muted: rgba(255,255,255,0.5);
+      --text-secondary: rgba(255,255,255,0.6);
+      --nav-h: 70px;
+      --mention-color: #0a84ff;
+      --mention-hover: #409cff;
     }
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; margin: 0; padding: 0; user-select: none; }
-    html, body { height: 100%; width: 100%; overflow: hidden; background: var(--bg); font-family: 'Inter', sans-serif; color: #fff; position: fixed; }
+    html, body { height: 100%; width: 100%; overflow: hidden; background: var(--bg); font-family: 'Space Grotesk', sans-serif; color: #fff; position: fixed; }
 
-    #app { width: 100%; height: 100dvh; overflow: hidden; }
-    .page-wrapper { display: flex; width: 400%; height: 100%; transition: transform 0.42s cubic-bezier(0.25,1,0.5,1); will-change: transform; }
-    .page { width: 25%; height: 100%; overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
-    .page::-webkit-scrollbar { display: none; }
-    #page-home, #page-profiles, #page-settings { padding-bottom: calc(var(--nav-h) + 20px); }
-    #page-zynx { padding-bottom: 0; }
-
-    .top-bar {
-      position: sticky; top: 0; z-index: 50;
-      padding: env(safe-area-inset-top, 14px) 18px 15px;
-      background: linear-gradient(to bottom, rgba(0,0,0,0.97) 70%, transparent);
+    #app { width: 100%; height: 100dvh; overflow: hidden; display: flex; flex-direction: column; }
+    
+    /* Top Header */
+    .top-header {
+      position: sticky; top: 0; z-index: 100;
+      padding: env(safe-area-inset-top, 14px) 20px 12px;
+      background: var(--bg);
       display: flex; align-items: center; justify-content: space-between;
     }
-    .brand { font-family: 'Orbitron', sans-serif; font-size: 20px; letter-spacing: 3px; font-weight: 700; }
-    .brand span { color: var(--accent); }
+    .brand { font-family: 'Space Grotesk', sans-serif; font-size: 22px; font-weight: 700; letter-spacing: 1px; }
+    .brand span { font-weight: 300; opacity: 0.7; }
+    .msg-icon { width: 40px; height: 40px; border-radius: 50%; background: var(--pill-bg); display: flex; align-items: center; justify-content: center; cursor: pointer; border: 1px solid var(--border); }
+    .msg-icon i { font-size: 16px; color: var(--accent); }
 
-    .story-scroll { display: flex; gap: 12px; padding: 4px 20px 20px; overflow-x: auto; scrollbar-width: none; }
-    .story-scroll::-webkit-scrollbar { display: none; }
-    .story-item { display: flex; flex-direction: column; align-items: center; gap: 6px; flex-shrink: 0; cursor: pointer; }
-    .story-sq {
-      width: 75px; height: 75px;
-      border-radius: 15px;
+    /* Main Content Area */
+    .main-content { flex: 1; overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch; scrollbar-width: none; padding-bottom: calc(var(--nav-h) + 20px); }
+    .main-content::-webkit-scrollbar { display: none; }
+
+    /* Horizontal Carousel Feed - centered with peek */
+    .carousel-container {
+      position: relative;
+      height: 540px;
+      margin: 10px 0 30px;
       overflow: hidden;
-      background: #111;
-      position: relative;
     }
-    .story-sq .av-wrap { position: absolute; inset: 0; }
-    .story-sq .av-wrap img { width: 100%; height: 100%; object-fit: cover; transition: opacity 0.7s ease; }
-    .story-sq .av-wrap .av2 { opacity: 0; }
-    .story-sq .initials { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; font-family: 'Orbitron', sans-serif; font-size: 17px; color: rgba(255,255,255,0.4); }
-    .story-name { font-size: 10px; color: var(--muted); max-width: 62px; text-align: center; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-
-    .feed-sep { height: 1px; background: var(--border); margin: 0 0 8px; }
-
-    .post-card { width: 100%; background: var(--bg); }
-    .post-header { display: flex; align-items: center; padding: 10px 14px; gap: 10px; cursor: pointer; }
-    .post-pfp {
-      width: 36px; height: 36px; border-radius: 10px;
-      overflow: hidden; flex-shrink: 0; background: #111;
-      position: relative;
-    }
-    .post-pfp .av-wrap { position: absolute; inset: 0; }
-    .post-pfp .av-wrap img { width: 100%; height: 100%; object-fit: cover; transition: opacity 0.7s ease; }
-    .post-pfp .av-wrap .av2 { opacity: 0; }
-    .post-pfp .initials { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; font-family: 'Orbitron', sans-serif; font-size: 13px; color: rgba(255,255,255,0.4); }
-    .post-uinfo { flex: 1; min-width: 0; }
-    .post-uname { font-size: 13px; font-weight: 600; display: block; }
-    .post-ucap { font-size: 11px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .post-dots { color: rgba(255,255,255,0.22); font-size: 20px; padding: 4px 6px; cursor: pointer; line-height: 1; }
-
-    .post-media {
-      width: 100%;
-      background: #080808;
-      position: relative;
-    }
-    .post-track {
+    .carousel-track {
       display: flex;
-      width: 100%;
-      transition: transform 0.35s cubic-bezier(0.16,1,0.3,1);
-    }
-    .post-slide {
-      min-width: 100%;
-      display: flex;
-      justify-content: center;
+      height: 100%;
       align-items: center;
-      background: #000;
+      gap: 16px;
+      transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+      will-change: transform;
+    }
+    .carousel-card {
+      flex-shrink: 0;
+      width: 280px;
+      height: 500px;
+      border-radius: 28px;
+      overflow: hidden;
       position: relative;
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      transition: all 0.3s ease;
+      transform: scale(0.92);
+      opacity: 0.7;
     }
-    .post-slide img,
-    .post-slide video {
+    .carousel-card.active {
+      transform: scale(1);
+      opacity: 1;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+      border-color: rgba(255,255,255,0.2);
+    }
+    .carousel-card img, .carousel-card video {
       width: 100%;
-      height: auto;
-      display: block;
-      object-fit: contain;
-      max-height: 75vh;
+      height: 100%;
+      object-fit: cover;
     }
-    /* Sound toggle button */
-    .sound-toggle {
+    .card-overlay {
       position: absolute;
-      bottom: 12px;
-      right: 12px;
-      background: rgba(0,0,0,0.6);
-      backdrop-filter: blur(8px);
-      border-radius: 30px;
+      inset: 0;
+      background: linear-gradient(to bottom, transparent 40%, rgba(0,0,0,0.9) 100%);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 20px;
+    }
+    .card-profile-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .small-avatar {
       width: 32px;
       height: 32px;
+      border-radius: 50%;
+      overflow: hidden;
+      background: #222;
+      border: 1px solid rgba(255,255,255,0.2);
+    }
+    .small-avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .profile-name {
+      font-size: 14px;
+      font-weight: 600;
+      color: #fff;
+      text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+    }
+    .card-bottom {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+    }
+    .card-info h3 {
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 4px;
+      line-height: 1.3;
+      color: rgba(255,255,255,0.9);
+    }
+    .card-info p {
+      font-size: 12px;
+      color: var(--text-secondary);
+      line-height: 1.4;
+    }
+    /* Mention styling: no underline, just colored text with pointer */
+    .mention-link {
+      color: var(--mention-color);
+      text-decoration: none;
+      font-weight: 500;
+      pointer-events: auto;
+      cursor: pointer;
+      transition: color 0.2s ease;
+    }
+    .mention-link:hover {
+      color: var(--mention-hover);
+      text-decoration: none;
+    }
+    .card-stats {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+    .card-stats i { font-size: 14px; }
+    .card-stats .liked { color: #ff3b3b; }
+    .save-icon { cursor: pointer; }
+
+    /* Featured Creators */
+    .creators-section {
+      padding: 0 20px 30px;
+    }
+    .section-title {
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 16px;
+      color: var(--accent);
+    }
+    .creators-scroll {
+      display: flex;
+      gap: 20px;
+      overflow-x: auto;
+      scrollbar-width: none;
+      padding-bottom: 10px;
+    }
+    .creators-scroll::-webkit-scrollbar { display: none; }
+    .creator-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      flex-shrink: 0;
+      cursor: pointer;
+    }
+    .creator-avatar {
+      width: 72px;
+      height: 72px;
+      border-radius: 50%;
+      overflow: hidden;
+      border: 2px solid var(--border);
+      position: relative;
+      background: var(--pill-bg);
+    }
+    .creator-avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .creator-name {
+      font-size: 11px;
+      color: var(--muted);
+      font-weight: 500;
+    }
+
+    /* Bottom Navigation */
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      height: var(--nav-h);
+      background: var(--bg);
+      border-top: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-around;
+      padding-bottom: env(safe-area-inset-bottom, 8px);
+    }
+    .nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      width: 60px;
+      height: 50px;
+      cursor: pointer;
+      position: relative;
+    }
+    .nav-item i {
+      font-size: 22px;
+      color: var(--muted);
+      transition: color 0.2s;
+    }
+    .nav-item.active i { color: var(--accent); }
+    .nav-item.create i {
+      width: 48px;
+      height: 32px;
+      background: var(--accent);
+      color: #000;
+      border-radius: 8px;
       display: flex;
       align-items: center;
       justify-content: center;
+      font-size: 16px;
+    }
+    .nav-dot {
+      position: absolute;
+      bottom: 4px;
+      width: 4px;
+      height: 4px;
+      border-radius: 50%;
+      background: var(--accent);
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+    .nav-item.active .nav-dot { opacity: 1; }
+
+    /* Modal */
+    #xmodal {
+      position: fixed;
+      inset: 0;
+      z-index: 600;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      background: rgba(0,0,0,0.95);
+      backdrop-filter: blur(20px);
+    }
+    #xmodal.open { display: flex; }
+    .xm-box {
+      width: 90vw;
+      max-width: 380px;
+      aspect-ratio: 3/5;
+      max-height: 84vh;
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      overflow: hidden;
+      position: relative;
+    }
+    .xm-hdr {
+      position: absolute;
+      top: 16px;
+      left: 16px;
+      right: 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
       z-index: 10;
+    }
+    .xm-user { font-weight: 600; font-size: 14px; }
+    .xm-close {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.1);
+      border: 1px solid var(--border);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       cursor: pointer;
-      border: 1px solid rgba(255,255,255,0.2);
-      color: white;
-      font-size: 14px;
+    }
+    .xm-track {
+      display: flex;
+      width: 100%;
+      height: 100%;
+      transition: transform 0.35s cubic-bezier(0.16,1,0.3,1);
+    }
+    .xm-slide {
+      min-width: 100%;
+      height: 100%;
+    }
+    .xm-slide img, .xm-slide video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .xm-dots {
+      position: absolute;
+      top: 60px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 6px;
+      z-index: 10;
+    }
+    .xmdot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.3);
+      transition: 0.3s;
+    }
+    .xmdot.on { background: var(--accent); width: 20px; border-radius: 3px; }
+    .xm-cap {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      padding: 30px 20px;
+      background: linear-gradient(transparent, rgba(0,0,0,0.95));
+      z-index: 10;
+      font-size: 12px;
+      color: rgba(255,255,255,0.7);
+      line-height: 1.5;
+    }
+    .xm-like {
+      position: absolute;
+      bottom: 20px;
+      right: 20px;
+      z-index: 20;
+    }
+    .xl-btn {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.1);
+      border: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      cursor: pointer;
+      font-size: 20px;
       transition: 0.2s;
     }
-    .sound-toggle:active { transform: scale(0.9); }
+    .xl-btn.liked { color: #ff3b3b; background: rgba(255,59,59,0.15); border-color: #ff3b3b; }
 
-    .cdots { position: absolute; bottom: 10px; left: 50%; transform: translateX(-50%); display: flex; gap: 4px; z-index: 5; }
-    .cdot { width: 5px; height: 5px; border-radius: 50%; background: rgba(255,255,255,0.28); transition: 0.3s; }
-    .cdot.on { background: var(--accent); width: 14px; border-radius: 4px; }
-    .multi-badge { position: absolute; top: 10px; right: 10px; width: 26px; height: 26px; border-radius: 50%; background: rgba(0,0,0,0.5); backdrop-filter: blur(8px); display: flex; align-items: center; justify-content: center; font-size: 10px; z-index: 5; }
-    .song-pill { position: absolute; top: 10px; left: 10px; z-index: 5; background: rgba(0,0,0,0.55); backdrop-filter: blur(14px); border-radius: 20px; padding: 5px 10px; display: flex; align-items: center; gap: 6px; }
-
-    .post-actions { display: flex; align-items: center; padding: 10px 14px 4px; gap: 18px; }
-    .act { background: none; border: none; color: rgba(255,255,255,0.6); font-size: 22px; cursor: pointer; padding: 2px; transition: color 0.2s, transform 0.15s; }
-    .act:active { transform: scale(0.82); }
-    .act.liked { color: #ff3b3b; }
-    .act-save { margin-left: auto; }
-    .act-save.saved { color: var(--accent); }
-
-    .post-likes { padding: 2px 14px 5px; font-size: 12px; font-weight: 600; color: rgba(255,255,255,0.82); }
-    .post-cap-text { padding: 0 14px 8px; font-size: 12px; line-height: 1.5; color: rgba(255,255,255,0.62); }
-    .post-cap-text strong { color: #fff; font-weight: 600; margin-right: 5px; }
-    .post-ts { padding: 0 14px 14px; font-size: 10px; color: var(--muted); font-family: 'Space Mono', monospace; letter-spacing: 0.5px; text-transform: uppercase; }
-    .post-divider { height: 6px; background: rgba(255,255,255,0.02); margin-bottom: 2px; }
-
-    .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; z-index: 100; padding: 0 16px; padding-bottom: env(safe-area-inset-bottom, 8px); height: var(--nav-h); display: flex; align-items: center; }
-    .nav-glass { width: 100%; background: rgba(8,8,10,0.82); backdrop-filter: blur(30px) saturate(200%); border: 1px solid rgba(255,255,255,0.08); border-radius: 22px; height: 56px; display: flex; align-items: center; justify-content: space-around; padding: 0 6px; }
-    .ni-item { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; width: 56px; height: 46px; border-radius: 14px; cursor: pointer; position: relative; }
-    .ni-item .ico { font-size: 19px; color: rgba(255,255,255,0.24); transition: color 0.25s, transform 0.25s; }
-    .ni-item .lbl { font-size: 8px; letter-spacing: 1px; text-transform: uppercase; color: rgba(255,255,255,0.15); font-family: 'Space Mono', monospace; transition: color 0.25s; }
-    .ni-item.on .ico { color: var(--accent); transform: scale(1.1); }
-    .ni-item.on .lbl { color: var(--accent); }
-    .ni-item.on::before { content: ''; position: absolute; top: -1px; left: 50%; transform: translateX(-50%); width: 18px; height: 2px; background: var(--accent); border-radius: 0 0 3px 3px; }
-
-    .p-list { padding: 0 16px; display: flex; flex-direction: column; gap: 10px; }
-    .p-row { display: flex; align-items: center; gap: 14px; padding: 14px 16px; background: rgba(255,255,255,0.03); border: 1px solid var(--border); border-radius: 18px; cursor: pointer; }
-    .p-av { width: 48px; height: 48px; border-radius: 13px; overflow: hidden; flex-shrink: 0; background: #111; position: relative; }
-
-    .s-user { margin: 12px 16px; padding: 16px; background: rgba(255,255,255,0.03); border: 1px solid var(--border); border-radius: 20px; display: flex; align-items: center; gap: 14px; }
-    .s-av { width: 52px; height: 52px; border-radius: 14px; overflow: hidden; background: #111; display: flex; align-items: center; justify-content: center; font-family: 'Orbitron', sans-serif; font-size: 20px; color: var(--accent); flex-shrink: 0; position: relative; }
-    .s-list { padding: 0 16px; }
-    .s-row { display: flex; align-items: center; justify-content: space-between; padding: 15px 0; border-bottom: 1px solid var(--border); cursor: pointer; }
-    .s-left { display: flex; align-items: center; gap: 14px; }
-    .s-icon { width: 36px; height: 36px; border-radius: 10px; background: rgba(255,255,255,0.05); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: 14px; }
-    .s-text strong { font-size: 14px; font-weight: 500; display: block; margin-bottom: 2px; }
-    .s-text span { font-size: 11px; color: var(--muted); }
-
-    .saved-view { padding: 16px; height: 100%; overflow-y: auto; }
-    .saved-header { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; }
-    .back-btn { background: rgba(255,255,255,0.05); border: none; color: white; width: 36px; height: 36px; border-radius: 12px; cursor: pointer; }
-    .saved-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    /* Additional panels */
+    .panel-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.96);
+      backdrop-filter: blur(16px);
+      z-index: 500;
+      display: none;
+      flex-direction: column;
+      overflow-y: auto;
+      padding: 70px 20px 90px;
+    }
+    .panel-overlay.open { display: flex; }
+    .panel-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+      font-size: 20px;
+      font-weight: 600;
+    }
+    .panel-close {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.1);
+      border: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+    .saved-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
     .saved-item {
-      background: #0c0c0c;
+      background: #111;
       border-radius: 18px;
       overflow: hidden;
       border: 1px solid var(--border);
@@ -172,85 +418,85 @@
     .saved-thumb { width: 100%; height: 100%; object-fit: cover; }
     .saved-info { position: absolute; bottom: 0; left: 0; right: 0; background: linear-gradient(to top, #000, transparent); padding: 12px 8px 6px; font-size: 11px; font-weight: 600; }
     .unsave-icon { position: absolute; top: 8px; right: 8px; background: rgba(0,0,0,0.6); border-radius: 30px; padding: 5px 7px; font-size: 11px; backdrop-filter: blur(8px); z-index: 12; cursor: pointer; }
-
-    #xmodal { position: fixed; inset: 0; z-index: 600; display: none; align-items: center; justify-content: center; background: rgba(0,0,0,0.9); backdrop-filter: blur(14px); }
-    #xmodal.open { display: flex; }
-    .xm-box { width: 90vw; max-width: 380px; aspect-ratio: 3/5; max-height: 84vh; background: #000; border: 1px solid var(--border); border-radius: 24px; overflow: hidden; position: relative; }
-    .xm-hdr { position: absolute; top: 10px; left: 10px; right: 10px; height: 42px; background: rgba(255,255,255,0.07); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.08); border-radius: 14px; display: flex; justify-content: space-between; align-items: center; padding: 0 10px; z-index: 10; }
-    .xm-pfp { width: 24px; height: 24px; border-radius: 7px; object-fit: cover; }
-    .xm-user { font-family: 'Orbitron', sans-serif; font-size: 8px; letter-spacing: 1px; text-transform: uppercase; }
-    .xm-close { width: 26px; height: 26px; border-radius: 50%; background: rgba(255,255,255,0.1); border: none; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 11px; cursor: pointer; }
-    .xm-track { display: flex; width: 100%; height: 100%; transition: transform 0.35s cubic-bezier(0.16,1,0.3,1); }
-    .xm-slide { min-width: 100%; height: 100%; }
-    .xm-slide img, .xm-slide video { width: 100%; height: 100%; object-fit: cover; }
-    .xm-dots { position: absolute; top: 62px; left: 50%; transform: translateX(-50%); display: flex; gap: 4px; z-index: 10; }
-    .xmdot { width: 4px; height: 4px; border-radius: 50%; background: rgba(255,255,255,0.25); transition: 0.3s; }
-    .xmdot.on { background: var(--accent); width: 12px; border-radius: 3px; }
-    .xm-cap { position: absolute; bottom: 0; left: 0; right: 0; padding: 24px 16px; background: linear-gradient(transparent, rgba(0,0,0,0.92) 80%); z-index: 10; pointer-events: none; }
-    .xm-like { position: absolute; bottom: 16px; right: 14px; display: flex; flex-direction: column; align-items: center; z-index: 20; }
-    .xl-btn { width: 40px; height: 40px; border-radius: 50%; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.12); display: flex; align-items: center; justify-content: center; color: #fff; cursor: pointer; transition: 0.2s; }
-    .xl-btn.liked { color: #ff3b3b; background: rgba(255,59,59,0.1); border-color: #ff3b3b; }
-    .xl-count { font-family: 'Orbitron', sans-serif; font-size: 8px; margin-top: 4px; color: #555; }
-
-    .sk { background: linear-gradient(90deg, #0e0e0e 25%, #181818 50%, #0e0e0e 75%); background-size: 200%; animation: sh 1.4s infinite; }
-    @keyframes sh { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
+    .profile-list-item {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 12px 16px;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      margin-bottom: 12px;
+      cursor: pointer;
+    }
+    .profile-avatar {
+      width: 52px;
+      height: 52px;
+      border-radius: 16px;
+      overflow: hidden;
+      background: #111;
+    }
+    .profile-avatar img { width: 100%; height: 100%; object-fit: cover; }
+    .profile-info strong { display: block; font-size: 14px; }
+    .profile-info span { font-size: 11px; color: var(--muted); }
+    iframe#zynxFrame {
+      width: 100%;
+      height: 90%;
+      border: none;
+      background: #000;
+      border-radius: 20px;
+    }
   </style>
 </head>
 <body>
 <div id="app">
-  <div class="page-wrapper" id="pw">
-    <!-- HOME FEED -->
-    <div class="page" id="page-home">
-      <div class="top-bar"><div class="brand">XOS <span>INT</span></div><i class=""></i></div>
-      <div class="story-scroll" id="storyRow"></div>
-      <div class="feed-sep"></div>
-      <div id="feed"></div>
+  <div class="top-header">
+    <div class="brand">XOS <span>INT</span></div>
+    <div class="msg-icon"><i class="fas fa-comment-dots"></i></div>
+  </div>
+
+  <!-- Main Content (no category pills) -->
+  <div class="main-content">
+    <div class="carousel-container" id="carouselContainer">
+      <div class="carousel-track" id="carouselTrack"></div>
     </div>
-    <!-- ZYNX -->
-    <div class="page" id="page-zynx" style="padding-bottom:0;"><iframe id="zynxFrame" src="about:blank" allow="autoplay" style="width:100%;height:100%;border:none;"></iframe></div>
-    <!-- PROFILES -->
-    <div class="page" id="page-profiles">
-      <div class="top-bar"><div class="brand">XOS <span>INT</span></div><i class="fas fa-user-plus"></i></div>
-      <div style="padding:4px 16px 14px;"><p style="font-family:'Space Mono',monospace;font-size:9px;color:var(--muted);letter-spacing:2px;">MEMBERS //</p></div>
-      <div class="p-list" id="profilesList"></div>
-    </div>
-    <!-- SETTINGS (MORE) -->
-    <div class="page" id="page-settings">
-      <div id="settingsMainView">
-        <div class="top-bar"><div class="brand">XOS <span>INT</span></div></div>
-        <div class="s-user"><div class="s-av" id="sAv">N</div><div class="s-info"><strong id="sName">—</strong><span id="sRole"> // USER</span></div></div>
-        <div class="s-list">
-          <div class="s-row" id="savedPostsRow"><div class="s-left"><div class="s-icon" style="color:#007aff"><i class="fas fa-bookmark"></i></div><div class="s-text"><strong>Saved Posts</strong><span>Your collection</span></div></div><i class="fas fa-chevron-right s-chev"></i></div>
-          <div class="s-row" onclick="go(1)"><div class="s-left"><div class="s-icon" style="color:#ff2d55"><i class="fas fa-play-circle"></i></div><div class="s-text"><strong>ZYNX</strong><span>Short reels</span></div></div><i class="fas fa-chevron-right s-chev"></i></div>
-          <div class="s-row" onclick="go(2)"><div class="s-left"><div class="s-icon" style="color:#5856d6"><i class="fas fa-users"></i></div><div class="s-text"><strong>Profiles</strong><span>Browse members</span></div></div><i class="fas fa-chevron-right s-chev"></i></div>
-          <div class="s-row" onclick="location.href='general_admin.html'"><div class="s-left"><div class="s-icon" style="color:#ff9f0a"><i class="fas fa-shield-alt"></i></div><div class="s-text"><strong>Admin</strong><span>Manage platform</span></div></div><i class="fas fa-chevron-right s-chev"></i></div>
-          <div class="s-row" onclick="logout()"><div class="s-left"><div class="s-icon" style="color:#ff3b30"><i class="fas fa-sign-out-alt"></i></div><div class="s-text"><strong>Sign Out</strong><span>Clear session</span></div></div><i class="fas fa-chevron-right s-chev"></i></div>
-        </div>
-        <p style="text-align:center;padding:28px 0;font-family:'Space Mono',monospace;font-size:9px;color:rgba(255,255,255,0.08);">XOS INT // v2.1</p>
-      </div>
-      <div id="savedGridView" style="display:none; height:100%; overflow-y:auto;"></div>
+    <div class="creators-section">
+      <h2 class="section-title">Featured Creators</h2>
+      <div class="creators-scroll" id="creatorsRow"></div>
     </div>
   </div>
-  <div class="bottom-nav" id="bnav">
-    <div class="nav-glass">
-      <div class="ni-item on" id="n0" onclick="go(0)"><i class="fas fa-home ico"></i><span class="lbl">Feed</span></div>
-      <div class="ni-item" id="n1" onclick="go(1)"><i class="fas fa-play-circle ico"></i><span class="lbl">Zynx</span></div>
-      <div class="ni-item" id="n2" onclick="go(2)"><i class="fas fa-users ico"></i><span class="lbl">People</span></div>
-      <div class="ni-item" id="n3" onclick="go(3)"><i class="fas fa-bars ico"></i><span class="lbl">More</span></div>
+
+  <div class="bottom-nav">
+    <div class="nav-item active" data-nav="0"><i class="fas fa-home"></i><div class="nav-dot"></div></div>
+    <div class="nav-item" data-nav="1"><i class="fas fa-search"></i></div>
+    <div class="nav-item create" data-nav="2"><i class="fas fa-plus"></i></div>
+    <div class="nav-item" data-nav="3"><i class="fas fa-bell"></i></div>
+    <div class="nav-item" data-nav="4"><i class="fas fa-user"></i></div>
+  </div>
+</div>
+
+<!-- Modal -->
+<div id="xmodal" onclick="closeMod(event)">
+  <div class="xm-box" id="xmBox" onclick="event.stopPropagation()">
+    <div class="xm-hdr">
+      <span id="xmUser" class="xm-user"></span>
+      <button class="xm-close" onclick="closeMod()"><i class="fas fa-times"></i></button>
+    </div>
+    <div id="xmDots" class="xm-dots"></div>
+    <div id="xmTrack" class="xm-track"></div>
+    <div class="xm-cap" id="xmCap"></div>
+    <div class="xm-like">
+      <button id="xlBtn" class="xl-btn" onclick="doLike()"><i class="fas fa-heart"></i></button>
     </div>
   </div>
 </div>
 
-<!-- EXPAND MODAL -->
-<div id="xmodal" onclick="closeMod(event)">
-  <div class="xm-box" id="xmBox" onclick="event.stopPropagation()">
-    <div class="xm-hdr"><div style="display:flex;align-items:center;gap:8px;"><img id="xmPfp" src="" class="xm-pfp" onerror="this.style.display='none'"><span id="xmUser" class="xm-user"></span></div><button class="xm-close" onclick="closeMod()"><i class="fas fa-times"></i></button></div>
-    <div id="xmDots" class="xm-dots"></div>
-    <div id="xmTrack" class="xm-track"></div>
-    <div class="xm-cap"><p style="font-family:'Space Mono',monospace;font-size:8px;color:var(--accent);margin-bottom:4px;">XOS // POST</p><p id="xmCap" style="font-size:11px;color:rgba(255,255,255,0.52);padding-right:54px;"></p></div>
-    <div class="xm-like"><button id="xlBtn" class="xl-btn" onclick="doLike()"><i class="fas fa-heart" style="font-size:15px;"></i></button><span id="xlCnt" class="xl-count">0</span></div>
-  </div>
-</div>
+<!-- Panels -->
+<div id="savedPanel" class="panel-overlay"><div class="panel-header"><span>📁 Saved Posts</span><div class="panel-close" onclick="closePanel('savedPanel')"><i class="fas fa-times"></i></div></div><div id="savedGridContainer" class="saved-grid"></div></div>
+<div id="profilesPanel" class="panel-overlay"><div class="panel-header"><span>👥 Members</span><div class="panel-close" onclick="closePanel('profilesPanel')"><i class="fas fa-times"></i></div></div><div id="profilesListContainer"></div></div>
+<div id="settingsPanel" class="panel-overlay"><div class="panel-header"><span>⚙️ Settings</span><div class="panel-close" onclick="closePanel('settingsPanel')"><i class="fas fa-times"></i></div></div><div id="settingsContent"></div></div>
+<div id="zynxPanel" class="panel-overlay"><div class="panel-header"><span>🎬 ZYNX</span><div class="panel-close" onclick="closePanel('zynxPanel')"><i class="fas fa-times"></i></div></div><iframe id="zynxFrame" src="about:blank" allow="autoplay" style="width:100%;height:90%;border:none;background:#000;border-radius:20px;"></iframe></div>
+
 <audio id="ap"></audio>
 
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
@@ -267,32 +513,40 @@
   });
   const db = firebase.database();
   
-  // ========== USER SESSION ==========
   function getCurrentUser() {
     const sessionRaw = localStorage.getItem('xos_session');
     if (!sessionRaw) return { username: 'Guest', userCode: null };
-    try {
-      const session = JSON.parse(sessionRaw);
-      return { username: session.username || 'Guest', userCode: session.userCode || null };
-    } catch(e) { return { username: 'Guest', userCode: null }; }
+    try { const session = JSON.parse(sessionRaw); return { username: session.username || 'Guest', userCode: session.userCode || null }; } 
+    catch(e) { return { username: 'Guest', userCode: null }; }
   }
   const currentUser = getCurrentUser();
   const USERNAME = currentUser.username;
-  const USER_CODE = currentUser.userCode;
 
-  // STATIC PFPS & POSTS
   const STATIC_PFP = { nikhil: 'file_00000000f4f47208a731ff7b47a3b568.png', niranjan: 'IMG-20260222-WA0034 (1).jpg' };
   const STATIC_POSTS = [
-    { uniqueId:'s1', uid:'niranjan', name:'Niranjan', pfp:STATIC_PFP.niranjan, pfp2:'', profileUrl:'profile.html?u=niranjan', media:[{src:'https://nikhil007-eng.github.io/xosint/nirup1.mp4',type:'video'}], audio:'', cap:'MAHASHIVRATRI', timestamp:Date.now()-3600000 },
-    { uniqueId:'s2', uid:'nikhil', name:'Nikhil', pfp:STATIC_PFP.nikhil, pfp2:'', profileUrl:'profile.html?u=nikhil', media:[{src:'https://nikhil007-eng.github.io/Developer-xos-/Picsart_26-02-28_14-41-10-477.jpg',type:'image'},{src:'https://nikhil007-eng.github.io/Developer-xos-/Picsart_26-02-28_14-41-10-477.jpg',type:'image'}], audio:'From_The_Start(256k).mp3', cap:'vibes', timestamp:Date.now()-7200000 }
+    { uniqueId:'s1', uid:'niranjan', name:'Niranjan', pfp:STATIC_PFP.niranjan, pfp2:'', profileUrl:'#', media:[{src:'https://nikhil007-eng.github.io/xosint/nirup1.mp4',type:'video'}], audio:'', cap:'MAHASHIVRATRI', timestamp:Date.now()-3600000 },
+    { uniqueId:'s2', uid:'nikhil', name:'Nikhil', pfp:STATIC_PFP.nikhil, pfp2:'', profileUrl:'#', media:[{src:'https://nikhil007-eng.github.io/Developer-xos-/Picsart_26-02-28_14-41-10-477.jpg',type:'image'},{src:'https://nikhil007-eng.github.io/Developer-xos-/Picsart_26-02-28_14-41-10-477.jpg',type:'image'}], audio:'From_The_Start(256k).mp3', cap:'vibes @anush@xos and @test@xos', timestamp:Date.now()-7200000 }
   ];
 
-  let POSTS = [], cur = 0, zynxOn = false;
+  let POSTS = [];
+  let carouselIndex = 0;
   let activePid = null, mSlide = 0, mTotal = 0;
-  let mSX=0, mSY=0, mDrag=false, mDir=null;
-  const toggleIds = [];
 
-  // ========== SAVED POSTS (per user) ==========
+  // Helper: format caption with @xos links (no visible link, just clickable mention)
+  function formatCaptionWithLinks(caption) {
+    if (!caption) return '';
+    // Match any word@xos (word can contain letters, numbers, underscore)
+    const regex = /\b([a-zA-Z0-9_]+)@xos\b/gi;
+    return caption.replace(regex, (match, username) => {
+      return `<span class="mention-link" data-username="${username}" onclick="event.stopPropagation(); goToProfile('${username}'); return false;">${match}</span>`;
+    });
+  }
+
+  function goToProfile(username) {
+    window.location.href = `profile.html?u=${encodeURIComponent(username)}`;
+  }
+
+  // Saved posts
   function getSavedKey() { return `xos_saved_${USERNAME}`; }
   function loadSavedPosts() { const raw = localStorage.getItem(getSavedKey()); return raw ? JSON.parse(raw) : []; }
   function savePostsToStorage(arr) { localStorage.setItem(getSavedKey(), JSON.stringify(arr)); }
@@ -304,299 +558,287 @@
     else { const toStore = { uniqueId: postObj.uniqueId, name: postObj.name, pfp: postObj.pfp, pfp2: postObj.pfp2, media: postObj.media, cap: postObj.cap, uid: postObj.uid, profileUrl: postObj.profileUrl, audio: postObj.audio }; saved.unshift(toStore); }
     savePostsToStorage(saved);
     updateSaveButtonUI(postObj.uniqueId, !exists);
-    if (document.getElementById('savedGridView').style.display === 'block') renderSavedGrid();
+    renderSavedGrid();
     return !exists;
   }
   function updateSaveButtonUI(uid, isSavedNow) {
-    document.querySelectorAll(`.act-save[data-unique="${uid}"]`).forEach(btn => {
-      if (isSavedNow) btn.classList.add('saved');
-      else btn.classList.remove('saved');
+    document.querySelectorAll(`.save-icon[data-uid="${uid}"]`).forEach(btn => {
       btn.innerHTML = isSavedNow ? '<i class="fas fa-bookmark"></i>' : '<i class="far fa-bookmark"></i>';
     });
   }
   function renderSavedGrid() {
-    const container = document.getElementById('savedGridView');
+    const container = document.getElementById('savedGridContainer');
     const saved = loadSavedPosts();
-    if (saved.length === 0) { container.innerHTML = `<div class="saved-view"><div class="saved-header"><button class="back-btn" onclick="hideSavedView()"><i class="fas fa-arrow-left"></i></button><span style="font-weight:500;">Saved posts</span></div><div style="text-align:center;padding:40px 20px;color:gray;">✨ No saved posts yet. Tap bookmark on any post.</div></div>`; return; }
-    let html = `<div class="saved-view"><div class="saved-header"><button class="back-btn" onclick="hideSavedView()"><i class="fas fa-arrow-left"></i></button><span style="font-weight:500;">Saved posts (${saved.length})</span></div><div class="saved-grid">`;
-    saved.forEach(post => { const thumb = post.media?.[0]?.src || ''; html += `<div class="saved-item" onclick="openPostModalFromSaved('${post.uniqueId.replace(/'/g, "\\'")}')"><img class="saved-thumb" src="${thumb}" onerror="this.src='https://placehold.co/400/111/333?text=📷'" loading="lazy"><div class="saved-info">${escapeHtml(post.name || 'User')}</div><div class="unsave-icon" onclick="event.stopPropagation(); unsaveFromGrid('${post.uniqueId.replace(/'/g, "\\'")}')"><i class="fas fa-trash-alt"></i></div></div>`; });
-    html += `</div></div>`; container.innerHTML = html;
+    if (!saved.length) { container.innerHTML = '<div style="text-align:center;padding:40px;color:gray;">✨ No saved posts yet. Tap bookmark on any post.</div>'; return; }
+    let html = '';
+    saved.forEach(post => {
+      const thumb = post.media?.[0]?.src || '';
+      html += `<div class="saved-item" onclick="openPostModalFromSaved('${post.uniqueId}')"><img class="saved-thumb" src="${thumb}" onerror="this.src='https://placehold.co/400/111/333?text=📷'"><div class="saved-info">${escapeHtml(post.name || 'User')}</div><div class="unsave-icon" onclick="event.stopPropagation(); unsaveFromSaved('${post.uniqueId}')"><i class="fas fa-trash-alt"></i></div></div>`;
+    });
+    container.innerHTML = html;
   }
-  function unsaveFromGrid(uid) {
-    const saved = loadSavedPosts();
-    const newSaved = saved.filter(p => p.uniqueId !== uid);
-    savePostsToStorage(newSaved);
+  function unsaveFromSaved(uid) {
+    const saved = loadSavedPosts().filter(p => p.uniqueId !== uid);
+    savePostsToStorage(saved);
     renderSavedGrid();
     const globalPost = POSTS.find(p => p.uniqueId === uid);
     if (globalPost) updateSaveButtonUI(uid, false);
-    else document.querySelectorAll(`.act-save[data-unique="${uid}"]`).forEach(btn => { btn.classList.remove('saved'); btn.innerHTML = '<i class="far fa-bookmark"></i>'; });
   }
-  function hideSavedView() { document.getElementById('settingsMainView').style.display = 'block'; document.getElementById('savedGridView').style.display = 'none'; }
-  function showSavedView() { document.getElementById('settingsMainView').style.display = 'none'; document.getElementById('savedGridView').style.display = 'block'; renderSavedGrid(); }
-  function openPostModalFromSaved(uniqueId) { const saved = loadSavedPosts(); const post = saved.find(p => p.uniqueId === uniqueId); if (post) openModalWithPost(post); }
+  function openPostModalFromSaved(uniqueId) {
+    const saved = loadSavedPosts();
+    const post = saved.find(p => p.uniqueId === uniqueId);
+    if (post) openModalWithPost(post);
+  }
   function openModalWithPost(post) {
     activePid = post.uniqueId; mSlide = 0; mTotal = post.media.length;
-    document.getElementById('xmPfp').src = post.pfp || ''; document.getElementById('xmUser').textContent = post.name; document.getElementById('xmCap').textContent = post.cap || '';
+    document.getElementById('xmUser').textContent = post.name;
+    const formattedCap = formatCaptionWithLinks(post.cap || '');
+    document.getElementById('xmCap').innerHTML = formattedCap;
     const track = document.getElementById('xmTrack');
-    track.innerHTML = post.media.map(m => `<div class="xm-slide">${m.type === 'video' ? `<video src="${m.src}" autoplay loop playsinline style="width:100%;height:100%;object-fit:cover;"></video>` : `<img src="${m.src}" style="width:100%;height:100%;object-fit:cover;">`}</div>`).join('');
+    track.innerHTML = post.media.map(m => `<div class="xm-slide">${m.type==='video'?`<video src="${m.src}" autoplay loop playsinline></video>`:`<img src="${m.src}">`}</div>`).join('');
     track.style.width = (post.media.length * 100) + '%';
-    track.querySelectorAll('.xm-slide').forEach(s => s.style.minWidth = (100 / post.media.length) + '%');
     document.getElementById('xmDots').innerHTML = post.media.length > 1 ? post.media.map((_,i) => `<div class="xmdot${i===0?' on':''}"></div>`).join('') : '';
-    const lk = parseInt(localStorage.getItem('lk_'+post.uniqueId)) || 0;
-    document.getElementById('xlCnt').textContent = lk; document.getElementById('xlBtn').classList.remove('liked');
-    document.getElementById('xmodal').classList.add('open'); const ap = document.getElementById('ap'); ap.pause(); ap.src = '';
-    if (post.audio) { ap.src = post.audio; ap.play().catch(()=>{}); }
+    const liked = parseInt(localStorage.getItem('lk_'+post.uniqueId)) > 0;
+    document.getElementById('xlBtn').classList.toggle('liked', liked);
+    document.getElementById('xmodal').classList.add('open');
     setupModSwipe();
+    const ap = document.getElementById('ap'); ap.pause(); ap.src = '';
+    if (post.audio) { ap.src = post.audio; ap.play().catch(()=>{}); }
   }
 
-  async function sharePost(uniqueId) {
-    const post = POSTS.find(p => p.uniqueId === uniqueId);
-    if (!post) return;
-    const text = `✨ XOS INT • ${post.name}: ${post.cap || 'check this out'} ✨`;
-    if (navigator.share) { try { await navigator.share({ title: 'XOS INT post', text }); } catch(e) {} } 
-    else { navigator.clipboard.writeText(text + " — XOS INT"); alert("📋 Post text copied to clipboard!"); }
-  }
-
-  // ========== HISTORY API ==========
-  function pushPageState(pageIndex) {
-    const state = { page: pageIndex };
-    history.pushState(state, '', `#page=${pageIndex}`);
-  }
-  window.addEventListener('popstate', (event) => {
-    const page = event.state?.page;
-    if (page !== undefined && page >= 0 && page <= 3) {
-      go(page, true); // skip pushState
-    } else {
-      // fallback: extract from hash
-      const hash = window.location.hash;
-      const match = hash.match(/page=([0-3])/);
-      if (match) go(parseInt(match[1]), true);
-    }
-  });
-
-  // ========== PAGE SWIPE + HISTORY ==========
-  const pw = document.getElementById('pw');
-  let pgSX=0, pgSY=0, pgDrag=false, pgDir=null;
-  pw.addEventListener('touchstart',e=>{pgSX=e.touches[0].clientX;pgSY=e.touches[0].clientY;pgDrag=true;pgDir=null;},{passive:true});
-  pw.addEventListener('touchmove',e=>{
-    if(!pgDrag)return;
-    const dx=e.touches[0].clientX-pgSX,dy=e.touches[0].clientY-pgSY;
-    if(!pgDir)pgDir=Math.abs(dx)>Math.abs(dy)&&Math.abs(dx)>10?'X':'Y';
-    if(pgDir==='X'){e.preventDefault();const pct=Math.max(-75,Math.min(0,cur*-25+(dx/window.innerWidth)*25));pw.style.transition='none';pw.style.transform=`translateX(${pct}%)`;}
-  },{passive:false});
-  pw.addEventListener('touchend',e=>{
-    if(!pgDrag||pgDir!=='X'){pgDrag=false;return;}pgDrag=false;
-    const dx=e.changedTouches[0].clientX-pgSX;
-    if(dx<-window.innerWidth*.2&&cur<3)go(cur+1);
-    else if(dx>window.innerWidth*.2&&cur>0)go(cur-1);
-    else snap();
-  },{passive:true});
-  function snap(){pw.style.transition='transform 0.38s cubic-bezier(0.25,1,0.5,1)';pw.style.transform=`translateX(${cur*-25}%)`;}
-  function go(idx, skipHistory=false){
-    if(idx<0||idx>3)return;
-    cur=idx;
-    pw.style.transition='transform 0.42s cubic-bezier(0.25,1,0.5,1)';
-    pw.style.transform=`translateX(${idx*-25}%)`;
-    [0,1,2,3].forEach(i=>document.getElementById('n'+i).classList.toggle('on',i===idx));
-    document.getElementById('bnav').style.display=idx===1?'none':'flex';
-    if(idx===1&&!zynxOn){document.getElementById('zynxFrame').src='ZYNX.html';zynxOn=true;}
-    if(idx===3) hideSavedView();
-    if(!skipHistory) pushPageState(idx);
-  }
-
-  // ========== LOAD DATA ==========
-  async function load(){
-    document.getElementById('sName').textContent = USERNAME;
-    document.getElementById('sRole').textContent = "USER";
-    const initial = USERNAME.charAt(0).toUpperCase();
-    document.getElementById('sAv').textContent = initial;
-    try{
-      const psnap=await db.ref('profiles').once('value');
-      const pdata=psnap.val()||{};
-      renderProfiles(pdata);
-      const me = pdata[USERNAME.toLowerCase()];
-      if(me?.photo){ const avDiv = document.getElementById('sAv'); avDiv.innerHTML = `<div class="av-wrap"><img src="${me.photo}"></div>`; }
-      let uids=Object.keys(pdata);
-      if(!uids.includes('nikhil')) uids.push('nikhil');
-      const all=[];
-      await Promise.all(uids.map(uid=>
-        db.ref(uid+'/posts').once('value').then(snap=>{
-          const d=snap.val(); if(!d) return;
-          const p=pdata[uid]||{};
-          const nm= (uid==='nikhil'&&!p.name)?'Nikhil':(p.name||uid.toUpperCase());
-          const pfp=p.photo||STATIC_PFP[uid]||'';
-          const pfp2=p.photo2||'';
-          Object.entries(d).forEach(([pid,v])=>{
-            if(!v.src) return;
-            all.push({uniqueId:uid+'_'+pid,uid,name:nm,pfp,pfp2,profileUrl:'profile.html?u='+uid,media:[{src:v.src,type:v.type||'image'}],audio:v.audio||'',cap:v.caption||'',timestamp:v.timestamp||0});
+  async function loadData() {
+    try {
+      const psnap = await db.ref('profiles').once('value');
+      const pdata = psnap.val() || {};
+      let uids = Object.keys(pdata);
+      if (!uids.includes('nikhil')) uids.push('nikhil');
+      const all = [];
+      await Promise.all(uids.map(uid =>
+        db.ref(uid+'/posts').once('value').then(snap => {
+          const d = snap.val(); if (!d) return;
+          const p = pdata[uid] || {};
+          const nm = (uid==='nikhil' && !p.name) ? 'Nikhil' : (p.name || uid.toUpperCase());
+          const pfp = p.photo || STATIC_PFP[uid] || '';
+          const pfp2 = p.photo2 || '';
+          Object.entries(d).forEach(([pid, v]) => {
+            if (!v.src) return;
+            all.push({
+              uniqueId: uid+'_'+pid, uid, name: nm, pfp, pfp2, profileUrl: 'profile.html?u='+uid,
+              media: [{ src: v.src, type: v.type || 'image' }],
+              audio: v.audio || '', cap: v.caption || '', timestamp: v.timestamp || 0,
+            });
           });
         }).catch(()=>{})
       ));
       all.sort((a,b)=>b.timestamp-a.timestamp);
-      const srcs=new Set(all.map(p=>p.media[0]?.src));
-      POSTS=[...all,...STATIC_POSTS.filter(p=>!srcs.has(p.media[0]?.src))];
-    }catch(e){POSTS=[...STATIC_POSTS];}
-    renderFeed();
-    renderStories();
-    // initial history state
-    const initialPage = window.location.hash.match(/page=([0-3])/);
-    if(initialPage) go(parseInt(initialPage[1]), true);
-    else pushPageState(0);
+      const srcs = new Set(all.map(p=>p.media[0]?.src));
+      POSTS = [...all, ...STATIC_POSTS.filter(p=>!srcs.has(p.media[0]?.src))];
+    } catch(e) { POSTS = [...STATIC_POSTS]; }
+    renderCarousel();
+    renderCreators();
   }
 
-  function renderStories(){
-    const row=document.getElementById('storyRow');
-    row.innerHTML='';
-    const seen=new Set(),users=[];
-    POSTS.forEach(p=>{if(!seen.has(p.uid)){seen.add(p.uid);users.push(p);}});
-    users.forEach(p=>{
-      const item=document.createElement('div');
-      item.className='story-item';
-      item.onclick=()=>location.href=p.profileUrl;
-      item.innerHTML=`<div class="story-sq">${pfpInner(p.pfp,p.pfp2,(p.name||'?').slice(0,2).toUpperCase())}</div><span class="story-name">${p.name}</span>`;
+  function renderCarousel() {
+    const track = document.getElementById('carouselTrack');
+    track.innerHTML = '';
+    POSTS.forEach((post, idx) => {
+      const card = document.createElement('div');
+      card.className = 'carousel-card' + (idx === carouselIndex ? ' active' : '');
+      card.dataset.index = idx;
+      const isVideo = post.media[0].type === 'video';
+      const mediaHtml = isVideo ? `<video src="${post.media[0].src}" muted autoplay loop playsinline></video>` : `<img src="${post.media[0].src}" loading="lazy">`;
+      const saved = isPostSaved(post.uniqueId);
+      const liked = parseInt(localStorage.getItem('lk_'+post.uniqueId)) > 0;
+      
+      // Split caption into first line and rest
+      const caption = post.cap || '';
+      const lines = caption.split('\n');
+      const firstLine = lines[0] || '';
+      const restLines = lines.slice(1).join('\n');
+      const formattedFirst = formatCaptionWithLinks(firstLine);
+      const formattedRest = formatCaptionWithLinks(restLines);
+      
+      const profileHtml = `
+        <div class="card-profile-row">
+          <div class="small-avatar">
+            ${post.pfp ? `<img src="${post.pfp}" onerror="this.style.display='none'">` : '<i class="fas fa-user-circle" style="font-size:32px; color:rgba(255,255,255,0.6);"></i>'}
+          </div>
+          <span class="profile-name">${escapeHtml(post.name)}</span>
+        </div>
+      `;
+      
+      card.innerHTML = `
+        ${mediaHtml}
+        <div class="card-overlay">
+          ${profileHtml}
+          <div class="card-bottom">
+            <div class="card-info">
+              <h3>${formattedFirst}</h3>
+              <p>${formattedRest}</p>
+            </div>
+            <div class="card-stats">
+              <span class="${liked ? 'liked' : ''}"><i class="fas fa-heart"></i> ${liked ? parseInt(localStorage.getItem('lk_'+post.uniqueId)) : (post.likes || 0)}</span>
+              <span><i class="fas fa-comment"></i></span>
+              <span>${ago(post.timestamp)}</span>
+              <span class="save-icon" data-uid="${post.uniqueId}" onclick="event.stopPropagation(); toggleSavePostById('${post.uniqueId}')">${saved ? '<i class="fas fa-bookmark"></i>' : '<i class="far fa-bookmark"></i>'}</span>
+            </div>
+          </div>
+        </div>
+      `;
+      card.onclick = () => openModFromPost(post);
+      track.appendChild(card);
+    });
+    updateCarousel();
+  }
+
+  function renderCreators() {
+    const usersMap = new Map();
+    POSTS.forEach(p => { if (!usersMap.has(p.uid)) usersMap.set(p.uid, { name: p.name, pfp: p.pfp, profileUrl: p.profileUrl }); });
+    const creators = Array.from(usersMap.values()).slice(0, 8);
+    const row = document.getElementById('creatorsRow');
+    row.innerHTML = '';
+    creators.forEach(c => {
+      const item = document.createElement('div');
+      item.className = 'creator-item';
+      item.onclick = () => window.location.href = c.profileUrl || '#';
+      item.innerHTML = `
+        <div class="creator-avatar">
+          ${c.pfp ? `<img src="${c.pfp}" onerror="this.style.display='none'">` : '<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:18px;">📷</div>'}
+        </div>
+        <span class="creator-name">${escapeHtml(c.name)}</span>
+      `;
       row.appendChild(item);
-      if(p.pfp&&p.pfp2){const w=item.querySelector('.av-wrap');if(w)startToggle(w.querySelector('.av1'),w.querySelector('.av2'));}
-    });
-  }
-  function pfpInner(pfp,pfp2,init){
-    if(pfp&&pfp2)return`<div class="av-wrap"><img class="av1" src="${pfp}" onerror="this.style.display='none'"><img class="av2" src="${pfp2}" onerror="this.style.display='none'"></div>`;
-    if(pfp)return`<div class="av-wrap"><img src="${pfp}" onerror="this.style.display='none'"></div>`;
-    return`<div class="initials">${init}</div>`;
-  }
-  function startToggle(a1,a2){ if(!a1||!a2) return; let s=true; const id=setInterval(()=>{s=!s;a1.style.opacity=s?'1':'0';a2.style.opacity=s?'0':'1';},3000); toggleIds.push(id); }
-
-  // ========== FEED RENDER with Sound Toggle ==========
-  function renderFeed(){
-    const feed=document.getElementById('feed');
-    feed.innerHTML='';
-    if(!POSTS.length){feed.innerHTML='<div style="text-align:center;padding:60px 0;font-family:Space Mono,monospace;font-size:10px;color:rgba(255,255,255,0.12);">NO POSTS YET</div>';return;}
-    POSTS.forEach((post,idx)=>{
-      const card=document.createElement('div');
-      card.className='post-card';
-      // build slides with sound toggle for video
-      let slidesHtml = '';
-      post.media.forEach((m, slideIdx) => {
-        const isVideo = m.type === 'video';
-        const videoTag = isVideo ? `<video src="${m.src}" muted autoplay loop playsinline style="width:100%;height:auto;max-height:75vh;"></video>` : `<img src="${m.src}" loading="lazy" style="width:100%;height:auto;display:block;">`;
-        const soundBtn = isVideo ? `<div class="sound-toggle" onclick="event.stopPropagation(); toggleVideoSound(this)"><i class="fas fa-volume-mute"></i></div>` : '';
-        slidesHtml += `<div class="post-slide" data-slide="${slideIdx}">${videoTag}${soundBtn}</div>`;
-      });
-      const dots=post.media.length>1?`<div class="cdots" id="cd${idx}">${post.media.map((_,i)=>`<div class="cdot${i===0?' on':''}"></div>`).join('')}</div>`:'';
-      const multi=post.media.length>1?`<div class="multi-badge"><i class="fas fa-clone"></i></div>`:'';
-      const song=post.audio?`<div class="song-pill"><i class="fas fa-compact-disc"></i><span>Audio</span></div>`:'';
-      const ts=post.timestamp?ago(post.timestamp):'recently';
-      const lk=parseInt(localStorage.getItem('lk_'+post.uniqueId))||0;
-      const savedStatus = isPostSaved(post.uniqueId);
-      card.innerHTML=`
-        <div class="post-header" onclick="location.href='${post.profileUrl}'">
-          <div class="post-pfp">${pfpInner(post.pfp,post.pfp2,(post.name||'?').slice(0,1).toUpperCase())}</div>
-          <div class="post-uinfo"><span class="post-uname">${post.name}</span><span class="post-ucap">${post.cap||'XOS INT'}</span></div>
-          <div class="post-dots" onclick="event.stopPropagation();openMod(${idx})">···</div>
-        </div>
-        <div class="post-media"><div class="post-track" id="pt${idx}">${slidesHtml}</div>${dots}${song}${multi}</div>
-        <div class="post-actions">
-          <button class="act${lk>0?' liked':''}" onclick="qLike(this,'${post.uniqueId}')"><i class="fas fa-heart"></i></button>
-          <button class="act" onclick="sharePost('${post.uniqueId}')"><i class="fas fa-paper-plane"></i></button>
-          <button class="act act-save ${savedStatus?'saved':''}" data-unique="${post.uniqueId}" onclick="toggleSavePostById('${post.uniqueId}')">${savedStatus?'<i class="fas fa-bookmark"></i>':'<i class="far fa-bookmark"></i>'}</button>
-        </div>
-        <div class="post-likes" id="lc_${post.uniqueId}">${lk} likes</div>
-        <div class="post-cap-text"><strong>${post.name}</strong>${post.cap||''}</div>
-        <div class="post-ts">${ts}</div>
-        <div class="post-divider"></div>`;
-      feed.appendChild(card);
-      if(post.media.length>1)setupSwipe(card.querySelector('.post-media'),idx,post.media.length);
-      if(post.pfp&&post.pfp2){const w=card.querySelector('.post-pfp .av-wrap');if(w)startToggle(w.querySelector('.av1'),w.querySelector('.av2'));}
     });
   }
 
-  // Sound toggle function
-  window.toggleVideoSound = (btn) => {
-    const slide = btn.closest('.post-slide');
-    const video = slide.querySelector('video');
-    if (!video) return;
-    video.muted = !video.muted;
-    const icon = btn.querySelector('i');
-    if (video.muted) {
-      icon.classList.remove('fa-volume-up');
-      icon.classList.add('fa-volume-mute');
-    } else {
-      icon.classList.remove('fa-volume-mute');
-      icon.classList.add('fa-volume-up');
-    }
-  };
-
-  function setupSwipe(el,idx,total){
-    let sx=0,drag=false,dir=null,s=0;
-    el.addEventListener('touchstart',e=>{sx=e.touches[0].clientX;drag=true;dir=null;},{passive:true});
-    el.addEventListener('touchmove',e=>{if(!drag)return;const dx=e.touches[0].clientX-sx;if(!dir)dir=Math.abs(dx)>8?'X':'Y';if(dir==='X')e.preventDefault();},{passive:false});
-    el.addEventListener('touchend',e=>{if(!drag||dir!=='X'){drag=false;return;}drag=false;const dx=e.changedTouches[0].clientX-sx;if(dx<-50&&s<total-1)s++;else if(dx>50&&s>0)s--;const t=document.getElementById('pt'+idx);t.style.transform=`translateX(${s*-100}%)`;const de=document.getElementById('cd'+idx);if(de)de.querySelectorAll('.cdot').forEach((d,i)=>d.classList.toggle('on',i===s));},{passive:true});
-  }
-
-  // MODAL functions (unchanged)
-  function openMod(idx){
-    const p=POSTS[idx];activePid=p.uniqueId;mSlide=0;mTotal=p.media.length;
-    document.getElementById('xmPfp').src=p.pfp||''; document.getElementById('xmUser').textContent=p.name; document.getElementById('xmCap').textContent=p.cap;
-    const track=document.getElementById('xmTrack');
-    track.innerHTML=p.media.map(m=>`<div class="xm-slide">${m.type==='video'?`<video src="${m.src}" autoplay loop playsinline style="width:100%;height:100%;object-fit:cover;"></video>`:`<img src="${m.src}" style="width:100%;height:100%;object-fit:cover;">`}</div>`).join('');
-    track.style.width=(p.media.length*100)+'%';
-    track.querySelectorAll('.xm-slide').forEach(s=>s.style.minWidth=(100/p.media.length)+'%');
-    document.getElementById('xmDots').innerHTML=p.media.length>1?p.media.map((_,i)=>`<div class="xmdot${i===0?' on':''}"></div>`).join(''):'';
-    const lk=parseInt(localStorage.getItem('lk_'+p.uniqueId))||0;
-    document.getElementById('xlCnt').textContent=lk; document.getElementById('xlBtn').classList.remove('liked');
+  function openModFromPost(post) {
+    activePid = post.uniqueId; mSlide = 0; mTotal = post.media.length;
+    document.getElementById('xmUser').textContent = post.name;
+    const formattedCap = formatCaptionWithLinks(post.cap || '');
+    document.getElementById('xmCap').innerHTML = formattedCap;
+    const track = document.getElementById('xmTrack');
+    track.innerHTML = post.media.map(m => `<div class="xm-slide">${m.type==='video'?`<video src="${m.src}" autoplay loop playsinline></video>`:`<img src="${m.src}">`}</div>`).join('');
+    track.style.width = (post.media.length * 100) + '%';
+    document.getElementById('xmDots').innerHTML = post.media.length > 1 ? post.media.map((_,i) => `<div class="xmdot${i===0?' on':''}"></div>`).join('') : '';
+    const liked = parseInt(localStorage.getItem('lk_'+post.uniqueId)) > 0;
+    document.getElementById('xlBtn').classList.toggle('liked', liked);
     document.getElementById('xmodal').classList.add('open');
-    const ap=document.getElementById('ap');ap.pause();ap.src='';
-    if(p.audio){ap.src=p.audio;ap.play().catch(()=>{});}
     setupModSwipe();
+    const ap = document.getElementById('ap'); ap.pause(); ap.src = '';
+    if (post.audio) { ap.src = post.audio; ap.play().catch(()=>{}); }
   }
-  function setupModSwipe(){
-    const box=document.getElementById('xmBox'),track=document.getElementById('xmTrack');
-    box.ontouchstart=e=>{mSX=e.touches[0].clientX;mSY=e.touches[0].clientY;mDrag=true;mDir=null;};
-    box.ontouchmove=e=>{
-      if(!mDrag)return;
-      const dx=e.touches[0].clientX-mSX,dy=e.touches[0].clientY-mSY;
-      if(!mDir)mDir=Math.abs(dx)>Math.abs(dy)?'X':'Y';
-      if(mDir==='X'){track.style.transition='none';track.style.transform=`translateX(${(-mSlide*box.offsetWidth)+dx}px)`;}
-      else{const t=dy<0?dy:dy*.2;box.style.transition='none';box.style.transform=`translateY(${t}px)`;box.style.opacity=''+Math.max(0,1-Math.abs(dy)/500);}
-    };
-    box.ontouchend=e=>{
-      if(!mDrag)return;mDrag=false;
-      const dx=mSX-e.changedTouches[0].clientX,dy=mSY-e.changedTouches[0].clientY;
-      if(mDir==='X'){track.style.transition='transform 0.35s cubic-bezier(0.16,1,0.3,1)';if(Math.abs(dx)>60){if(dx>0&&mSlide<mTotal-1)mSlide++;else if(dx<0&&mSlide>0)mSlide--;}track.style.transform=`translateX(${-mSlide*box.offsetWidth}px)`;document.getElementById('xmDots').querySelectorAll('.xmdot').forEach((d,i)=>d.classList.toggle('on',i===mSlide));}
-      else if(dy>80){box.style.transition='transform 0.35s cubic-bezier(0.16,1,0.3,1),opacity 0.3s';box.style.transform='translateY(-120vh)';box.style.opacity='0';setTimeout(closeMod,320);}
-      else{box.style.transition='transform 0.35s cubic-bezier(0.16,1,0.3,1),opacity 0.3s';box.style.transform='translateY(0)';box.style.opacity='1';}
-    };
-  }
-  function closeMod(e){if(e&&e.target&&e.target!==document.getElementById('xmodal'))return;document.getElementById('xmodal').classList.remove('open');const ap=document.getElementById('ap');ap.pause();ap.src='';document.getElementById('xmTrack').innerHTML='';}
-  function qLike(btn,id){if(btn.classList.contains('liked'))return;btn.classList.add('liked');const p=parseInt(localStorage.getItem('lk_'+id))||0;localStorage.setItem('lk_'+id,p+1);const el=document.getElementById('lc_'+id);if(el)el.textContent=(p+1)+' likes';}
-  function doLike(){if(!activePid)return;const b=document.getElementById('xlBtn');if(b.classList.contains('liked'))return;b.classList.add('liked');const p=parseInt(localStorage.getItem('lk_'+activePid))||0;localStorage.setItem('lk_'+activePid,p+1);document.getElementById('xlCnt').textContent=p+1;const el=document.getElementById('lc_'+activePid);if(el)el.textContent=(p+1)+' likes';}
-  function toggleSavePostById(uid) { const p = POSTS.find(x=>x.uniqueId===uid); if(p) toggleSavePost(p); }
 
-  function renderProfiles(pdata){
-    const list=document.getElementById('profilesList');list.innerHTML='';
-    const entries=Object.values(pdata).sort((a,b)=>(a.createdAt||0)-(b.createdAt||0));
-    if(!entries.length){list.innerHTML='<p style="text-align:center;padding:40px 0;font-family:Space Mono,monospace;font-size:9px;color:rgba(255,255,255,0.12);">NO PROFILES</p>';return;}
-    entries.forEach(p=>{
-      const uid=p.id||(p.name||'').toLowerCase();
-      const isAdmin=uid==='nikhil';
-      const init=(p.name||'?').slice(0,2).toUpperCase();
-      const row=document.createElement('div');row.className='p-row';
-      row.onclick=()=>location.href='profile.html?u='+encodeURIComponent(uid);
-      let avHtml='';
-      if(p.photo&&p.photo2)avHtml=`<div class="av-wrap"><img class="av1" src="${p.photo}" onerror="this.style.display='none'"><img class="av2" src="${p.photo2}" onerror="this.style.display='none'"></div>`;
-      else if(p.photo)avHtml=`<div class="av-wrap"><img src="${p.photo}" onerror="this.style.display='none'"></div>`;
-      else avHtml=`<div class="initials">${init}</div>`;
-      row.innerHTML=`<div class="p-av">${avHtml}</div><div class="p-info"><strong>${p.name}<i class="fas fa-check-circle ${isAdmin?'tick-red':'tick-blue'}"></i></strong><span>@${uid} · ${isAdmin?'admin':'member'}</span></div><i class="fas fa-chevron-right p-chev"></i>`;
-      list.appendChild(row);
-      if(p.photo&&p.photo2){const w=row.querySelector('.av-wrap');if(w)startToggle(w.querySelector('.av1'),w.querySelector('.av2'));}
+  function setupModSwipe() {
+    const box = document.getElementById('xmBox');
+    let startX = 0, startY = 0;
+    box.ontouchstart = e => { startX = e.touches[0].clientX; startY = e.touches[0].clientY; };
+    box.ontouchend = e => {
+      const dx = startX - e.changedTouches[0].clientX;
+      const dy = startY - e.changedTouches[0].clientY;
+      if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 60) {
+        const track = document.getElementById('xmTrack');
+        if (dx > 0 && mSlide < mTotal - 1) mSlide++;
+        else if (dx < 0 && mSlide > 0) mSlide--;
+        track.style.transform = `translateX(${-mSlide * 100}%)`;
+        document.querySelectorAll('.xmdot').forEach((d,i) => d.classList.toggle('on', i === mSlide));
+      } else if (dy > 80) closeMod();
+    };
+  }
+
+  function closeMod(e) { if(e && e.target !== document.getElementById('xmodal')) return; document.getElementById('xmodal').classList.remove('open'); document.getElementById('xmTrack').innerHTML = ''; }
+  function doLike() {
+    if(!activePid) return;
+    const btn = document.getElementById('xlBtn');
+    if(btn.classList.contains('liked')) return;
+    btn.classList.add('liked');
+    const curr = parseInt(localStorage.getItem('lk_'+activePid)) || 0;
+    localStorage.setItem('lk_'+activePid, curr + 1);
+    updateLikeDisplay(activePid, curr+1);
+  }
+  function updateLikeDisplay(uid, count) {
+    const likeSpan = document.querySelector(`.card-stats span[data-uid="${uid}"]`);
+    if(likeSpan) likeSpan.innerHTML = `<i class="fas fa-heart"></i> ${count}`;
+  }
+  function toggleSavePostById(uid) { const post = POSTS.find(p => p.uniqueId === uid); if(post) toggleSavePost(post); }
+  function ago(ts) { const d = Date.now() - ts, m = Math.floor(d/60000); if(m<1) return 'now'; if(m<60) return m+'m'; const h = Math.floor(m/60); if(h<24) return h+'h'; return Math.floor(h/24)+'d'; }
+  function escapeHtml(str) { if(!str) return ''; return str.replace(/[&<>]/g, function(m){ if(m==='&') return '&amp;'; if(m==='<') return '&lt;'; if(m==='>') return '&gt;'; return m;}); }
+
+  // Carousel with centering + peek
+  function setupCarouselSwipe() {
+    const container = document.getElementById('carouselContainer');
+    let startX = 0, isDragging = false;
+    container.addEventListener('touchstart', e => { startX = e.touches[0].clientX; isDragging = true; }, {passive: true});
+    container.addEventListener('touchmove', e => { if (isDragging && Math.abs(e.touches[0].clientX - startX) > 50) e.preventDefault(); }, {passive: false});
+    container.addEventListener('touchend', e => {
+      if (!isDragging) return;
+      isDragging = false;
+      const diff = e.changedTouches[0].clientX - startX;
+      if (Math.abs(diff) > 60) {
+        if (diff < 0 && carouselIndex < POSTS.length - 1) carouselIndex++;
+        else if (diff > 0 && carouselIndex > 0) carouselIndex--;
+        updateCarousel();
+      }
     });
   }
-  function ago(ts){const d=Date.now()-ts,m=Math.floor(d/60000);if(m<1)return'just now';if(m<60)return m+'m ago';const h=Math.floor(m/60);if(h<24)return h+'h ago';return Math.floor(h/24)+'d ago';}
-  function escapeHtml(str){ if(!str) return ''; return str.replace(/[&<>]/g, function(m){ if(m==='&') return '&amp;'; if(m==='<') return '&lt;'; if(m==='>') return '&gt;'; return m;}); }
-  function logout(){ localStorage.removeItem('xos_session'); location.href = window.location.pathname; }
+  function updateCarousel() {
+    const cards = document.querySelectorAll('.carousel-card');
+    cards.forEach((card, idx) => card.classList.toggle('active', idx === carouselIndex));
+    const containerWidth = document.querySelector('.carousel-container').offsetWidth;
+    const cardWidth = 280;
+    const gap = 16;
+    const offset = carouselIndex * (cardWidth + gap) - (containerWidth/2) + (cardWidth/2);
+    document.getElementById('carouselTrack').style.transform = `translateX(${-offset}px)`;
+  }
 
-  document.getElementById('savedPostsRow').addEventListener('click', showSavedView);
-  window.go = go; window.sharePost = sharePost; window.toggleSavePostById = toggleSavePostById; window.openPostModalFromSaved = openPostModalFromSaved; window.hideSavedView = hideSavedView; window.unsaveFromGrid = unsaveFromGrid; window.openMod = openMod; window.closeMod = closeMod; window.qLike = qLike; window.doLike = doLike; window.toggleVideoSound = toggleVideoSound;
-  load();
+  // Panels
+  function openPanel(panelId) {
+    document.getElementById(panelId).classList.add('open');
+    if (panelId === 'savedPanel') renderSavedGrid();
+    if (panelId === 'profilesPanel') renderProfilesPanel();
+    if (panelId === 'settingsPanel') renderSettingsPanel();
+    if (panelId === 'zynxPanel') { const frame = document.getElementById('zynxFrame'); if(frame.src === 'about:blank') frame.src = 'ZYNX.html'; }
+  }
+  function closePanel(panelId) { document.getElementById(panelId).classList.remove('open'); }
+  async function renderProfilesPanel() {
+    const container = document.getElementById('profilesListContainer');
+    const psnap = await db.ref('profiles').once('value');
+    const pdata = psnap.val() || {};
+    const entries = Object.values(pdata);
+    if(!entries.length) { container.innerHTML = '<div style="text-align:center;padding:40px;">No profiles yet</div>'; return; }
+    let html = '';
+    entries.forEach(p => {
+      const uid = p.id || (p.name||'').toLowerCase();
+      html += `<div class="profile-list-item" onclick="window.location.href='profile.html?u=${encodeURIComponent(uid)}'">
+        <div class="profile-avatar">${p.photo ? `<img src="${p.photo}" onerror="this.style.display='none'">` : '<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;">👤</div>'}</div>
+        <div class="profile-info"><strong>${escapeHtml(p.name||uid)}</strong><span>@${uid}</span></div>
+      </div>`;
+    });
+    container.innerHTML = html;
+  }
+  function renderSettingsPanel() {
+    const container = document.getElementById('settingsContent');
+    container.innerHTML = `<div style="margin:0 0 20px 0;padding:16px;background:rgba(255,255,255,0.03);border-radius:20px;display:flex;align-items:center;gap:14px;"><div style="width:52px;height:52px;border-radius:14px;background:#111;display:flex;align-items:center;justify-content:center;">${USERNAME.charAt(0).toUpperCase()}</div><div><strong>${escapeHtml(USERNAME)}</strong><div style="font-size:11px;color:var(--muted);">Member</div></div></div>
+    <div><div style="display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid var(--border);cursor:pointer;" onclick="closePanel('settingsPanel');openPanel('savedPanel');"><span>📚 Saved posts</span><i class="fas fa-chevron-right"></i></div>
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid var(--border);cursor:pointer;" onclick="logout()"><span>🚪 Sign out</span><i class="fas fa-sign-out-alt"></i></div></div>`;
+  }
+  function logout() { localStorage.removeItem('xos_session'); location.reload(); }
+
+  // Bottom navigation
+  document.querySelectorAll('.nav-item').forEach((item, idx) => {
+    item.addEventListener('click', () => {
+      document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+      item.classList.add('active');
+      if (idx === 0) { closePanel('savedPanel'); closePanel('profilesPanel'); closePanel('settingsPanel'); closePanel('zynxPanel'); }
+      else if (idx === 1) openPanel('profilesPanel');
+      else if (idx === 2) openPanel('zynxPanel');
+      else if (idx === 3) openPanel('settingsPanel');
+      else if (idx === 4) openPanel('savedPanel');
+    });
+  });
+
+  window.closeMod = closeMod; window.doLike = doLike; window.toggleSavePostById = toggleSavePostById; window.openPostModalFromSaved = openPostModalFromSaved; window.unsaveFromSaved = unsaveFromSaved; window.openPanel = openPanel; window.closePanel = closePanel; window.logout = logout; window.goToProfile = goToProfile;
+  loadData();
+  setTimeout(() => setupCarouselSwipe(), 100);
 </script>
 </body>
 </html>
